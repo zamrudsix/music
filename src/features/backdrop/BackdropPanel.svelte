@@ -94,12 +94,12 @@
     isImporting = false;
     importProgress = null;
 
-    // Background preload all items asynchronously so upcoming slideshow items are ready in advance
+    // Hanya preload sedikit item di depan biar tidak berat (sisanya on-demand)
     setTimeout(() => {
-      newItems.forEach((it) => {
+      newItems.slice(0, 4).forEach((it) => {
         backgroundManager.ensureAssetLoaded(it);
       });
-    }, 100);
+    }, 200);
   }
 
   async function handleNativePickFiles() {
@@ -185,17 +185,21 @@
           await backgroundManager.loadAsset(newItem).catch(() => {});
         }
 
-        try {
-          await db.assets.put({
-            id,
-            projectId: projectStore.project.id,
-            name: file.name,
-            type: isVideo ? 'video' : 'image',
-            blob: file,
-            createdAt: Date.now(),
-          });
-        } catch (err) {
-          console.warn('Could not cache asset in IndexedDB:', err);
+        // Hanya cache ke IndexedDB kalau tidak ada native path (browser mode)
+        // Desktop: cukup simpan filePath, jangan simpan full file ke C:
+        if (!nativePath) {
+          try {
+            await db.assets.put({
+              id,
+              projectId: projectStore.project.id,
+              name: file.name,
+              type: isVideo ? 'video' : 'image',
+              blob: file,
+              createdAt: Date.now(),
+            });
+          } catch (err) {
+            console.warn('Could not cache asset in IndexedDB:', err);
+          }
         }
 
         if (!isMulti) {

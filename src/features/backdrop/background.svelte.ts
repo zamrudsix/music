@@ -484,18 +484,8 @@ export class BackgroundManager {
       this.releaseAsset(item.id);
       await this.loadAsset(item);
 
-      // Refresh DB cache
-      try {
-        const { db } = await import('../../lib/db/database');
-        await db.assets.put({
-          id: item.id,
-          projectId: 'default-project',
-          name: item.name,
-          type: item.type,
-          blob,
-          createdAt: Date.now(),
-        });
-      } catch {}
+      // JANGAN simpan full blob ke IndexedDB (biar C: tidak penuh)
+      // Hanya simpan path, load on-demand dari disk
 
       return true;
     } catch (e) {
