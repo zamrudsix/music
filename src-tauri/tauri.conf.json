@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "MusicVisualizer",
+  "productName": "poncoberas",
   "version": "3.3.0",
-  "identifier": "com.boneyanto.musicvisualizer",
+  "identifier": "com.poncoberas.visualizer",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Beras Visualizer",
+        "title": "poncoberas",
         "width": 1400,
         "height": 880,
         "minWidth": 1024,

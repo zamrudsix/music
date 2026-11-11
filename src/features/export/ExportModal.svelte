@@ -166,8 +166,13 @@
     if (!isDesktop()) return;
     try {
       const { invoke } = await import('@tauri-apps/api/core');
-      const folder = await invoke<string | null>('select_folder', { title: 'Pilih Folder Tujuan Export Video' });
+      const folder = await invoke<string | null>('select_folder', { title: 'Pilih Folder Tujuan Export Video (JANGAN di C:)' });
       if (folder) {
+        const lower = folder.toLowerCase();
+        if (lower.startsWith('c:') || lower.startsWith('c:\\') || lower.startsWith('c:/')) {
+          alert('Dilarang menggunakan drive C:/. Silakan pilih folder di drive lain (D:, E:, F:, dll).');
+          return;
+        }
         projectStore.project.exportSettings.customExportDir = folder;
         localStorage.setItem('beras_custom_export_dir', folder);
         projectStore.saveToDB();
@@ -634,8 +639,8 @@
               </div>
 
               <div class="flex items-center gap-2">
-                <div class="flex-1 p-2 rounded-lg bg-neutral-900 border border-neutral-800 text-[11px] text-neutral-300 truncate font-mono select-all" title={projectStore.project.exportSettings.customExportDir || 'Default: Folder Downloads'}>
-                  {projectStore.project.exportSettings.customExportDir || '📁 Folder Downloads Sistem (Default)'}
+                <div class="flex-1 p-2 rounded-lg bg-neutral-900 border border-neutral-800 text-[11px] text-neutral-300 truncate font-mono select-all" title={projectStore.project.exportSettings.customExportDir || 'Default: Auto non-C: drive (poncoberas)'}>
+                  {projectStore.project.exportSettings.customExportDir || '📁 Auto non-C: (poncoberas)'}
                 </div>
                 {#if isDesktop()}
                   <button 

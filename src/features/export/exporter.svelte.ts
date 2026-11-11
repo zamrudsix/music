@@ -95,7 +95,7 @@ export class VideoExporter {
             // Live taskbar title updates so user can monitor progress even when minimized/occluded
             const percent = Math.round(data.progress * 100);
             const etaText = data.etaSeconds > 0 ? ` - ETA ${Math.floor(data.etaSeconds / 60)}m${data.etaSeconds % 60}s` : '';
-            setWindowTitle(`[${percent}%] Beras Visualizer (${data.currentFPS || 0} FPS${etaText})`);
+            setWindowTitle(`[${percent}%] poncoberas (${data.currentFPS || 0} FPS${etaText})`);
           }
         } else if (data.type === 'COMPLETE') {
           this.stage = 'finalizing';
@@ -105,7 +105,7 @@ export class VideoExporter {
           this.finalRenderTimeSeconds = Math.max(1, Math.round(totalRenderMs / 1000));
           this.cleanup();
 
-          setWindowTitle('Beras Visualizer - Selesai!');
+          setWindowTitle('poncoberas - Selesai!');
           if (this.autoMinimizeOnWindows && isWindows()) {
             unminimizeWindow();
           }
@@ -125,7 +125,7 @@ export class VideoExporter {
           this.errorMessage = data.message;
           this.cleanup();
           sweepOpfsTempFiles().catch(() => {});
-          setWindowTitle('Beras Visualizer');
+          setWindowTitle('poncoberas');
           if (this.autoMinimizeOnWindows && isWindows()) {
             unminimizeWindow();
           }
@@ -134,7 +134,7 @@ export class VideoExporter {
           this.isExporting = false;
           this.cleanup();
           sweepOpfsTempFiles().catch(() => {});
-          setWindowTitle('Beras Visualizer');
+          setWindowTitle('poncoberas');
           if (this.autoMinimizeOnWindows && isWindows()) {
             unminimizeWindow();
           }

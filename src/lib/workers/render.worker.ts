@@ -559,7 +559,7 @@ self.onmessage = async (e: MessageEvent<RenderRequest | { type: 'CANCEL' }>) => 
     const wmFontSize = Math.max(11, Math.round(13 * watermarkScale));
     const wmFont = `600 ${wmFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.font = wmFont;
-    const wmText = 'Made with Beras Visualizer';
+    const wmText = 'Made with poncoberas';
     const wmTextWidth = ctx.measureText(wmText).width;
     const wmWaveWidth = Math.round(18 * watermarkScale);
     const wmWaveGap = Math.round(8 * watermarkScale);
@@ -1700,7 +1700,7 @@ function drawImageOverlays(
 /**
  * Aesthetic Non-Intrusive Watermark (Zero allocation, ultra-lightweight)
  * Positioned cleanly in the corner (bottom-right safe area) with elegant glassmorphism style,
- * crisp typography ("Made with Beras Visualizer"), and subtle wave bars.
+ * crisp typography ("Made with poncoberas"), and subtle wave bars.
  * Does not obscure center visuals, lyrics, or audio spectrum.
  */
 function drawDynamicWatermark(
