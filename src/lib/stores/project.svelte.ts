@@ -340,6 +340,21 @@ class ProjectState {
     }
   }
 
+  /**
+   * Distribute all background items evenly across total audio duration.
+   * No leftovers — every image/video gets equal time.
+   */
+  distributeBackgroundEvenly() {
+    const totalDur = this.project.audio.duration || 60;
+    const items = this.project.background.items || [];
+    if (items.length === 0) return;
+    const perItem = totalDur / items.length;
+    for (const item of items) {
+      item.duration = Math.max(0.5, perItem);
+    }
+    this.saveToDB();
+  }
+
   async moveAudioTrackUp(index: number) {
     if (!this.project.audio.tracks || index <= 0) return;
     const tracks = this.project.audio.tracks;

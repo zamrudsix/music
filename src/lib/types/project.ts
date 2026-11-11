@@ -459,6 +459,7 @@ export interface ExportSettings {
   audioBitrate: number;
   customExportDir?: string;
   exportRange?: ExportRange;
+  previewQuality?: 'full' | 'high' | 'medium' | 'low';
 }
 
 export interface ProjectConfig {

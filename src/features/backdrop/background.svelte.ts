@@ -3,21 +3,32 @@ import { computeImageMotion, computeTransition, type MotionTransform } from '../
 import { isDesktop } from '../../lib/utils/platform';
 
 export class BackgroundManager {
-  private imageCache = new Map<string, HTMLImageElement>();
+  private imageCache = new Map<string, HTMLImageElement | ImageBitmap>();
   private videoCache = new Map<string, HTMLVideoElement>();
   private loadingSet = new Set<string>();
   private lruOrder: string[] = [];
-  private readonly maxCachedImages = 128;
-  private lastRenderedMedia: HTMLImageElement | HTMLVideoElement | null = null;
+  private readonly maxCachedImages = 24; // Turunkan dari 128 biar ringan
+  private lastRenderedMedia: HTMLImageElement | HTMLVideoElement | ImageBitmap | null = null;
 
-  async loadAsset(item: BackgroundItem): Promise<HTMLImageElement | HTMLVideoElement> {
+  // Max dimension untuk preview (export selalu full)
+  private getPreviewMaxDim(quality: string = 'medium'): number {
+    switch (quality) {
+      case 'full': return 3840;
+      case 'high': return 1920;
+      case 'medium': return 1280;
+      case 'low': return 720;
+      default: return 1280;
+    }
+  }
+
+  async loadAsset(item: BackgroundItem): Promise<HTMLImageElement | HTMLVideoElement | ImageBitmap> {
     if ((!item.url || item.url.trim() === '') && item.filePath && isDesktop()) {
       await this.reloadAssetFromDisk(item);
     }
 
     if (item.type === 'image') {
       const existing = this.imageCache.get(item.id);
-      if (existing && existing.src === item.url && existing.complete && existing.naturalWidth > 0) {
+      if (existing && (existing instanceof HTMLImageElement ? existing.complete && existing.naturalWidth > 0 : true)) {
         this.touchLRU(item.id);
         return existing;
       }
@@ -26,26 +37,50 @@ export class BackgroundManager {
       }
 
       this.loadingSet.add(item.id);
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.src = item.url;
-        img.onload = () => {
-          this.loadingSet.delete(item.id);
-          this.imageCache.set(item.id, img);
-          this.touchLRU(item.id);
-          this.pruneLRU();
-          resolve(img);
-        };
-        img.onerror = (err) => {
-          this.loadingSet.delete(item.id);
-          console.warn('Failed to load background image:', item.name, err);
-          reject(err);
-        };
-      });
+      try {
+        // Prefer createImageBitmap dengan resize biar ringan
+        const blob = await fetch(item.url).then(r => r.blob()).catch(() => null);
+        if (blob) {
+          const maxDim = this.getPreviewMaxDim((typeof localStorage !== 'undefined' ? localStorage.getItem('preview_quality') : null) || 'medium');
+        const bitmap = await createImageBitmap(blob, {
+            resizeWidth: maxDim,
+            resizeHeight: maxDim,
+            resizeQuality: maxDim >= 1920 ? 'high' : 'medium',
+          }).catch(() => null);
+          if (bitmap) {
+            this.loadingSet.delete(item.id);
+            this.imageCache.set(item.id, bitmap);
+            this.touchLRU(item.id);
+            this.pruneLRU();
+            return bitmap;
+          }
+        }
+
+        // Fallback ke Image biasa
+        return await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.src = item.url;
+          img.onload = () => {
+            this.loadingSet.delete(item.id);
+            this.imageCache.set(item.id, img);
+            this.touchLRU(item.id);
+            this.pruneLRU();
+            resolve(img);
+          };
+          img.onerror = (err) => {
+            this.loadingSet.delete(item.id);
+            reject(err);
+          };
+        });
+      } catch (err) {
+        this.loadingSet.delete(item.id);
+        throw err;
+      }
     } else {
+      // Video: jangan decode full dulu
       const existing = this.videoCache.get(item.id);
-      if (existing && existing.src === item.url && existing.readyState >= 2) {
+      if (existing && existing.readyState >= 1) {
         return existing;
       }
       if (existing) {
@@ -57,8 +92,14 @@ export class BackgroundManager {
       vid.muted = true;
       vid.playsInline = true;
       vid.loop = true;
+      vid.preload = 'metadata'; // Hanya metadata dulu, bukan full buffer
       await new Promise((resolve) => {
-        vid.onloadeddata = resolve;
+        const done = () => {
+          vid.removeEventListener('loadedmetadata', done);
+          resolve(undefined);
+        };
+        vid.addEventListener('loadedmetadata', done);
+        setTimeout(done, 3000); // timeout biar tidak hang
       });
       this.videoCache.set(item.id, vid);
       return vid;
@@ -110,7 +151,11 @@ export class BackgroundManager {
     if (this.imageCache.has(id)) {
       const img = this.imageCache.get(id);
       if (img === this.lastRenderedMedia) this.lastRenderedMedia = null;
-      if (img && 'src' in img) img.src = '';
+      if (img instanceof HTMLImageElement) {
+        img.src = '';
+      } else if (img && 'close' in img) {
+        try { (img as ImageBitmap).close(); } catch {}
+      }
       this.imageCache.delete(id);
     }
     this.lruOrder = this.lruOrder.filter((k) => k !== id);

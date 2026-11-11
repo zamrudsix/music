@@ -298,6 +298,16 @@
           </button>
         {/if}
 
+        {#if projectStore.project.background.items.length > 1}
+          <button 
+            type="button"
+            onclick={() => projectStore.distributeBackgroundEvenly()}
+            class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-medium flex items-center gap-1 transition-colors cursor-pointer"
+            title="Bagi semua gambar merata sepanjang durasi lagu (tidak ada sisa)"
+          >
+            Bagi Merata
+          </button>
+        {/if}
         {#if projectStore.project.background.items.length > 5}
           <button 
             type="button"

@@ -288,6 +288,26 @@
       </div>
 
       <!-- Content (Scrollable) -->
+        <!-- Preview Quality (hanya untuk preview di app, export tetap full) -->
+        <div class="p-3 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
+          <div class="text-xs font-semibold text-neutral-300">Preview Quality (App)</div>
+          <p class="text-[10px] text-neutral-500">Preview di app bisa kasar biar ringan. Export/render tetap full quality sesuai file asli.</p>
+          <select 
+            class="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-xs text-neutral-200"
+            onchange={(e) => {
+              const q = e.target.value;
+              localStorage.setItem('preview_quality', q);
+              if (projectStore.project.exportSettings) projectStore.project.exportSettings.previewQuality = q as any;
+              projectStore.saveToDB();
+            }}
+          >
+            <option value="full">Full quality (berat)</option>
+            <option value="high" selected>High quality</option>
+            <option value="medium">Medium quality (recommended)</option>
+            <option value="low">Low quality (paling ringan)</option>
+          </select>
+        </div>
+
       <div class="p-4 sm:p-6 space-y-4 sm:space-y-5 flex-1 overflow-y-auto min-h-0">
         
         <!-- Free Watermark & Quota Notification Notice -->
