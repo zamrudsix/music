@@ -1,0 +1,57 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.*
+
+# Editor and OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local working files & agent artifacts
+prd.md
+ecosystem.config.cjs
+src-tauri/target
+
+ecosystem.config.json
+.agents
+.claude
+.fallow
+skills-lock.json
+bench.html
+run_bench.mjs
+.gemini
+.codegraph
+.codex
+.cursor
+.kiro
+.mcp.json
+AGENTS.md
+GEMINI.md
+opencode.jsonc
+
+# Master Keypair & Private License Generator
+src-tauri/.beras_master_key.json
+.beras_master_key.json
+
+tools/license_generator/
+server/
+CARA_GENERATE_LISENSI.md
+README.md
