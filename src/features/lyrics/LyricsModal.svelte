@@ -53,6 +53,7 @@
     { code: 'th', label: '🇹🇭 Thai (TH)' },
     { code: 'vi', label: '🇻🇳 Vietnamese (VI)' },
     { code: 'tl', label: '🇵🇭 Tagalog (TL)' },
+    { code: 'la', label: '🇻🇦 Latin (LA)' },
   ];
 
   export function open() {

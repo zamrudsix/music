@@ -78,27 +78,6 @@
               <option value="Space Grotesk">Space Grotesk</option>
               <option value="Playfair Display">Playfair Display</option>
               <option value="Roboto Mono">Roboto Mono</option>
-              <option value="Anton">Anton</option>
-              <option value="Archivo Black">Archivo Black</option>
-              <option value="Bangers">Bangers</option>
-              <option value="Bowlby One">Bowlby One</option>
-              <option value="Bungee">Bungee</option>
-              <option value="Creepster">Creepster</option>
-              <option value="Fredoka One">Fredoka One</option>
-              <option value="Lilita One">Lilita One</option>
-              <option value="Luckiest Guy">Luckiest Guy</option>
-              <option value="Nunito">Nunito</option>
-              <option value="Outfit">Outfit</option>
-              <option value="Permanent Marker">Permanent Marker</option>
-              <option value="Press Start 2P">Press Start 2P</option>
-              <option value="Righteous">Righteous</option>
-              <option value="Rubik">Rubik</option>
-              <option value="Russo One">Russo One</option>
-              <option value="Staatliches">Staatliches</option>
-              <option value="Teko">Teko</option>
-              <option value="Ultra">Ultra</option>
-              <option value="Viga">Viga</option>
-              <option value="Zilla Slab">Zilla Slab</option>
               {#if projectStore.project.customFonts}
                 {#each projectStore.project.customFonts as cf}
                   <option value={cf.name}>{cf.name} (Custom)</option>

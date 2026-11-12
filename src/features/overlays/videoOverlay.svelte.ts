@@ -50,14 +50,8 @@ export class VideoOverlayManager {
     vid.muted = true;
     vid.playsInline = true;
     vid.loop = true;
-    vid.preload = 'metadata';
     await new Promise((resolve) => {
-      const done = () => {
-        vid.removeEventListener('loadedmetadata', done);
-        resolve(undefined);
-      };
-      vid.addEventListener('loadedmetadata', done);
-      setTimeout(done, 2500);
+      vid.onloadeddata = resolve;
     });
     this.videoElements.set(item.id, vid);
     return vid;

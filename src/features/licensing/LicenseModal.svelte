@@ -115,7 +115,7 @@
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
-              <h2 class="text-xs sm:text-sm font-bold text-neutral-100 truncate">Aktivasi Lisensi poncoberas</h2>
+              <h2 class="text-xs sm:text-sm font-bold text-neutral-100 truncate">Aktivasi Lisensi Beras Visualizer</h2>
               {#if licenseManager.isLicensed}
                 <span class="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold uppercase tracking-wider">
                   PRO Active
@@ -136,7 +136,7 @@
               {:else if licenseManager.freeQuotaRemaining > 0}
                 Anda memiliki {licenseManager.freeQuotaRemaining} token render gratis tanpa watermark.
               {:else}
-                Ekspor gratis menyertakan watermark minimalis "Made with poncoberas".
+                Ekspor gratis menyertakan watermark minimalis "Made with Beras Visualizer".
               {/if}
             </p>
           </div>

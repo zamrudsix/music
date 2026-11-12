@@ -94,12 +94,12 @@
     isImporting = false;
     importProgress = null;
 
-    // Hanya preload sedikit item di depan biar tidak berat (sisanya on-demand)
+    // Background preload all items asynchronously so upcoming slideshow items are ready in advance
     setTimeout(() => {
-      newItems.slice(0, 4).forEach((it) => {
+      newItems.forEach((it) => {
         backgroundManager.ensureAssetLoaded(it);
       });
-    }, 200);
+    }, 100);
   }
 
   async function handleNativePickFiles() {
@@ -185,21 +185,17 @@
           await backgroundManager.loadAsset(newItem).catch(() => {});
         }
 
-        // Hanya cache ke IndexedDB kalau tidak ada native path (browser mode)
-        // Desktop: cukup simpan filePath, jangan simpan full file ke C:
-        if (!nativePath) {
-          try {
-            await db.assets.put({
-              id,
-              projectId: projectStore.project.id,
-              name: file.name,
-              type: isVideo ? 'video' : 'image',
-              blob: file,
-              createdAt: Date.now(),
-            });
-          } catch (err) {
-            console.warn('Could not cache asset in IndexedDB:', err);
-          }
+        try {
+          await db.assets.put({
+            id,
+            projectId: projectStore.project.id,
+            name: file.name,
+            type: isVideo ? 'video' : 'image',
+            blob: file,
+            createdAt: Date.now(),
+          });
+        } catch (err) {
+          console.warn('Could not cache asset in IndexedDB:', err);
         }
 
         if (!isMulti) {
@@ -302,16 +298,6 @@
           </button>
         {/if}
 
-        {#if projectStore.project.background.items.length > 1}
-          <button 
-            type="button"
-            onclick={() => projectStore.distributeBackgroundEvenly()}
-            class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-medium flex items-center gap-1 transition-colors cursor-pointer"
-            title="Bagi semua gambar merata sepanjang durasi lagu (tidak ada sisa)"
-          >
-            Bagi Merata
-          </button>
-        {/if}
         {#if projectStore.project.background.items.length > 5}
           <button 
             type="button"

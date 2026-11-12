@@ -166,13 +166,8 @@
     if (!isDesktop()) return;
     try {
       const { invoke } = await import('@tauri-apps/api/core');
-      const folder = await invoke<string | null>('select_folder', { title: 'Pilih Folder Tujuan Export Video (JANGAN di C:)' });
+      const folder = await invoke<string | null>('select_folder', { title: 'Pilih Folder Tujuan Export Video' });
       if (folder) {
-        const lower = folder.toLowerCase();
-        if (lower.startsWith('c:') || lower.startsWith('c:\\') || lower.startsWith('c:/')) {
-          alert('Dilarang menggunakan drive C:/. Silakan pilih folder di drive lain (D:, E:, F:, dll).');
-          return;
-        }
         projectStore.project.exportSettings.customExportDir = folder;
         localStorage.setItem('beras_custom_export_dir', folder);
         projectStore.saveToDB();
@@ -288,26 +283,6 @@
       </div>
 
       <!-- Content (Scrollable) -->
-        <!-- Preview Quality (hanya untuk preview di app, export tetap full) -->
-        <div class="p-3 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
-          <div class="text-xs font-semibold text-neutral-300">Preview Quality (App)</div>
-          <p class="text-[10px] text-neutral-500">Preview di app bisa kasar biar ringan. Export/render tetap full quality sesuai file asli.</p>
-          <select 
-            class="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-xs text-neutral-200"
-            onchange={(e) => {
-              const q = e.target.value;
-              localStorage.setItem('preview_quality', q);
-              if (projectStore.project.exportSettings) projectStore.project.exportSettings.previewQuality = q as any;
-              projectStore.saveToDB();
-            }}
-          >
-            <option value="full">Full quality (berat)</option>
-            <option value="high" selected>High quality</option>
-            <option value="medium">Medium quality (recommended)</option>
-            <option value="low">Low quality (paling ringan)</option>
-          </select>
-        </div>
-
       <div class="p-4 sm:p-6 space-y-4 sm:space-y-5 flex-1 overflow-y-auto min-h-0">
         
         <!-- Free Watermark & Quota Notification Notice -->
@@ -659,8 +634,8 @@
               </div>
 
               <div class="flex items-center gap-2">
-                <div class="flex-1 p-2 rounded-lg bg-neutral-900 border border-neutral-800 text-[11px] text-neutral-300 truncate font-mono select-all" title={projectStore.project.exportSettings.customExportDir || 'Default: Auto non-C: drive (poncoberas)'}>
-                  {projectStore.project.exportSettings.customExportDir || '📁 Auto non-C: (poncoberas)'}
+                <div class="flex-1 p-2 rounded-lg bg-neutral-900 border border-neutral-800 text-[11px] text-neutral-300 truncate font-mono select-all" title={projectStore.project.exportSettings.customExportDir || 'Default: Folder Downloads'}>
+                  {projectStore.project.exportSettings.customExportDir || '📁 Folder Downloads Sistem (Default)'}
                 </div>
                 {#if isDesktop()}
                   <button 

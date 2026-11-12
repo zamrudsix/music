@@ -84,6 +84,7 @@
         <option value="th">🇹🇭 Thai (ไทย)</option>
         <option value="vi">🇻🇳 Vietnamese (Tiếng Việt)</option>
         <option value="tl">🇵🇭 Tagalog (Filipino)</option>
+        <option value="la">🇻🇦 Latin (Latina)</option>
       </select>
     </div>
 

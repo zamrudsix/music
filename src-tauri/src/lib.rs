@@ -14,39 +14,6 @@ pub struct FileInfo {
   pub filename: String,
 }
 
-/// Prefer non-C: drive for all user data / exports. Force avoid C: on Windows.
-fn get_preferred_dir(app: &tauri::AppHandle, custom_dir: Option<String>) -> Result<PathBuf, String> {
-  // If user provided custom dir, reject if it is on C:
-  if let Some(dir) = custom_dir.filter(|d| !d.trim().is_empty()) {
-    let p = PathBuf::from(&dir);
-    let s = p.to_string_lossy().to_lowercase();
-    if s.starts_with("c:") || s.starts_with("c:\\") || s.starts_with("c:/") {
-      return Err("Dilarang menggunakan drive C:/. Pilih folder di drive lain (D:, E:, dll).".to_string());
-    }
-    if !p.exists() {
-      std::fs::create_dir_all(&p).map_err(|e| format!("Gagal buat folder: {}", e))?;
-    }
-    return Ok(p);
-  }
-
-  // Auto-pick first available non-C: drive
-  #[cfg(target_os = "windows")]
-  {
-    for letter in b'D'..=b'Z' {
-      let drive_root = format!("{}:\\", letter as char);
-      if std::path::Path::new(&drive_root).exists() {
-        let preferred = PathBuf::from(format!("{}:\\poncoberas", letter as char));
-        if std::fs::create_dir_all(&preferred).is_ok() {
-          return Ok(preferred);
-        }
-      }
-    }
-  }
-
-  // Fallback only if no other drive (should rarely happen)
-  app.path().download_dir().map_err(|e| e.to_string())
-}
-
 #[tauri::command]
 fn save_video_chunk(
   app: tauri::AppHandle, 
@@ -57,14 +24,22 @@ fn save_video_chunk(
   is_last: bool,
   custom_dir: Option<String>
 ) -> Result<String, String> {
-  let target_dir = get_preferred_dir(&app, custom_dir)?;
+  let target_dir: PathBuf = if let Some(dir) = custom_dir.filter(|d| !d.trim().is_empty()) {
+    let p = PathBuf::from(&dir);
+    if !p.exists() {
+      if let Err(e) = std::fs::create_dir_all(&p) {
+        eprintln!("[save_video_chunk] Failed to create custom dir {:?}: {}, falling back to Downloads", p, e);
+        app.path().download_dir().map_err(|err| err.to_string())?
+      } else {
+        p
+      }
+    } else {
+      p
+    }
+  } else {
+    app.path().download_dir().map_err(|e| e.to_string())?
+  };
   let file_path = target_dir.join(&filename);
-
-  // Extra safety: refuse if somehow still on C:
-  let path_str = file_path.to_string_lossy().to_lowercase();
-  if path_str.starts_with("c:") {
-    return Err("Output ke drive C: diblokir. Gunakan custom folder di drive lain.".to_string());
-  }
 
   let mut file = if is_first {
     OpenOptions::new().create(true).write(true).truncate(true).open(&file_path)
@@ -132,13 +107,16 @@ fn save_text_file(
   content: String,
   custom_dir: Option<String>
 ) -> Result<String, String> {
-  let target_dir = get_preferred_dir(&app, custom_dir)?;
+  let target_dir: PathBuf = if let Some(dir) = custom_dir.filter(|d| !d.trim().is_empty()) {
+    let p = PathBuf::from(&dir);
+    if !p.exists() {
+      std::fs::create_dir_all(&p).map_err(|e| format!("Failed to create custom directory: {}", e))?;
+    }
+    p
+  } else {
+    app.path().download_dir().map_err(|e| e.to_string())?
+  };
   let file_path = target_dir.join(&filename);
-
-  let path_str = file_path.to_string_lossy().to_lowercase();
-  if path_str.starts_with("c:") {
-    return Err("Output ke drive C: diblokir. Gunakan folder di drive lain.".to_string());
-  }
 
   let mut file = OpenOptions::new()
     .create(true)

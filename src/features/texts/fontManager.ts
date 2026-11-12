@@ -1,9 +1,8 @@
 import { db } from '../../lib/db/database';
 import type { CustomFontItem } from '../../lib/types/project';
 
-// Predefined remote TTF URLs for standard + viral built-in visualizer typography
+// Predefined remote TTF URLs for standard built-in visualizer typography
 const BUILTIN_FONT_URLS: Record<string, string> = {
-  // Original
   'Bebas Neue': 'https://fonts.gstatic.com/s/bebasneue/v16/JTUSjIg69CK48gW7PXooxW4.ttf',
   'Inter': 'https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuGKYMZg.ttf',
   'Montserrat': 'https://fonts.gstatic.com/s/montserrat/v31/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCuM70w-.ttf',
@@ -12,29 +11,6 @@ const BUILTIN_FONT_URLS: Record<string, string> = {
   'Space Grotesk': 'https://fonts.gstatic.com/s/spacegrotesk/v22/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj42Vksj.ttf',
   'Playfair Display': 'https://fonts.gstatic.com/s/playfairdisplay/v40/nuFRD-vYSZviVYUb_rj3ij__anPXDTnCjmHKM4nYO7KN_k-UbtY.ttf',
   'Roboto Mono': 'https://fonts.gstatic.com/s/robotomono/v31/L0xuDF4xlVMF-BfR8bXMIhJHg45mwgGEFl0_Of2PQw.ttf',
-
-  // 20+ viral / popular display & modern fonts
-  'Anton': 'https://fonts.gstatic.com/s/anton/v27/1Ptgg87LROyAm0K0.ttf',
-  'Archivo Black': 'https://fonts.gstatic.com/s/archivoblack/v23/HTxqL289NzCGg4MzN6KJ7eW6OYs.ttf',
-  'Bangers': 'https://fonts.gstatic.com/s/bangers/v25/FeVQS0BTqb0h60ACL5k.ttf',
-  'Bowlby One': 'https://fonts.gstatic.com/s/bowlbyone/v25/taiPGmVuC4y96PFeqp8smo4.ttf',
-  'Bungee': 'https://fonts.gstatic.com/s/bungee/v17/N0bU2SZBIuF2PU_ECg.ttf',
-  'Creepster': 'https://fonts.gstatic.com/s/creepster/v13/AlZy_zVUqJz4yMrniH4hdQ.ttf',
-  'Fredoka One': 'https://fonts.gstatic.com/s/fredokaone/v15/k3kUo8kEI-tA1RRcTZGmTmHB.ttf',
-  'Lilita One': 'https://fonts.gstatic.com/s/lilitaone/v17/i7dPIFZ9Zz-WBtRtedDbUEY.ttf',
-  'Luckiest Guy': 'https://fonts.gstatic.com/s/luckiestguy/v25/_gP_1RrxsjcxVyin9l9n_j2RSg.ttf',
-  'Nunito': 'https://fonts.gstatic.com/s/nunito/v32/XRXI3I6Li01BKofiOc5wtlZ2di8HDLshRTM.ttf',
-  'Outfit': 'https://fonts.gstatic.com/s/outfit/v15/QGYyz_MVcBeNP4NjuGObqx1XmO1I4TC1C4E.ttf',
-  'Permanent Marker': 'https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004Hao.ttf',
-  'Press Start 2P': 'https://fonts.gstatic.com/s/pressstart2p/v16/e3t4euO8T-267oIAQAu6jDQyK0nS.ttf',
-  'Righteous': 'https://fonts.gstatic.com/s/righteous/v18/1cXxaUPXBpj2rGoU7C9mjw.ttf',
-  'Rubik': 'https://fonts.gstatic.com/s/rubik/v31/iJWZBXyIfDnIV5PNhY1KTN7Z-Yh-B4i1UA.ttf',
-  'Russo One': 'https://fonts.gstatic.com/s/russoone/v18/Z9XUDmZRWg6M1LvRYsH-yA.ttf',
-  'Staatliches': 'https://fonts.gstatic.com/s/staatliches/v15/HI_OiY8KO6hCsQSoAPmtMbec.ttf',
-  'Teko': 'https://fonts.gstatic.com/s/teko/v23/LYjYdG7kmE0gV69VVPPdFl06VN8XG7Sy.ttf',
-  'Ultra': 'https://fonts.gstatic.com/s/ultra/v25/zOLy4prXmrtY-tT6.ttf',
-  'Viga': 'https://fonts.gstatic.com/s/viga/v15/xMQbuFFdSaiX_QI.ttf',
-  'Zilla Slab': 'https://fonts.gstatic.com/s/zillaslab/v12/dFa6ZfeM_74wlPZtksIFWj0.ttf',
 };
 
 export class FontManager {

@@ -3,8 +3,7 @@ import { computeOverlayTransition } from '../../lib/utils/transition';
 import { isDesktop } from '../../lib/utils/platform';
 
 export class ImageOverlayManager {
-  private imageCache = new Map<string, HTMLImageElement | ImageBitmap>();
-  private readonly MAX_DIM = 1280;
+  private imageCache = new Map<string, HTMLImageElement>();
 
   async reloadAssetFromDisk(item: ImageOverlayItem): Promise<boolean> {
     if (!isDesktop() || !item.filePath) return false;
@@ -42,33 +41,17 @@ export class ImageOverlayManager {
     }
   }
 
-  async preloadImage(item: ImageOverlayItem): Promise<HTMLImageElement | ImageBitmap> {
+  async preloadImage(item: ImageOverlayItem): Promise<HTMLImageElement> {
     if ((!item.url || item.url.trim() === '') && item.filePath) {
       await this.reloadAssetFromDisk(item);
     }
     const existing = this.imageCache.get(item.id);
-    if (existing && (existing instanceof HTMLImageElement ? (existing.complete && existing.naturalWidth > 0) : true)) {
+    if (existing && existing.src === item.url && existing.complete && existing.naturalWidth > 0) {
       return existing;
     }
     if (existing) {
       this.releaseAsset(item.id);
     }
-
-    try {
-      const blob = await fetch(item.url).then(r => r.blob()).catch(() => null);
-      if (blob) {
-        const bitmap = await createImageBitmap(blob, {
-          resizeWidth: this.MAX_DIM,
-          resizeHeight: this.MAX_DIM,
-          resizeQuality: 'medium',
-        }).catch(() => null);
-        if (bitmap) {
-          this.imageCache.set(item.id, bitmap);
-          return bitmap;
-        }
-      }
-    } catch {}
-
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
@@ -87,11 +70,7 @@ export class ImageOverlayManager {
   releaseAsset(id: string) {
     const img = this.imageCache.get(id);
     if (img) {
-      if (img instanceof HTMLImageElement) {
-        img.src = '';
-      } else if ('close' in img) {
-        try { (img as ImageBitmap).close(); } catch {}
-      }
+      img.src = '';
       this.imageCache.delete(id);
     }
   }
