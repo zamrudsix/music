@@ -100,7 +100,7 @@ export class GroqService {
   static async transcribeAudioBuffer(
     audioBuffer: AudioBuffer,
     apiKey: string,
-    model: string = 'whisper-large-v3-turbo',
+    model: string = 'whisper-large-v3',
     signal?: AbortSignal,
     onProgress?: (status: string, percent: number) => void,
     language: string = 'auto'
@@ -162,7 +162,7 @@ export class GroqService {
   static async transcribeAudio(
     file: File | Blob,
     apiKey: string,
-    model: string = 'whisper-large-v3-turbo',
+    model: string = 'whisper-large-v3',
     signal?: AbortSignal,
     onProgress?: (status: string, percent: number) => void,
     language: string = 'auto'

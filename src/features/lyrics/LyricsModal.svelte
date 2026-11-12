@@ -108,7 +108,7 @@
           segments = await GroqService.transcribeAudioBuffer(
             projectStore.audioBuffer,
             taskQueuePool.apiKey,
-            'whisper-large-v3-turbo',
+            'whisper-large-v3',
             abortController.signal,
             (status: string, percent: number) => {
               singleStatusText = status;
@@ -131,7 +131,7 @@
           segments = await GroqService.transcribeAudio(
             blob,
             taskQueuePool.apiKey,
-            'whisper-large-v3-turbo',
+            'whisper-large-v3',
             abortController.signal,
             (status: string, percent: number) => {
               singleStatusText = status;
@@ -352,7 +352,7 @@
                       {projectStore.project.audio.fileName || 'No timeline audio loaded'}
                     </div>
                     <div class="text-[11px] text-neutral-500 font-mono">
-                      Model: whisper-large-v3-turbo • Per-Word Timestamps
+                      Model: whisper-large-v3 • Per-Word Timestamps
                     </div>
                   </div>
                 </div>
@@ -569,7 +569,7 @@
             <div class="flex items-center justify-between">
               <div>
                 <span class="font-medium text-neutral-200">Concurrent Batch Pool</span>
-                <p class="text-[11px] text-neutral-400">Process up to {taskQueuePool.concurrencyLimit} songs simultaneously with whisper-large-v3-turbo</p>
+                <p class="text-[11px] text-neutral-400">Process up to {taskQueuePool.concurrencyLimit} songs simultaneously with whisper-large-v3</p>
               </div>
 
               <div class="flex items-center gap-2">
