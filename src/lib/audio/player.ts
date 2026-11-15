@@ -40,6 +40,23 @@ export class AudioEngine {
         this.pauseOffset = 0;
       }
     };
+
+    // Stop at exportRange end if enabled (preview trim)
+    const range = projectStore.project.exportSettings.exportRange;
+    if (range?.enabled && range.endTime > 0) {
+      const stopAt = range.endTime;
+      const check = setInterval(() => {
+        if (!projectStore.isPlaying || !this.source) {
+          clearInterval(check);
+          return;
+        }
+        if (this.getCurrentTime() >= stopAt) {
+          this.pause();
+          projectStore.currentTime = stopAt;
+          clearInterval(check);
+        }
+      }, 100);
+    }
   }
 
   pause() {

@@ -211,6 +211,21 @@
         <span>Playlist ({projectStore.project.audio.tracks?.length || 0})</span>
       </button>
 
+      <!-- Apply permanent trim -->
+      {#if projectStore.project.exportSettings.exportRange?.enabled}
+        <button 
+          onclick={async () => {
+            if (confirm('Potong audio secara permanen? Sisa di luar range akan dihapus. Bisa di-undo.')) {
+              await projectStore.trimAudioToRange();
+            }
+          }}
+          class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded bg-rose-600 hover:bg-rose-500 text-white text-[10px] sm:text-[11px] font-medium flex items-center gap-1.5 transition-colors border border-rose-500 cursor-pointer"
+          title="Hapus permanen audio di luar range yang dipilih"
+        >
+          ✂️ Potong Permanen
+        </button>
+      {/if}
+
       <!-- Potong Durasi MP3 / Render Range button -->
       <button 
         onclick={() => onOpenExport?.()}

@@ -35,7 +35,13 @@
     licenseModalRef?.open();
   }
 
-  onMount(() => {
+  onMount(async () => {
+    // Preload local bundled fonts
+    const localFonts = ['Roboto','Open Sans','Lato','Montserrat','Bebas Neue','Anton','Oswald','Poppins','Pacifico','Lobster'];
+    for (const f of localFonts) {
+      fontManager.ensureFontLoaded(f).catch(() => {});
+    }
+
     projectStore.loadFromDB();
     sweepOpfsTempFiles().catch(() => {});
 

@@ -2,6 +2,19 @@ import { db } from '../../lib/db/database';
 import type { CustomFontItem } from '../../lib/types/project';
 
 // Predefined remote TTF URLs for standard + creative built-in visualizer typography
+const LOCAL_FONTS: Record<string, string> = {
+  'Roboto': '/fonts/Roboto.ttf',
+  'Open Sans': '/fonts/OpenSans.ttf',
+  'Lato': '/fonts/Lato.ttf',
+  'Montserrat': '/fonts/Montserrat.ttf',
+  'Bebas Neue': '/fonts/BebasNeue.ttf',
+  'Anton': '/fonts/Anton.ttf',
+  'Oswald': '/fonts/Oswald.ttf',
+  'Poppins': '/fonts/Poppins.ttf',
+  'Pacifico': '/fonts/Pacifico.ttf',
+  'Lobster': '/fonts/Lobster.ttf',
+};
+
 const BUILTIN_FONT_URLS: Record<string, string> = {
   // Original clean / modern
   'Bebas Neue': 'https://fonts.gstatic.com/s/bebasneue/v16/JTUSjIg69CK48gW7PXooxW4.ttf',
@@ -152,7 +165,8 @@ export class FontManager {
     const cleanName = fontName.replace(/["']/g, '').trim();
     if (this.loadedFonts.has(cleanName)) return;
 
-    const builtinUrl = BUILTIN_FONT_URLS[cleanName];
+    const localUrl = LOCAL_FONTS[cleanName];
+    const builtinUrl = localUrl || BUILTIN_FONT_URLS[cleanName];
     if (!builtinUrl) return;
 
     try {

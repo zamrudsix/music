@@ -227,6 +227,52 @@ class ProjectState {
       this.saveToDB();
     }
   }
+
+  /**
+   * Permanently trim audio to the current exportRange.
+   * Remaining audio outside the range is deleted.
+   */
+  async trimAudioToRange() {
+    const range = this.project.exportSettings.exportRange;
+    if (!range || !range.enabled || !this.audioBuffer) return;
+
+    this.pushUndo();
+
+    const start = Math.max(0, range.startTime);
+    const end = Math.min(this.audioBuffer.duration, range.endTime);
+    if (end - start < 0.1) return;
+
+    const sampleRate = this.audioBuffer.sampleRate;
+    const channels = this.audioBuffer.numberOfChannels;
+    const startSample = Math.floor(start * sampleRate);
+    const endSample = Math.floor(end * sampleRate);
+    const length = endSample - startSample;
+
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const newBuffer = ctx.createBuffer(channels, length, sampleRate);
+
+    for (let c = 0; c < channels; c++) {
+      const oldData = this.audioBuffer.getChannelData(c);
+      const newData = newBuffer.getChannelData(c);
+      newData.set(oldData.subarray(startSample, endSample));
+    }
+
+    this.audioBuffer = newBuffer;
+    this.project.audio.duration = newBuffer.duration;
+
+    // Reset range to full new duration
+    range.startTime = 0;
+    range.endTime = newBuffer.duration;
+    range.enabled = false;
+
+    // Rebuild beats roughly (simple)
+    this.beats = [];
+    this.frequencyFrames = [];
+
+    await this.saveToDB();
+    console.log(`Audio trimmed to ${newBuffer.duration.toFixed(1)}s`);
+  }
+
   currentTime = $state<number>(0);
   isPlaying = $state<boolean>(false);
   activeTab = $state<'background' | 'particles' | 'spectrum' | 'lyrics' | 'images' | 'texts' | 'tracklist-overlay' | 'tracklist-png' | 'export'>('background');
