@@ -68,6 +68,12 @@
 
   let isScrubbing = $state(false);
 
+  const effectiveDuration = $derived(
+    projectStore.project.exportSettings.exportRange?.enabled
+      ? Math.max(0.05, (projectStore.project.exportSettings.exportRange.endTime || 0) - (projectStore.project.exportSettings.exportRange.startTime || 0))
+      : (projectStore.project.audio.duration || 1)
+  );
+
   function seekFromEvent(e: PointerEvent | MouseEvent) {
     e.stopPropagation();
     e.preventDefault();
@@ -75,7 +81,7 @@
     const rect = timelineContainer.getBoundingClientRect();
     const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
     const progress = x / rect.width;
-    const targetTime = progress * (projectStore.project.audio.duration || 1);
+    const targetTime = progress * effectiveDuration;
     // Update UI immediately
     projectStore.currentTime = targetTime;
     audioEngine.seek(targetTime, projectStore.audioBuffer);
@@ -84,6 +90,41 @@
   function handleTimelineClick(e: MouseEvent) {
     if (dragging) return;
     seekFromEvent(e);
+  }
+
+  function onTimelineContextMenu(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!projectStore.audioBuffer || !timelineContainer) return;
+
+    const rect = timelineContainer.getBoundingClientRect();
+    const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+    const progress = x / rect.width;
+    const clickTime = progress * (projectStore.project.audio.duration || 1);
+
+    if (!projectStore.project.exportSettings.exportRange) {
+      projectStore.project.exportSettings.exportRange = { enabled: true, startTime: 0, endTime: projectStore.project.audio.duration || 30 };
+    }
+    const range = projectStore.project.exportSettings.exportRange;
+    range.enabled = true;
+
+    // First right-click sets start, second sets end (or toggle)
+    if (Math.abs(clickTime - range.startTime) < 0.5) {
+      range.endTime = clickTime;
+    } else {
+      range.startTime = Math.min(clickTime, range.endTime);
+      range.endTime = Math.max(clickTime, range.endTime);
+    }
+
+    // Keep start < end
+    if (range.startTime > range.endTime) {
+      const tmp = range.startTime;
+      range.startTime = range.endTime;
+      range.endTime = tmp;
+    }
+
+    projectStore.saveToDB();
+    alert(`Range dipotong: ${range.startTime.toFixed(2)}s – ${range.endTime.toFixed(2)}s`);
   }
 
   function onTimelinePointerDown(e: PointerEvent) {
@@ -267,7 +308,7 @@
           {/if}
           <input 
             type="text" 
-            value={Math.floor(projectStore.project.audio.duration / 60) + ':' + (Math.floor(projectStore.project.audio.duration % 60)).toString().padStart(2, '0')}
+            value={Math.floor(effectiveDuration / 60) + ':' + (Math.floor(effectiveDuration % 60)).toString().padStart(2, '0')}
             onchange={(e) => {
               const val = (e.target as HTMLInputElement).value.trim();
               const parts = val.split(':');
@@ -316,6 +357,7 @@
       class="h-10 w-full bg-neutral-950/80 rounded-lg border border-neutral-800 relative cursor-pointer overflow-hidden group"
       onclick={handleTimelineClick}
       onpointerdown={onTimelinePointerDown}
+      oncontextmenu={onTimelineContextMenu}
       onpointermove={onTimelinePointerMove}
       onpointerup={onTimelinePointerUp}
       onpointercancel={onTimelinePointerUp}
@@ -389,7 +431,7 @@
       {#if projectStore.project.audio.duration > 0}
         <div 
           class="absolute top-0 bottom-0 w-0.5 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)] z-10 pointer-events-none"
-          style={`left: ${(projectStore.currentTime / projectStore.project.audio.duration) * 100}%;`}
+          style={`left: ${((projectStore.currentTime - (projectStore.project.exportSettings.exportRange?.enabled ? projectStore.project.exportSettings.exportRange.startTime : 0)) / effectiveDuration) * 100}%;`}
         >
           <div class="w-2.5 h-2.5 bg-cyan-400 rounded-sm -translate-x-[4px] -translate-y-0.5 transform rotate-45"></div>
         </div>
