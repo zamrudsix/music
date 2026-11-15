@@ -233,7 +233,7 @@ class ProjectState {
     if (this.originalAudioBackup && this.originalAudioBackup.buffer) {
       this.audioBuffer = this.originalAudioBackup.buffer;
       this.project.audio.duration = this.audioBuffer.duration;
-      this.project.audio.tracks = structuredClone(this.originalAudioBackup.tracks);
+      this.project.audio.tracks = this.originalAudioBackup.tracks.map(t => ({...t}));
       this.trackBuffers.clear();
       if (this.project.audio.tracks?.[0]) {
         this.trackBuffers.set(this.project.audio.tracks[0].id, this.audioBuffer);
@@ -262,7 +262,14 @@ class ProjectState {
     if (!this.originalAudioBackup && this.audioBuffer) {
       this.originalAudioBackup = {
         buffer: this.audioBuffer,
-        tracks: structuredClone(this.project.audio.tracks || []),
+        tracks: (this.project.audio.tracks || []).map(t => ({
+          id: t.id,
+          name: t.name,
+          fileSize: t.fileSize,
+          duration: t.duration,
+          url: t.url,
+          filePath: t.filePath,
+        })),
       };
     }
 
@@ -432,7 +439,14 @@ class ProjectState {
       // Always keep a fresh original backup when audio is loaded
       this.originalAudioBackup = {
         buffer: merged,
-        tracks: structuredClone(this.project.audio.tracks || []),
+        tracks: (this.project.audio.tracks || []).map(t => ({
+          id: t.id,
+          name: t.name,
+          fileSize: t.fileSize,
+          duration: t.duration,
+          url: t.url,
+          filePath: t.filePath,
+        })),
       };
       this.project.updatedAt = Date.now();
 
