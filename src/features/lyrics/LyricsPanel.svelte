@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { fontManager } from '../texts';
   import { projectStore } from '../../lib/stores/project.svelte';
   import { SubtitleService } from './subtitle';
   import { Sparkles, Languages, FolderOpen, Type, Move, Plus, AlignLeft, AlignCenter, AlignRight } from '@lucide/svelte';
@@ -144,7 +145,10 @@
     </div>
     <select 
       bind:value={projectStore.project.lyrics.config.fontFamily}
-      onchange={() => projectStore.saveToDB()}
+      onchange={async () => {
+        await fontManager.ensureFontLoaded(projectStore.project.lyrics.config.fontFamily);
+        projectStore.saveToDB();
+      }}
       class="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2 text-neutral-200 focus:border-cyan-500 outline-none cursor-pointer"
     >
       <option value="Inter">Inter (Clean Sans)</option>

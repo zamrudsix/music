@@ -125,24 +125,21 @@ export class FontManager {
    */
   async ensureFontLoaded(fontName: string): Promise<void> {
     const cleanName = fontName.replace(/["']/g, '').trim();
-    if (this.fontBuffers.has(cleanName)) return;
+    if (this.loadedFonts.has(cleanName)) return;
 
     const builtinUrl = BUILTIN_FONT_URLS[cleanName];
-    if (builtinUrl) {
-      try {
-        const cached = await db.assets.get('builtin-font-' + cleanName);
-        if (cached && cached.blob) {
-          const buf = await cached.blob.arrayBuffer();
-          this.fontBuffers.set(cleanName, buf.slice(0));
-          return;
-        }
+    if (!builtinUrl) return;
 
+    try {
+      let buf: ArrayBuffer | null = null;
+      const cached = await db.assets.get('builtin-font-' + cleanName);
+      if (cached && cached.blob) {
+        buf = await cached.blob.arrayBuffer();
+      } else {
         const resp = await fetch(builtinUrl);
         if (resp.ok) {
           const blob = await resp.blob();
-          const buf = await blob.arrayBuffer();
-          this.fontBuffers.set(cleanName, buf.slice(0));
-          // Cache into indexedDB for offline access
+          buf = await blob.arrayBuffer();
           try {
             await db.assets.put({
               id: 'builtin-font-' + cleanName,
@@ -152,15 +149,18 @@ export class FontManager {
               blob,
               createdAt: Date.now(),
             });
-          } catch (e) {
-
-            // non-critical
-          }
-          console.log(`✅ Loaded and cached font buffer for render: ${cleanName}`);
+          } catch {}
         }
-      } catch (err) {
-        console.warn(`Could not preload font buffer for ${cleanName}:`, err);
       }
+
+      if (buf) {
+        this.fontBuffers.set(cleanName, buf.slice(0));
+        // Register ke document.fonts supaya canvas & preview bisa pakai
+        await this.registerFontFromArrayBuffer(cleanName, buf);
+        console.log(`✅ Font registered for preview: ${cleanName}`);
+      }
+    } catch (err) {
+      console.warn(`Could not load font ${cleanName}:`, err);
     }
   }
 

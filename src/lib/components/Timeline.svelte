@@ -235,9 +235,34 @@
     <!-- Audio Track Summary & Counter -->
     <div class="flex items-center gap-2 sm:gap-3">
       {#if projectStore.project.audio.tracks && projectStore.project.audio.tracks.length > 0}
-        <span class="text-[10px] sm:text-[11px] text-cyan-400 font-mono">
-          Total: {Math.floor(projectStore.project.audio.duration / 60)}:{(Math.floor(projectStore.project.audio.duration % 60)).toString().padStart(2, '0')}
-        </span>
+        <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-cyan-400 font-mono">
+          <span class="text-neutral-400">Posisi:</span>
+          <span class="text-cyan-300">{Math.floor(projectStore.currentTime / 60)}:{(Math.floor(projectStore.currentTime % 60)).toString().padStart(2, '0')}</span>
+          <span class="text-neutral-600">/</span>
+          <span>Total:</span>
+          <input 
+            type="text" 
+            value={Math.floor(projectStore.project.audio.duration / 60) + ':' + (Math.floor(projectStore.project.audio.duration % 60)).toString().padStart(2, '0')}
+            onchange={(e) => {
+              const val = (e.target as HTMLInputElement).value.trim();
+              const parts = val.split(':');
+              let seconds = 0;
+              if (parts.length === 2) {
+                seconds = (parseInt(parts[0]) || 0) * 60 + (parseInt(parts[1]) || 0);
+              } else {
+                seconds = parseFloat(val) || 0;
+              }
+              const max = projectStore.project.audio.duration || 0;
+              seconds = Math.max(0, Math.min(max, seconds));
+              projectStore.currentTime = seconds;
+              if (projectStore.audioBuffer) {
+                audioEngine.seek(seconds, projectStore.audioBuffer);
+              }
+            }}
+            class="w-12 bg-neutral-800 border border-neutral-700 rounded px-1 py-0.5 text-cyan-300 outline-none focus:border-cyan-500"
+            title="Ketik waktu (mm:ss) lalu Enter untuk lompat"
+          />
+        </div>
         <button 
           onclick={handleDeleteAllTracks}
           class={`flex items-center gap-1 text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded transition-all cursor-pointer ${

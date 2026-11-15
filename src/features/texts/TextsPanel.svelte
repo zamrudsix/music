@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { fontManager } from './fontManager';
   import { projectStore } from '../../lib/stores/project.svelte';
   import { Type, Plus, Trash2 } from '@lucide/svelte';
 </script>
@@ -67,7 +68,10 @@
             <span class="text-neutral-500 block mb-1">Font Family</span>
             <select 
               bind:value={item.fontFamily}
-              onchange={() => projectStore.saveToDB()}
+              onchange={async () => {
+                await fontManager.ensureFontLoaded(item.fontFamily);
+                projectStore.saveToDB();
+              }}
               class="w-full bg-neutral-900 border border-neutral-800 rounded p-1.5 text-neutral-200 outline-none cursor-pointer"
             >
               <option value="Inter">Inter</option>
