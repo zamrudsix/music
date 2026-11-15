@@ -117,9 +117,13 @@
     if (!range) return;
     const maxDur = Math.round(projectStore.project.audio.duration || 3600);
     const parsed = parseTimeToSeconds(endInputStr, range.endTime);
-    projectStore.pushUndo(); range.endTime = Math.min(maxDur, Math.max(range.startTime + 1, parsed));
+    projectStore.pushUndo(); range.endTime = Math.min(maxDur, Math.max(range.startTime + 0.05, parsed));
     endInputStr = secondsToTimeString(range.endTime);
     projectStore.saveToDB();
+    // Langsung potong permanen supaya sisa hilang di panel
+    if (range.enabled) {
+      projectStore.trimAudioToRange();
+    }
   }
 
   function setPartialRangePreset(type: '30s' | '1m' | '3m' | '5m' | 'round-minute' | 'nudge-minus' | 'nudge-plus' | 'preview' | 'full') {
