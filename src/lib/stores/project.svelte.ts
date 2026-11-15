@@ -240,13 +240,13 @@ class ProjectState {
 
     const start = Math.max(0, range.startTime);
     const end = Math.min(this.audioBuffer.duration, range.endTime);
-    if (end - start < 0.1) return;
+    if (end - start < 0.05) return;
 
     const sampleRate = this.audioBuffer.sampleRate;
     const channels = this.audioBuffer.numberOfChannels;
     const startSample = Math.floor(start * sampleRate);
     const endSample = Math.floor(end * sampleRate);
-    const length = endSample - startSample;
+    const length = Math.max(1, endSample - startSample);
 
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
     const newBuffer = ctx.createBuffer(channels, length, sampleRate);
@@ -254,23 +254,39 @@ class ProjectState {
     for (let c = 0; c < channels; c++) {
       const oldData = this.audioBuffer.getChannelData(c);
       const newData = newBuffer.getChannelData(c);
-      newData.set(oldData.subarray(startSample, endSample));
+      newData.set(oldData.subarray(startSample, startSample + length));
     }
 
+    // Replace the main buffer permanently
     this.audioBuffer = newBuffer;
     this.project.audio.duration = newBuffer.duration;
+    this.project.audio.fileName = `Trimmed (${newBuffer.duration.toFixed(2)}s)`;
 
-    // Reset range to full new duration
+    // Clear original tracks so rebuildMergedAudio doesn't restore full audio
+    this.project.audio.tracks = [];
+    this.trackBuffers.clear();
+
+    // Create a single virtual track from the trimmed buffer
+    const trackId = 'trimmed-' + Date.now();
+    this.project.audio.tracks = [{
+      id: trackId,
+      name: `Trimmed Audio (${newBuffer.duration.toFixed(2)}s)`,
+      fileSize: length * channels * 4,
+      duration: newBuffer.duration,
+    }];
+    this.trackBuffers.set(trackId, newBuffer);
+
+    // Reset range
     range.startTime = 0;
     range.endTime = newBuffer.duration;
     range.enabled = false;
 
-    // Rebuild beats roughly (simple)
     this.beats = [];
     this.frequencyFrames = [];
+    this.currentTime = 0;
 
     await this.saveToDB();
-    console.log(`Audio trimmed to ${newBuffer.duration.toFixed(1)}s`);
+    alert(`Audio dipotong permanen menjadi ${newBuffer.duration.toFixed(2)} detik. Sisa dihapus.`);
   }
 
   currentTime = $state<number>(0);

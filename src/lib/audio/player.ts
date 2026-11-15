@@ -23,40 +23,48 @@ export class AudioEngine {
       await ctx.resume();
     }
 
+    const range = projectStore.project.exportSettings.exportRange;
+    const useRange = range?.enabled && range.endTime > range.startTime;
+
+    let playBuffer = buffer;
+    let playOffset = offset;
+
+    if (useRange) {
+      // Create temporary trimmed buffer for preview so user hears the cut result
+      const start = Math.max(0, range!.startTime);
+      const end = Math.min(buffer.duration, range!.endTime);
+      const sampleRate = buffer.sampleRate;
+      const channels = buffer.numberOfChannels;
+      const startSample = Math.floor(start * sampleRate);
+      const length = Math.max(1, Math.floor((end - start) * sampleRate));
+
+      const tmp = ctx.createBuffer(channels, length, sampleRate);
+      for (let c = 0; c < channels; c++) {
+        const src = buffer.getChannelData(c);
+        const dst = tmp.getChannelData(c);
+        dst.set(src.subarray(startSample, startSample + length));
+      }
+      playBuffer = tmp;
+      playOffset = Math.max(0, offset - start);
+    }
+
     this.source = ctx.createBufferSource();
-    this.source.buffer = buffer;
+    this.source.buffer = playBuffer;
     this.source.connect(ctx.destination);
 
-    this.pauseOffset = Math.max(0, Math.min(offset, buffer.duration));
+    this.pauseOffset = Math.max(0, Math.min(playOffset, playBuffer.duration));
     this.startTime = ctx.currentTime - this.pauseOffset;
 
     this.source.start(0, this.pauseOffset);
     projectStore.isPlaying = true;
 
     this.source.onended = () => {
-      if (this.getCurrentTime() >= buffer.duration) {
+      if (this.getCurrentTime() >= playBuffer.duration) {
         projectStore.isPlaying = false;
-        projectStore.currentTime = 0;
+        projectStore.currentTime = useRange ? range!.startTime : 0;
         this.pauseOffset = 0;
       }
     };
-
-    // Stop at exportRange end if enabled (preview trim)
-    const range = projectStore.project.exportSettings.exportRange;
-    if (range?.enabled && range.endTime > 0) {
-      const stopAt = range.endTime;
-      const check = setInterval(() => {
-        if (!projectStore.isPlaying || !this.source) {
-          clearInterval(check);
-          return;
-        }
-        if (this.getCurrentTime() >= stopAt) {
-          this.pause();
-          projectStore.currentTime = stopAt;
-          clearInterval(check);
-        }
-      }, 100);
-    }
   }
 
   pause() {

@@ -262,6 +262,9 @@
           <span class="text-cyan-300">{Math.floor(projectStore.currentTime / 60)}:{(Math.floor(projectStore.currentTime % 60)).toString().padStart(2, '0')}</span>
           <span class="text-neutral-600">/</span>
           <span>Total:</span>
+          {#if projectStore.project.exportSettings.exportRange?.enabled}
+            <span class="text-amber-400">(trim {projectStore.project.exportSettings.exportRange.startTime.toFixed(1)}-{projectStore.project.exportSettings.exportRange.endTime.toFixed(1)}s)</span>
+          {/if}
           <input 
             type="text" 
             value={Math.floor(projectStore.project.audio.duration / 60) + ':' + (Math.floor(projectStore.project.audio.duration % 60)).toString().padStart(2, '0')}
