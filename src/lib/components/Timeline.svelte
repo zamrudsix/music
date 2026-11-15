@@ -69,11 +69,15 @@
   let isScrubbing = $state(false);
 
   function seekFromEvent(e: PointerEvent | MouseEvent) {
+    e.stopPropagation();
+    e.preventDefault();
     if (!projectStore.audioBuffer || !timelineContainer) return;
     const rect = timelineContainer.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const progress = Math.max(0, Math.min(1, x / rect.width));
+    const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+    const progress = x / rect.width;
     const targetTime = progress * (projectStore.project.audio.duration || 1);
+    // Update UI immediately
+    projectStore.currentTime = targetTime;
     audioEngine.seek(targetTime, projectStore.audioBuffer);
   }
 

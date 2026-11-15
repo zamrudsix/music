@@ -175,7 +175,40 @@
       <option value="Creepster">Creepster (Horror)</option>
       <option value="Special Elite">Special Elite (Typewriter)</option>
       <option value="Monoton">Monoton (Neon)</option>
-      {#if projectStore.project.customFonts}
+      
+              <option value="Roboto">Roboto</option>
+              <option value="Open Sans">Open Sans</option>
+              <option value="Lato">Lato</option>
+              <option value="Nunito">Nunito</option>
+              <option value="Source Sans 3">Source Sans 3</option>
+              <option value="Ubuntu">Ubuntu</option>
+              <option value="Merriweather">Merriweather (Serif)</option>
+              <option value="Lora">Lora (Serif)</option>
+              <option value="PT Serif">PT Serif</option>
+              <option value="Crimson Text">Crimson Text</option>
+              <option value="Libre Baskerville">Libre Baskerville</option>
+              <option value="Noto Serif">Noto Serif</option>
+              <option value="Work Sans">Work Sans</option>
+              <option value="DM Sans">DM Sans</option>
+              <option value="Karla">Karla</option>
+              <option value="Mulish">Mulish</option>
+              <option value="Barlow">Barlow</option>
+              <option value="Heebo">Heebo</option>
+              <option value="Manrope">Manrope</option>
+              <option value="Outfit">Outfit</option>
+              <option value="Figtree">Figtree</option>
+              <option value="Sora">Sora</option>
+              <option value="Josefin Sans">Josefin Sans</option>
+              <option value="Quicksand">Quicksand</option>
+              <option value="Raleway">Raleway</option>
+              <option value="Cabin">Cabin</option>
+              <option value="Hind">Hind</option>
+              <option value="Titillium Web">Titillium Web</option>
+              <option value="Fira Sans">Fira Sans</option>
+              <option value="Noto Sans">Noto Sans</option>
+              <option value="IBM Plex Sans">IBM Plex Sans</option>
+              <option value="IBM Plex Serif">IBM Plex Serif</option>
+              {#if projectStore.project.customFonts}
         {#each projectStore.project.customFonts as cf}
           <option value={cf.name}>{cf.name} (Custom)</option>
         {/each}
