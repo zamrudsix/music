@@ -87,6 +87,13 @@
               <option value="Permanent Marker">Permanent Marker</option>
               <option value="Caveat">Caveat (Handwritten)</option>
               <option value="Lobster">Lobster</option>
+              <option value="Dancing Script">Dancing Script</option>
+              <option value="Great Vibes">Great Vibes</option>
+              <option value="Satisfy">Satisfy</option>
+              <option value="Indie Flower">Indie Flower</option>
+              <option value="Amatic SC">Amatic SC</option>
+              <option value="Shadows Into Light">Shadows Into Light</option>
+              <option value="Kalam">Kalam</option>
               <option value="Comfortaa">Comfortaa</option>
               <option value="Orbitron">Orbitron (Futuristic)</option>
               <option value="Press Start 2P">Press Start 2P (Pixel)</option>

@@ -69,6 +69,7 @@ export class LyricRenderer {
     );
 
     const baseFontSize = (config.fontSize || 36) * scaleFactor;
+    const lineSpacing = (config.lineSpacing ?? 1.25); // default lebih longgar
     let finalFontSize = config.followBeat 
       ? baseFontSize * (1 + (beatFactor - 1) * 0.2) 
       : baseFontSize;

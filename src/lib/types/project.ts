@@ -305,6 +305,7 @@ export interface LyricConfig {
   stroke?: boolean;
   strokeColor?: string;
   strokeWidth?: number;
+  lineSpacing?: number; // extra spacing between lines, default 1.2
 }
 
 export type OverlayFitMode = 'cover' | 'fill' | 'fit';

@@ -66,15 +66,43 @@
     await projectStore.addAudioTracks(target.files);
   }
 
-  function handleTimelineClick(e: MouseEvent) {
-    if (dragging) return; // ignore click while dragging
-    if (!projectStore.audioBuffer) return;
-    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const progress = Math.max(0, Math.min(1, clickX / rect.width));
-    const targetTime = progress * projectStore.project.audio.duration;
-    
+  let isScrubbing = $state(false);
+
+  function seekFromEvent(e: PointerEvent | MouseEvent) {
+    if (!projectStore.audioBuffer || !timelineContainer) return;
+    const rect = timelineContainer.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const progress = Math.max(0, Math.min(1, x / rect.width));
+    const targetTime = progress * (projectStore.project.audio.duration || 1);
     audioEngine.seek(targetTime, projectStore.audioBuffer);
+  }
+
+  function handleTimelineClick(e: MouseEvent) {
+    if (dragging) return;
+    seekFromEvent(e);
+  }
+
+  function onTimelinePointerDown(e: PointerEvent) {
+    if (dragging) return;
+    isScrubbing = true;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    seekFromEvent(e);
+  }
+
+  function onTimelinePointerMove(e: PointerEvent) {
+    if (isScrubbing) {
+      seekFromEvent(e);
+    } else {
+      onPointerMove(e);
+    }
+  }
+
+  function onTimelinePointerUp(e: PointerEvent) {
+    if (isScrubbing) {
+      isScrubbing = false;
+      try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+    }
+    onPointerUp(e);
   }
 
   function getImageStartEnd(img: ImageOverlayItem, totalDur: number): { start: number; end: number } {
@@ -233,9 +261,10 @@
       bind:this={timelineContainer}
       class="h-10 w-full bg-neutral-950/80 rounded-lg border border-neutral-800 relative cursor-pointer overflow-hidden group"
       onclick={handleTimelineClick}
-      onpointermove={onPointerMove}
-      onpointerup={onPointerUp}
-      onpointercancel={onPointerUp}
+      onpointerdown={onTimelinePointerDown}
+      onpointermove={onTimelinePointerMove}
+      onpointerup={onTimelinePointerUp}
+      onpointercancel={onTimelinePointerUp}
     >
       {#if projectStore.isProcessingAudio}
         <div class="absolute inset-0 flex items-center justify-center gap-2 bg-neutral-950/90 text-cyan-400 text-xs">

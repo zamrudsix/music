@@ -163,6 +163,13 @@
       <option value="Permanent Marker">Permanent Marker</option>
       <option value="Caveat">Caveat (Handwritten)</option>
       <option value="Lobster">Lobster</option>
+              <option value="Dancing Script">Dancing Script</option>
+              <option value="Great Vibes">Great Vibes</option>
+              <option value="Satisfy">Satisfy</option>
+              <option value="Indie Flower">Indie Flower</option>
+              <option value="Amatic SC">Amatic SC</option>
+              <option value="Shadows Into Light">Shadows Into Light</option>
+              <option value="Kalam">Kalam</option>
       <option value="Orbitron">Orbitron (Futuristic)</option>
       <option value="Press Start 2P">Press Start 2P (Pixel)</option>
       <option value="Creepster">Creepster (Horror)</option>
@@ -239,6 +246,23 @@
     </div>
 
     <div>
+      <div class="flex justify-between text-neutral-400 mb-1 text-[11px]">
+        <span>Jarak Antar Baris (Line Spacing)</span>
+        <span>{(projectStore.project.lyrics.config.lineSpacing ?? 1.25).toFixed(2)}</span>
+      </div>
+      <input 
+        type="range" 
+        min="1.0" 
+        max="2.0" 
+        step="0.05" 
+        value={projectStore.project.lyrics.config.lineSpacing ?? 1.25}
+        oninput={(e) => {
+          projectStore.project.lyrics.config.lineSpacing = parseFloat((e.target as HTMLInputElement).value);
+          projectStore.saveToDB();
+        }}
+        class="w-full accent-cyan-500 cursor-pointer" 
+      />
+
       <div class="flex justify-between text-neutral-400 mb-1 text-[11px]">
         <span>Horizontal X</span>
         <span>{Math.round(projectStore.project.lyrics.config.x * 100)}%</span>
