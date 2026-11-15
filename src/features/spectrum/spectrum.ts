@@ -139,10 +139,7 @@ export class SpectrumRenderer {
       
       
       
-      // default Ponco fallback - unique per style name hash
-      const hue = style.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 360;
-      for (let i = 0; i < 32; i++) {
-        // Real unique Ponco styles
+      // Real unique Ponco styles
     if (style === 'Ponco Bars Glow') {
       const barW = width / 48;
       for (let i = 0; i < 48; i++) {
@@ -174,7 +171,7 @@ export class SpectrumRenderer {
     if (style === 'Ponco Line Wave') {
       ctx.beginPath();
       for (let x = 0; x < width; x += 3) {
-        const idx = Math.floor((x / width) * data.length);
+        const idx = Math.floor((x / width) * freqData.length);
         const y = height / 2 + Math.sin(x * 0.015) * (freqData[idx] / 255) * (height * 0.35);
         if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
@@ -2385,4 +2382,4 @@ export class SpectrumRenderer {
     }
   }
 }
-}
+
