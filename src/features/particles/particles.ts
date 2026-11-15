@@ -143,6 +143,78 @@ export class ParticleSystem {
       vx = (Math.random() - 0.5) * config.speed * scaleFactor;
       vy = (Math.random() - 0.5) * config.speed * scaleFactor;
       color = config.color && config.color !== '#ffffff' ? config.color : '#a855f7';
+    } else if (preset === 'Ponco Neon Dust') {
+      p.vx = (Math.random() - 0.5) * 0.4;
+      p.vy = -Math.random() * 0.6;
+      p.size = Math.random() * 2 + 1;
+      p.color = `hsl(${180 + Math.random() * 40}, 100%, 60%)`;
+      (p as any).shape = 'circle';
+    } else if (preset === 'Ponco Fireflies') {
+      p.vx = Math.sin(Math.random() * 6) * 0.3;
+      p.vy = Math.cos(Math.random() * 6) * 0.2;
+      p.size = Math.random() * 3 + 1;
+      p.color = `hsl(${40 + Math.random() * 20}, 100%, 60%)`;
+      (p as any).shape = 'star';
+    } else if (preset === 'Ponco Galaxy Dust') {
+      p.vx = (Math.random() - 0.5) * 0.2;
+      p.vy = (Math.random() - 0.5) * 0.2;
+      p.size = Math.random() * 1.5 + 0.5;
+      p.color = `hsl(${Math.random() * 360}, 80%, 70%)`;
+      (p as any).shape = 'dot';
+    } else if (preset === 'Ponco Rain Glow') {
+      p.vx = 0;
+      p.vy = Math.random() * 2 + 1;
+      p.size = Math.random() * 1 + 0.5;
+      p.color = `hsl(200, 100%, 60%)`;
+      (p as any).shape = 'line';
+    } else if (preset === 'Ponco Spark Burst') {
+      const a = Math.random() * Math.PI * 2;
+      const s = Math.random() * 2 + 0.5;
+      p.vx = Math.cos(a) * s;
+      p.vy = Math.sin(a) * s;
+      p.size = Math.random() * 2 + 1;
+      p.color = `hsl(${Math.random() * 60}, 100%, 60%)`;
+      (p as any).shape = 'spark';
+    } else if (preset === 'Ponco Lightning') {
+      p.vx = (Math.random() - 0.5) * 1;
+      p.vy = Math.random() * 3;
+      p.size = Math.random() * 4 + 2;
+      p.color = `hsl(200, 100%, 80%)`;
+      (p as any).shape = 'lightning';
+    } else if (preset === 'Ponco Snow') {
+      p.vx = (Math.random() - 0.5) * 0.3;
+      p.vy = Math.random() * 0.8 + 0.3;
+      p.size = Math.random() * 3 + 1;
+      p.color = '#ffffff';
+      (p as any).shape = 'snow';
+    } else if (preset === 'Ponco Fire') {
+      p.vx = (Math.random() - 0.5) * 0.5;
+      p.vy = -Math.random() * 1.5 - 0.5;
+      p.size = Math.random() * 4 + 2;
+      p.color = `hsl(${Math.random() * 30}, 100%, 50%)`;
+      (p as any).shape = 'fire';
+    } else if (preset === 'Ponco Fireflies') {
+      p.vx = Math.sin(Math.random() * 6) * 0.3;
+      p.vy = Math.cos(Math.random() * 6) * 0.2;
+      p.size = Math.random() * 3 + 1;
+      p.color = `hsl(${40 + Math.random() * 20}, 100%, 60%)`;
+    } else if (preset === 'Ponco Galaxy Dust') {
+      p.vx = (Math.random() - 0.5) * 0.2;
+      p.vy = (Math.random() - 0.5) * 0.2;
+      p.size = Math.random() * 1.5 + 0.5;
+      p.color = `hsl(${Math.random() * 360}, 80%, 70%)`;
+    } else if (preset === 'Ponco Rain Glow') {
+      p.vx = 0;
+      p.vy = Math.random() * 2 + 1;
+      p.size = Math.random() * 1 + 0.5;
+      p.color = `hsl(200, 100%, 60%)`;
+    } else if (preset === 'Ponco Spark Burst') {
+      const a = Math.random() * Math.PI * 2;
+      const s = Math.random() * 2 + 0.5;
+      p.vx = Math.cos(a) * s;
+      p.vy = Math.sin(a) * s;
+      p.size = Math.random() * 2 + 1;
+      p.color = `hsl(${Math.random() * 60}, 100%, 60%)`;
     } else if (preset === 'Meteor Shower') {
       size = Math.max(2 * scaleFactor, (Math.random() * 0.7 + 0.3) * baseSize);
       vx = -Math.abs((Math.random() * 2.5 + 2) * config.speed * scaleFactor);
@@ -327,7 +399,52 @@ export class ParticleSystem {
       const sz = p.baseSize * (config.followBeat ? 1 + (beatFactor - 1) * 0.2 : 1.0);
       ctx.globalAlpha = p.alpha * (config.opacity ?? 0.4) * 0.3;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, sz, 0, Math.PI * 2);
+      
+      const shape = (p as any).shape || 'circle';
+      if (shape === 'lightning') {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x + sz, p.y + sz * 2);
+        ctx.lineTo(p.x - sz * 0.5, p.y + sz);
+        ctx.lineTo(p.x + sz * 0.3, p.y + sz * 3);
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      } else if (shape === 'snow') {
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const a = (i / 6) * Math.PI * 2;
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x + Math.cos(a) * sz, p.y + Math.sin(a) * sz);
+        }
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      } else if (shape === 'fire') {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y - sz);
+        ctx.quadraticCurveTo(p.x + sz, p.y, p.x, p.y + sz);
+        ctx.quadraticCurveTo(p.x - sz, p.y, p.x, p.y - sz);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      } else if (shape === 'star') {
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
+          const r = i % 2 === 0 ? sz : sz * 0.4;
+          ctx.lineTo(p.x + Math.cos(a) * r, p.y + Math.sin(a) * r);
+        }
+        ctx.closePath();
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, sz, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      }
+
+      // ctx.arc(p.x, p.y, sz, 0, Math.PI * 2);
       ctx.fill();
     }
   }

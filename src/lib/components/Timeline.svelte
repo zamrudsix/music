@@ -294,7 +294,11 @@
     <div class="flex items-center gap-2 sm:gap-3">
       {#if projectStore.project.audio.tracks && projectStore.project.audio.tracks.length > 0}
         <button 
-          onclick={() => projectStore.undo()}
+          onclick={async () => {
+            await projectStore.undo();
+            // Force UI refresh
+            projectStore.project = projectStore.project;
+          }}
           class="px-1.5 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-[10px] flex items-center gap-1 border border-neutral-700"
           title="Undo (Ctrl+Z)"
         >
