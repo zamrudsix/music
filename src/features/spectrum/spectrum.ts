@@ -134,6 +134,57 @@ export class SpectrumRenderer {
   ) {
     const totalWidth = width * 0.72 * (config.scale ?? 1.0);
     const startX = posX - totalWidth / 2;
+        // === Ponco unique styles ===
+    if (style.startsWith('Ponco')) {
+      const t = Date.now() / 1000;
+      if (style === 'Ponco Neon Bars') {
+        // glowing vertical bars with color shift
+        for (let i = 0; i < 64; i++) {
+          const h = (data[i % data.length] / 255) * height * 0.8;
+          const x = (i / 64) * width;
+          ctx.fillStyle = `hsl(${(t * 40 + i * 6) % 360}, 100%, 55%)`;
+          ctx.shadowColor = ctx.fillStyle;
+          ctx.shadowBlur = 12;
+          ctx.fillRect(x, height - h, width / 70, h);
+        }
+        ctx.shadowBlur = 0;
+        return;
+      }
+      if (style === 'Ponco Circular Glow') {
+        const cx = width / 2, cy = height / 2;
+        for (let i = 0; i < 48; i++) {
+          const a = (i / 48) * Math.PI * 2 + t;
+          const r = 80 + (data[i % data.length] / 255) * 120;
+          ctx.beginPath();
+          ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 4, 0, Math.PI * 2);
+          ctx.fillStyle = `hsl(${(i * 8 + t * 30) % 360}, 100%, 60%)`;
+          ctx.fill();
+        }
+        return;
+      }
+      if (style === 'Ponco Wave Pulse') {
+        ctx.beginPath();
+        ctx.moveTo(0, height / 2);
+        for (let x = 0; x < width; x += 4) {
+          const idx = Math.floor((x / width) * data.length);
+          const y = height / 2 + Math.sin(x * 0.02 + t * 3) * (data[idx] / 255) * 80;
+          ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = `hsl(${(t * 50) % 360}, 100%, 55%)`;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        return;
+      }
+      // default Ponco fallback - unique per style name hash
+      const hue = style.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 360;
+      for (let i = 0; i < 32; i++) {
+        const h = (data[i % data.length] / 255) * height * 0.7;
+        ctx.fillStyle = `hsl(${(hue + i * 10) % 360}, 90%, 55%)`;
+        ctx.fillRect((i / 32) * width, height - h, width / 40, h);
+      }
+      return;
+    }
+
     const isThin = style === 'Bars Thin';
     const isDense = style === 'Bars Dense';
     const isFat = style === 'Bars Fat';
