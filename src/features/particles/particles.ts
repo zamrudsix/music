@@ -11,7 +11,7 @@ export interface Particle {
   color: string;
   rotation: number;
   vRot: number;
-  shape?: 'star' | 'circle' | 'square' | 'petal';
+  shape?: 'star' | 'circle' | 'square' | 'petal' | 'triangle' | 'diamond' | 'line' | 'lightning' | 'snow' | 'fire' | 'spark';
 }
 
 const CONFETTI_COLORS = ['#38bdf8', '#f43f5e', '#fbbf24', '#34d399', '#a855f7', '#ec4899', '#f97316'];
