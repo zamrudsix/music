@@ -162,6 +162,31 @@ export class SpectrumRenderer {
         }
         return;
       }
+      if (style === 'Ponco Radial Burst') {
+        const cx = width / 2, cy = height / 2;
+        for (let i = 0; i < 36; i++) {
+          const a = (i / 36) * Math.PI * 2;
+          const len = 40 + (data[i % data.length] / 255) * 150;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len);
+          ctx.strokeStyle = `hsl(${(i * 10) % 360}, 100%, 55%)`;
+          ctx.lineWidth = 3;
+          ctx.stroke();
+        }
+        return;
+      }
+      if (style === 'Ponco Mirror Dual') {
+        const mid = height / 2;
+        for (let i = 0; i < 48; i++) {
+          const h = (data[i % data.length] / 255) * mid * 0.8;
+          const x = (i / 48) * width;
+          ctx.fillStyle = `hsl(${200 + i * 3}, 100%, 55%)`;
+          ctx.fillRect(x, mid - h, width / 55, h);
+          ctx.fillRect(x, mid, width / 55, h);
+        }
+        return;
+      }
       if (style === 'Ponco Wave Pulse') {
         ctx.beginPath();
         ctx.moveTo(0, height / 2);

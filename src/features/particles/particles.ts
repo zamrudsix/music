@@ -148,19 +148,19 @@ export class ParticleSystem {
       p.vy = -Math.random() * 0.6;
       p.size = Math.random() * 2 + 1;
       p.color = `hsl(${180 + Math.random() * 40}, 100%, 60%)`;
-      (p as any).shape = 'circle';
+      (p as any).shape = 'triangle';
     } else if (preset === 'Ponco Fireflies') {
       p.vx = Math.sin(Math.random() * 6) * 0.3;
       p.vy = Math.cos(Math.random() * 6) * 0.2;
       p.size = Math.random() * 3 + 1;
       p.color = `hsl(${40 + Math.random() * 20}, 100%, 60%)`;
-      (p as any).shape = 'star';
+      (p as any).shape = 'square';
     } else if (preset === 'Ponco Galaxy Dust') {
       p.vx = (Math.random() - 0.5) * 0.2;
       p.vy = (Math.random() - 0.5) * 0.2;
       p.size = Math.random() * 1.5 + 0.5;
       p.color = `hsl(${Math.random() * 360}, 80%, 70%)`;
-      (p as any).shape = 'dot';
+      (p as any).shape = 'diamond';
     } else if (preset === 'Ponco Rain Glow') {
       p.vx = 0;
       p.vy = Math.random() * 2 + 1;
@@ -401,7 +401,27 @@ export class ParticleSystem {
       ctx.beginPath();
       
       const shape = (p as any).shape || 'circle';
-      if (shape === 'lightning') {
+      if (shape === 'triangle') {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y - sz);
+        ctx.lineTo(p.x + sz, p.y + sz);
+        ctx.lineTo(p.x - sz, p.y + sz);
+        ctx.closePath();
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      } else if (shape === 'square') {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x - sz, p.y - sz, sz * 2, sz * 2);
+      } else if (shape === 'diamond') {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y - sz);
+        ctx.lineTo(p.x + sz, p.y);
+        ctx.lineTo(p.x, p.y + sz);
+        ctx.lineTo(p.x - sz, p.y);
+        ctx.closePath();
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      } else if (shape === 'lightning') {
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
         ctx.lineTo(p.x + sz, p.y + sz * 2);
