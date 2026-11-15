@@ -146,7 +146,7 @@ export class SpectrumRenderer {
     if (style === 'Ponco Bars Glow') {
       const barW = width / 48;
       for (let i = 0; i < 48; i++) {
-        const h = (data[i % data.length] / 255) * height * 0.85;
+        const h = (freqData[i % freqData.length] / 255) * height * 0.85;
         const x = i * barW;
         const grd = ctx.createLinearGradient(0, height - h, 0, height);
         grd.addColorStop(0, `hsl(${(i * 7) % 360}, 100%, 60%)`);
@@ -163,9 +163,9 @@ export class SpectrumRenderer {
       const cx = width / 2, cy = height / 2, baseR = Math.min(width, height) * 0.25;
       for (let i = 0; i < 40; i++) {
         const a = (i / 40) * Math.PI * 2;
-        const r = baseR + (data[i % data.length] / 255) * baseR;
+        const r = baseR + (freqData[i % freqData.length] / 255) * baseR;
         ctx.beginPath();
-        ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 3 + (data[i % data.length] / 255) * 4, 0, Math.PI * 2);
+        ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 3 + (freqData[i % freqData.length] / 255) * 4, 0, Math.PI * 2);
         ctx.fillStyle = `hsl(${(i * 9) % 360}, 100%, 55%)`;
         ctx.fill();
       }
@@ -175,7 +175,7 @@ export class SpectrumRenderer {
       ctx.beginPath();
       for (let x = 0; x < width; x += 3) {
         const idx = Math.floor((x / width) * data.length);
-        const y = height / 2 + Math.sin(x * 0.015) * (data[idx] / 255) * (height * 0.35);
+        const y = height / 2 + Math.sin(x * 0.015) * (freqData[idx] / 255) * (height * 0.35);
         if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.strokeStyle = '#22d3ee';
@@ -187,7 +187,7 @@ export class SpectrumRenderer {
       const cx = width / 2, cy = height / 2;
       for (let i = 0; i < 32; i++) {
         const a = (i / 32) * Math.PI * 2;
-        const len = 30 + (data[i % data.length] / 255) * Math.min(width, height) * 0.4;
+        const len = 30 + (freqData[i % freqData.length] / 255) * Math.min(width, height) * 0.4;
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.lineTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len);
