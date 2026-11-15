@@ -44,26 +44,9 @@
       <option value="snow">Snow (Legacy)</option>
       <option value="sparks">Beat Sparks (Legacy)</option>
     
-      <option value="Ponco Neon Dust">Ponco Neon Dust</option>
-      <option value="Ponco Fireflies">Ponco Fireflies</option>
-      <option value="Ponco Galaxy Dust">Ponco Galaxy Dust</option>
-      <option value="Ponco Rain Glow">Ponco Rain Glow</option>
-      <option value="Ponco Spark Burst">Ponco Spark Burst</option>
-      <option value="Ponco Aurora Particles">Ponco Aurora Particles</option>
-      <option value="Ponco Cyber Bits">Ponco Cyber Bits</option>
-      <option value="Ponco Bubble Rise">Ponco Bubble Rise</option>
-      <option value="Ponco Star Field">Ponco Star Field</option>
-      <option value="Ponco Energy Orbs">Ponco Energy Orbs</option>
-      <option value="Ponco Glitch Dots">Ponco Glitch Dots</option>
-      <option value="Ponco Prism Rain">Ponco Prism Rain</option>
-      <option value="Ponco Void Particles">Ponco Void Particles</option>
-      <option value="Ponco Holo Specks">Ponco Holo Specks</option>
-      <option value="Ponco Bass Sparks">Ponco Bass Sparks</option>
-      <option value="Ponco Liquid Drops">Ponco Liquid Drops</option>
-      <option value="Ponco Quantum Dust">Ponco Quantum Dust</option>
-      <option value="Ponco Neon Confetti">Ponco Neon Confetti</option>
-      <option value="Ponco Plasma Bits">Ponco Plasma Bits</option>
-      <option value="Ponco Orbit Motes">Ponco Orbit Motes</option>
+      <option value="Ponco Triangles">Ponco Triangles</option>
+      <option value="Ponco Squares">Ponco Squares</option>
+      <option value="Ponco Diamonds">Ponco Diamonds</option>
     </select>
   </div>
 

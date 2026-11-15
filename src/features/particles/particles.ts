@@ -215,6 +215,24 @@ export class ParticleSystem {
       p.vy = Math.sin(a) * s;
       p.size = Math.random() * 2 + 1;
       p.color = `hsl(${Math.random() * 60}, 100%, 60%)`;
+    } else if (preset === 'Ponco Triangles') {
+      p.vx = (Math.random() - 0.5) * 0.5;
+      p.vy = -Math.random() * 0.8;
+      p.size = Math.random() * 6 + 3;
+      p.color = `hsl(${Math.random() * 60}, 100%, 55%)`;
+      (p as any).shape = 'triangle';
+    } else if (preset === 'Ponco Squares') {
+      p.vx = (Math.random() - 0.5) * 0.4;
+      p.vy = Math.random() * 0.6;
+      p.size = Math.random() * 5 + 2;
+      p.color = `hsl(${180 + Math.random() * 40}, 100%, 55%)`;
+      (p as any).shape = 'square';
+    } else if (preset === 'Ponco Diamonds') {
+      p.vx = (Math.random() - 0.5) * 0.3;
+      p.vy = (Math.random() - 0.5) * 0.3;
+      p.size = Math.random() * 5 + 2;
+      p.color = `hsl(${280 + Math.random() * 40}, 100%, 60%)`;
+      (p as any).shape = 'diamond';
     } else if (preset === 'Meteor Shower') {
       size = Math.max(2 * scaleFactor, (Math.random() * 0.7 + 0.3) * baseSize);
       vx = -Math.abs((Math.random() * 2.5 + 2) * config.speed * scaleFactor);

@@ -134,78 +134,73 @@ export class SpectrumRenderer {
   ) {
     const totalWidth = width * 0.72 * (config.scale ?? 1.0);
     const startX = posX - totalWidth / 2;
-        // === Ponco unique styles ===
-    if (style.startsWith('Ponco')) {
-      const t = Date.now() / 1000;
-      if (style === 'Ponco Neon Bars') {
-        // glowing vertical bars with color shift
-        for (let i = 0; i < 64; i++) {
-          const h = (data[i % data.length] / 255) * height * 0.8;
-          const x = (i / 64) * width;
-          ctx.fillStyle = `hsl(${(t * 40 + i * 6) % 360}, 100%, 55%)`;
-          ctx.shadowColor = ctx.fillStyle;
-          ctx.shadowBlur = 12;
-          ctx.fillRect(x, height - h, width / 70, h);
-        }
-        ctx.shadowBlur = 0;
-        return;
-      }
-      if (style === 'Ponco Circular Glow') {
-        const cx = width / 2, cy = height / 2;
-        for (let i = 0; i < 48; i++) {
-          const a = (i / 48) * Math.PI * 2 + t;
-          const r = 80 + (data[i % data.length] / 255) * 120;
-          ctx.beginPath();
-          ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 4, 0, Math.PI * 2);
-          ctx.fillStyle = `hsl(${(i * 8 + t * 30) % 360}, 100%, 60%)`;
-          ctx.fill();
-        }
-        return;
-      }
-      if (style === 'Ponco Radial Burst') {
-        const cx = width / 2, cy = height / 2;
-        for (let i = 0; i < 36; i++) {
-          const a = (i / 36) * Math.PI * 2;
-          const len = 40 + (data[i % data.length] / 255) * 150;
-          ctx.beginPath();
-          ctx.moveTo(cx, cy);
-          ctx.lineTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len);
-          ctx.strokeStyle = `hsl(${(i * 10) % 360}, 100%, 55%)`;
-          ctx.lineWidth = 3;
-          ctx.stroke();
-        }
-        return;
-      }
-      if (style === 'Ponco Mirror Dual') {
-        const mid = height / 2;
-        for (let i = 0; i < 48; i++) {
-          const h = (data[i % data.length] / 255) * mid * 0.8;
-          const x = (i / 48) * width;
-          ctx.fillStyle = `hsl(${200 + i * 3}, 100%, 55%)`;
-          ctx.fillRect(x, mid - h, width / 55, h);
-          ctx.fillRect(x, mid, width / 55, h);
-        }
-        return;
-      }
-      if (style === 'Ponco Wave Pulse') {
-        ctx.beginPath();
-        ctx.moveTo(0, height / 2);
-        for (let x = 0; x < width; x += 4) {
-          const idx = Math.floor((x / width) * data.length);
-          const y = height / 2 + Math.sin(x * 0.02 + t * 3) * (data[idx] / 255) * 80;
-          ctx.lineTo(x, y);
-        }
-        ctx.strokeStyle = `hsl(${(t * 50) % 360}, 100%, 55%)`;
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        return;
-      }
+        
+      
+      
+      
+      
       // default Ponco fallback - unique per style name hash
       const hue = style.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 360;
       for (let i = 0; i < 32; i++) {
         const h = (data[i % data.length] / 255) * height * 0.7;
         ctx.fillStyle = `hsl(${(hue + i * 10) % 360}, 90%, 55%)`;
         ctx.fillRect((i / 32) * width, height - h, width / 40, h);
+      }
+      return;
+    }
+
+        // Real unique Ponco styles
+    if (style === 'Ponco Bars Glow') {
+      const barW = width / 48;
+      for (let i = 0; i < 48; i++) {
+        const h = (data[i % data.length] / 255) * height * 0.85;
+        const x = i * barW;
+        const grd = ctx.createLinearGradient(0, height - h, 0, height);
+        grd.addColorStop(0, `hsl(${(i * 7) % 360}, 100%, 60%)`);
+        grd.addColorStop(1, `hsl(${(i * 7 + 40) % 360}, 100%, 40%)`);
+        ctx.fillStyle = grd;
+        ctx.shadowColor = grd;
+        ctx.shadowBlur = 8;
+        ctx.fillRect(x + 1, height - h, barW - 2, h);
+      }
+      ctx.shadowBlur = 0;
+      return;
+    }
+    if (style === 'Ponco Circle Dots') {
+      const cx = width / 2, cy = height / 2, baseR = Math.min(width, height) * 0.25;
+      for (let i = 0; i < 40; i++) {
+        const a = (i / 40) * Math.PI * 2;
+        const r = baseR + (data[i % data.length] / 255) * baseR;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 3 + (data[i % data.length] / 255) * 4, 0, Math.PI * 2);
+        ctx.fillStyle = `hsl(${(i * 9) % 360}, 100%, 55%)`;
+        ctx.fill();
+      }
+      return;
+    }
+    if (style === 'Ponco Line Wave') {
+      ctx.beginPath();
+      for (let x = 0; x < width; x += 3) {
+        const idx = Math.floor((x / width) * data.length);
+        const y = height / 2 + Math.sin(x * 0.015) * (data[idx] / 255) * (height * 0.35);
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = '#22d3ee';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      return;
+    }
+    if (style === 'Ponco Radial Lines') {
+      const cx = width / 2, cy = height / 2;
+      for (let i = 0; i < 32; i++) {
+        const a = (i / 32) * Math.PI * 2;
+        const len = 30 + (data[i % data.length] / 255) * Math.min(width, height) * 0.4;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len);
+        ctx.strokeStyle = `hsl(${(i * 11) % 360}, 100%, 55%)`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
       }
       return;
     }
