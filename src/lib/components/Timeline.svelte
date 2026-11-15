@@ -92,42 +92,33 @@
     seekFromEvent(e);
   }
 
-  function onTimelineContextMenu(e: MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!projectStore.audioBuffer || !timelineContainer) return;
+  let rangeDrag = $state<{ startX: number; startTime: number } | null>(null);
 
-    const rect = timelineContainer.getBoundingClientRect();
-    const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
-    const progress = x / rect.width;
-    const clickTime = progress * (projectStore.project.audio.duration || 1);
+  function onTimelinePointerDown(e: PointerEvent) {
+    if (e.button === 2) return; // ignore right click
+    if (dragging) return;
 
+    // Start range drag (hold Shift or just drag for trim)
+    const rect = timelineContainer?.getBoundingClientRect();
+    if (!rect || !projectStore.audioBuffer) return;
+
+    const x = e.clientX - rect.left;
+    const progress = Math.max(0, Math.min(1, x / rect.width));
+    const t = progress * (projectStore.project.audio.duration || 1);
+
+    rangeDrag = { startX: e.clientX, startTime: t };
+    isScrubbing = true;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+
+    // Initialize range
     if (!projectStore.project.exportSettings.exportRange) {
-      projectStore.project.exportSettings.exportRange = { enabled: true, startTime: 0, endTime: projectStore.project.audio.duration || 30 };
+      projectStore.project.exportSettings.exportRange = { enabled: true, startTime: t, endTime: t };
     }
     const range = projectStore.project.exportSettings.exportRange;
     range.enabled = true;
-
-    // First right-click sets start, second sets end (or toggle)
-    if (Math.abs(clickTime - range.startTime) < 0.5) {
-      range.endTime = clickTime;
-    } else {
-      range.startTime = Math.min(clickTime, range.endTime);
-      range.endTime = Math.max(clickTime, range.endTime);
-    }
-
-    // Keep start < end
-    if (range.startTime > range.endTime) {
-      const tmp = range.startTime;
-      range.startTime = range.endTime;
-      range.endTime = tmp;
-    }
-
-    projectStore.saveToDB();
-    alert(`Range dipotong: ${range.startTime.toFixed(2)}s – ${range.endTime.toFixed(2)}s`);
+    range.startTime = t;
+    range.endTime = t;
   }
-
-  function onTimelinePointerDown(e: PointerEvent) {
     if (dragging) return;
     isScrubbing = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -135,7 +126,17 @@
   }
 
   function onTimelinePointerMove(e: PointerEvent) {
-    if (isScrubbing) {
+    if (rangeDrag && timelineContainer) {
+      const rect = timelineContainer.getBoundingClientRect();
+      const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+      const progress = x / rect.width;
+      const t = progress * (projectStore.project.audio.duration || 1);
+      const range = projectStore.project.exportSettings.exportRange;
+      if (range) {
+        range.startTime = Math.min(rangeDrag.startTime, t);
+        range.endTime = Math.max(rangeDrag.startTime, t);
+      }
+    } else if (isScrubbing) {
       seekFromEvent(e);
     } else {
       onPointerMove(e);
@@ -143,6 +144,10 @@
   }
 
   function onTimelinePointerUp(e: PointerEvent) {
+    if (rangeDrag) {
+      rangeDrag = null;
+      projectStore.saveToDB();
+    }
     if (isScrubbing) {
       isScrubbing = false;
       try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
@@ -357,7 +362,6 @@
       class="h-10 w-full bg-neutral-950/80 rounded-lg border border-neutral-800 relative cursor-pointer overflow-hidden group"
       onclick={handleTimelineClick}
       onpointerdown={onTimelinePointerDown}
-      oncontextmenu={onTimelineContextMenu}
       onpointermove={onTimelinePointerMove}
       onpointerup={onTimelinePointerUp}
       onpointercancel={onTimelinePointerUp}
