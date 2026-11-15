@@ -95,43 +95,17 @@
   let rangeDrag = $state<{ startX: number; startTime: number } | null>(null);
 
   function onTimelinePointerDown(e: PointerEvent) {
-    if (e.button === 2) return; // ignore right click
+    if (e.button !== 0) return; // left click only
     if (dragging) return;
+    if (!timelineContainer || !projectStore.audioBuffer) return;
 
-    // Start range drag (hold Shift or just drag for trim)
-    const rect = timelineContainer?.getBoundingClientRect();
-    if (!rect || !projectStore.audioBuffer) return;
-
-    const x = e.clientX - rect.left;
-    const progress = Math.max(0, Math.min(1, x / rect.width));
-    const t = progress * (projectStore.project.audio.duration || 1);
-
-    rangeDrag = { startX: e.clientX, startTime: t };
     isScrubbing = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-
-    // Initialize range
-    if (!projectStore.project.exportSettings.exportRange) {
-      projectStore.project.exportSettings.exportRange = { enabled: true, startTime: t, endTime: t };
-    }
-    const range = projectStore.project.exportSettings.exportRange;
-    range.enabled = true;
-    range.startTime = t;
-    range.endTime = t;
+    seekFromEvent(e);
   }
 
   function onTimelinePointerMove(e: PointerEvent) {
-    if (rangeDrag && timelineContainer) {
-      const rect = timelineContainer.getBoundingClientRect();
-      const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
-      const progress = x / rect.width;
-      const t = progress * (projectStore.project.audio.duration || 1);
-      const range = projectStore.project.exportSettings.exportRange;
-      if (range) {
-        range.startTime = Math.min(rangeDrag.startTime, t);
-        range.endTime = Math.max(rangeDrag.startTime, t);
-      }
-    } else if (isScrubbing) {
+    if (isScrubbing) {
       seekFromEvent(e);
     } else {
       onPointerMove(e);

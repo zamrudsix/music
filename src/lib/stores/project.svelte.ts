@@ -219,12 +219,16 @@ class ProjectState {
     } catch {}
   }
 
-  undo() {
+  async undo() {
     if (this.undoStack.length === 0) return;
     const prev = this.undoStack.pop();
     if (prev) {
       this.project = prev;
-      this.saveToDB();
+      // Restore original audio by rebuilding from tracks
+      this.trackBuffers.clear();
+      this.audioBuffer = null;
+      await this.rebuildMergedAudio();
+      await this.saveToDB();
     }
   }
 
