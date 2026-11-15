@@ -119,11 +119,6 @@
     range.startTime = t;
     range.endTime = t;
   }
-    if (dragging) return;
-    isScrubbing = true;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    seekFromEvent(e);
-  }
 
   function onTimelinePointerMove(e: PointerEvent) {
     if (rangeDrag && timelineContainer) {
