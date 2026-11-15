@@ -50,6 +50,7 @@ export class VideoOverlayManager {
     vid.muted = true;
     vid.playsInline = true;
     vid.loop = true;
+    vid.playbackRate = item.playbackRate ?? 1.0;
     await new Promise((resolve) => {
       vid.onloadeddata = resolve;
     });
@@ -82,11 +83,25 @@ export class VideoOverlayManager {
     }
   }
 
-  syncPlayback(isPlaying: boolean, currentTime: number) {
-    this.videoElements.forEach((vid) => {
+  syncPlayback(isPlaying: boolean, currentTime: number, items?: VideoOverlayItem[]) {
+    // Build a quick map of playback rates if items are provided
+    const rateMap = new Map<string, number>();
+    if (items) {
+      for (const item of items) {
+        rateMap.set(item.id, item.playbackRate ?? 1.0);
+      }
+    }
+
+    this.videoElements.forEach((vid, id) => {
+      const rate = rateMap.get(id) ?? vid.playbackRate ?? 1.0;
+      if (Math.abs(vid.playbackRate - rate) > 0.01) {
+        vid.playbackRate = rate;
+      }
+
       const duration = vid.duration || 10;
-      const targetTime = currentTime % duration;
-      // Compute circular loop difference to prevent 4.98s fake drift on loop boundaries
+      // Map project time through the playback rate so slow-mo / fast-forward stays in sync
+      const targetTime = ((currentTime * rate) % duration + duration) % duration;
+
       let drift = Math.abs(vid.currentTime - targetTime);
       if (drift > duration / 2) {
         drift = duration - drift;
@@ -94,13 +109,11 @@ export class VideoOverlayManager {
 
       if (isPlaying) {
         if (vid.paused) vid.play().catch(() => {});
-        // Only seek if circular drift exceeds 0.5s and video is not currently seeking
         if (!vid.seeking && drift > 0.5) {
           vid.currentTime = targetTime;
         }
       } else {
         if (!vid.paused) vid.pause();
-        // When paused / scrubbing, seek cleanly if drift exceeds 0.1s
         if (!vid.seeking && drift > 0.1) {
           vid.currentTime = targetTime;
         }
@@ -196,6 +209,18 @@ export class VideoOverlayManager {
       ctx.globalAlpha = drawAlpha;
       ctx.globalCompositeOperation = (item.blendMode as GlobalCompositeOperation) || 'source-over';
       ctx.translate(posX, posY);
+
+      // Alternating mirror (normal → mirror → normal → ...)
+      if (item.mirrorEnabled) {
+        const interval = Math.max(1, item.mirrorInterval ?? 60);
+        const start = item.startTime ?? 0;
+        const elapsed = Math.max(0, currentTime - start);
+        const cycle = Math.floor(elapsed / interval);
+        const isMirrored = cycle % 2 === 1;
+        if (isMirrored) {
+          ctx.scale(-1, 1); // horizontal flip
+        }
+      }
 
       if (item.chromaKey?.enabled) {
         this.renderChromaKey(ctx, vid, drawW, drawH, item.chromaKey);

@@ -1,8 +1,9 @@
 import { db } from '../../lib/db/database';
 import type { CustomFontItem } from '../../lib/types/project';
 
-// Predefined remote TTF URLs for standard built-in visualizer typography
+// Predefined remote TTF URLs for standard + creative built-in visualizer typography
 const BUILTIN_FONT_URLS: Record<string, string> = {
+  // Original clean / modern
   'Bebas Neue': 'https://fonts.gstatic.com/s/bebasneue/v16/JTUSjIg69CK48gW7PXooxW4.ttf',
   'Inter': 'https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuGKYMZg.ttf',
   'Montserrat': 'https://fonts.gstatic.com/s/montserrat/v31/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCuM70w-.ttf',
@@ -11,6 +12,27 @@ const BUILTIN_FONT_URLS: Record<string, string> = {
   'Space Grotesk': 'https://fonts.gstatic.com/s/spacegrotesk/v22/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj42Vksj.ttf',
   'Playfair Display': 'https://fonts.gstatic.com/s/playfairdisplay/v40/nuFRD-vYSZviVYUb_rj3ij__anPXDTnCjmHKM4nYO7KN_k-UbtY.ttf',
   'Roboto Mono': 'https://fonts.gstatic.com/s/robotomono/v31/L0xuDF4xlVMF-BfR8bXMIhJHg45mwgGEFl0_Of2PQw.ttf',
+
+  // Bold / Impact / Display
+  'Anton': 'https://fonts.gstatic.com/s/anton/v27/1Ptgg87LROyAm0K08i4g.ttf',
+  'Archivo Black': 'https://fonts.gstatic.com/s/archivoblack/v21/HTxqL289NzCGg4MzN6KJ7eW6OYuP_x7yx3A.ttf',
+  'Righteous': 'https://fonts.gstatic.com/s/righteous/v17/1cXxaUPXBpj2rGoU7C9WiHGA.ttf',
+  'Bangers': 'https://fonts.gstatic.com/s/bangers/v24/FeVQS0BTqb0h60ACL5la2bxii28.ttf',
+  'Rubik': 'https://fonts.gstatic.com/s/rubik/v28/iJWZBXyIfDnIV5PNhY1KTN7Z-Yh-B4i1UA.ttf',
+
+  // Handwritten / Script / Fun
+  'Pacifico': 'https://fonts.gstatic.com/s/pacifico/v22/FwZY7-Qmy14u9lezJ-6H6MmBp0u-.ttf',
+  'Permanent Marker': 'https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004La2Cfw.ttf',
+  'Caveat': 'https://fonts.gstatic.com/s/caveat/v17/WnznHAc5bAfYB2QRah7pcpNvOx-pjfJ9eIWpZA.ttf',
+  'Lobster': 'https://fonts.gstatic.com/s/lobster/v30/neILzCirqoswsqX9zoKmM4MwWJU.ttf',
+  'Comfortaa': 'https://fonts.gstatic.com/s/comfortaa/v45/1Pt_g8LJRfWJmhDAuUsSQamb1W0lwk4S4WjMPrQVIT9c2c8.ttf',
+
+  // Futuristic / Tech / Special
+  'Orbitron': 'https://fonts.gstatic.com/s/orbitron/v31/yMJMMIlzdpvBhQQL_SC3X9yhF25-T1nyGy6BoWgz.ttf',
+  'Press Start 2P': 'https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK3nVivNm4I81.ttf',
+  'Creepster': 'https://fonts.gstatic.com/s/creepster/v13/AlZy_zVUqJz4yMrniH4hdXf4XB0f74.ttf',
+  'Special Elite': 'https://fonts.gstatic.com/s/specialelite/v18/XLYgIZbkc4mQLL5i2lB5AxQQvQ.ttf',
+  'Monoton': 'https://fonts.gstatic.com/s/monoton/v19/5h1aiZUrOngCibe4fkULkQ.ttf',
 };
 
 export class FontManager {

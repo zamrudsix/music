@@ -90,6 +90,9 @@
         animation: 'none',
         followBeat: false,
         beatSensitivity: 1.0,
+        playbackRate: 1.0,
+        mirrorEnabled: false,
+        mirrorInterval: 60,
       };
 
       await videoOverlayManager.loadVideo(newItem);
@@ -341,6 +344,68 @@
                 class="w-full bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-neutral-200 outline-none"
               />
             </div>
+          </div>
+
+          <!-- Playback Speed (Slow-mo / Fast) -->
+          <div class="space-y-1 text-[11px] pt-1.5 border-t border-neutral-900">
+            <div class="flex justify-between text-neutral-400">
+              <span>Playback Speed</span>
+              <span class="text-cyan-400 font-mono">{(vid.playbackRate ?? 1.0).toFixed(2)}x</span>
+            </div>
+            <input 
+              type="range" 
+              min="0.1" 
+              max="3.0" 
+              step="0.05" 
+              value={vid.playbackRate ?? 1.0}
+              oninput={(e) => {
+                const val = parseFloat((e.target as HTMLInputElement).value);
+                vid.playbackRate = val;
+              }}
+              onchange={() => projectStore.saveToDB()} 
+              class="w-full accent-cyan-500 cursor-pointer" 
+            />
+            <div class="flex justify-between text-[9px] text-neutral-600">
+              <span>0.1x (very slow)</span>
+              <span>1.0x normal</span>
+              <span>3.0x fast</span>
+            </div>
+          </div>
+
+          <!-- Alternating Mirror Effect -->
+          <div class="p-2 rounded bg-neutral-900/60 border border-neutral-800 space-y-2 text-[11px]">
+            <label class="flex items-center justify-between cursor-pointer">
+              <span class="text-neutral-300 font-medium">Mirror Bolak-Balik</span>
+              <input 
+                type="checkbox" 
+                bind:checked={vid.mirrorEnabled}
+                onchange={() => projectStore.saveToDB()}
+                class="accent-cyan-500 w-4 h-4 cursor-pointer"
+              />
+            </label>
+            {#if vid.mirrorEnabled}
+              <div class="space-y-1">
+                <div class="flex justify-between text-neutral-400">
+                  <span>Interval (detik)</span>
+                  <span class="text-cyan-400 font-mono">{(vid.mirrorInterval ?? 60)}s</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="5" 
+                  max="300" 
+                  step="5" 
+                  value={vid.mirrorInterval ?? 60}
+                  oninput={(e) => {
+                    vid.mirrorInterval = parseInt((e.target as HTMLInputElement).value, 10);
+                  }}
+                  onchange={() => projectStore.saveToDB()} 
+                  class="w-full accent-cyan-500 cursor-pointer" 
+                />
+                <div class="text-[9px] text-neutral-500">
+                  Normal {vid.mirrorInterval ?? 60}s → Mirror {vid.mirrorInterval ?? 60}s → Normal → Mirror...
+                </div>
+              </div>
+            {/if}
           </div>
 
           <!-- Transition Animation -->

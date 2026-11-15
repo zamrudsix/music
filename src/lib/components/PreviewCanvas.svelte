@@ -150,7 +150,11 @@
     }
 
     // Sync video overlays & background video playback state
-    videoOverlayManager.syncPlayback(projectStore.isPlaying, projectStore.currentTime);
+    videoOverlayManager.syncPlayback(
+      projectStore.isPlaying,
+      projectStore.currentTime,
+      projectStore.project.overlays.videos || []
+    );
     backgroundManager.syncPlayback(projectStore.isPlaying, projectStore.currentTime);
 
     // 1. Clear & Render Background

@@ -362,6 +362,12 @@ export interface VideoOverlayItem {
   endTime?: number;
   transition?: OverlayTransitionType;
   transitionDuration?: number;
+  /** Playback speed for video overlays. 1.0 = normal, 0.5 = half speed (slow-mo), 2.0 = double speed. Default 1.0 */
+  playbackRate?: number;
+  /** Enable alternating mirror effect (normal → mirror → normal → ...) */
+  mirrorEnabled?: boolean;
+  /** Duration of each normal / mirror segment in seconds. Default 60 (1 minute) */
+  mirrorInterval?: number;
 }
 
 export type TextAnimationType = 'none' | 'pulse-beat' | 'floating' | 'shimmer' | 'typewriter' | 'glow-pulse' | 'marquee-left';

@@ -9,8 +9,10 @@
     Plus, 
     Trash2, 
     ListMusic,
-    Scissors
+    Scissors,
+    Image as ImageIcon
   } from '@lucide/svelte';
+  import type { ImageOverlayItem } from '../types/project';
 
   interface Props {
     onOpenPlaylist?: () => void;
@@ -29,6 +31,19 @@
   let fileInput: HTMLInputElement;
   let isConfirmingDelete = $state(false);
   let deleteTimer: any = null;
+
+  // Drag state for CapCut-style image overlay clips
+  let dragging = $state<{
+    id: string;
+    type: 'move' | 'left' | 'right';
+    startX: number;
+    startTime: number;
+    endTime: number;
+    timelineWidth: number;
+    totalDuration: number;
+  } | null>(null);
+
+  let timelineContainer: HTMLDivElement | null = null;
 
   function handleDeleteAllTracks() {
     if (!isConfirmingDelete) {
@@ -52,6 +67,7 @@
   }
 
   function handleTimelineClick(e: MouseEvent) {
+    if (dragging) return; // ignore click while dragging
     if (!projectStore.audioBuffer) return;
     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
     const clickX = e.clientX - rect.left;
@@ -60,9 +76,77 @@
     
     audioEngine.seek(targetTime, projectStore.audioBuffer);
   }
+
+  function getImageStartEnd(img: ImageOverlayItem, totalDur: number): { start: number; end: number } {
+    const start = typeof img.startTime === 'number' && Number.isFinite(img.startTime) ? Math.max(0, img.startTime) : 0;
+    const end = typeof img.endTime === 'number' && Number.isFinite(img.endTime) && img.endTime > start
+      ? Math.min(totalDur, img.endTime)
+      : totalDur;
+    return { start, end };
+  }
+
+  function onImagePointerDown(e: PointerEvent, img: ImageOverlayItem, edge: 'left' | 'right' | 'move') {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const totalDur = projectStore.project.audio.duration || 1;
+    const { start, end } = getImageStartEnd(img, totalDur);
+
+    const rect = timelineContainer?.getBoundingClientRect();
+    if (!rect) return;
+
+    dragging = {
+      id: img.id,
+      type: edge,
+      startX: e.clientX,
+      startTime: start,
+      endTime: end,
+      timelineWidth: rect.width,
+      totalDuration: totalDur,
+    };
+
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function onPointerMove(e: PointerEvent) {
+    if (!dragging) return;
+
+    const dx = e.clientX - dragging.startX;
+    const deltaSec = (dx / dragging.timelineWidth) * dragging.totalDuration;
+
+    const img = projectStore.project.overlays.images.find(i => i.id === dragging!.id);
+    if (!img) return;
+
+    let newStart = dragging.startTime;
+    let newEnd = dragging.endTime;
+
+    if (dragging.type === 'left') {
+      newStart = Math.max(0, Math.min(dragging.endTime - 0.2, dragging.startTime + deltaSec));
+    } else if (dragging.type === 'right') {
+      newEnd = Math.min(dragging.totalDuration, Math.max(dragging.startTime + 0.2, dragging.endTime + deltaSec));
+    } else {
+      // move
+      const duration = dragging.endTime - dragging.startTime;
+      newStart = Math.max(0, Math.min(dragging.totalDuration - duration, dragging.startTime + deltaSec));
+      newEnd = newStart + duration;
+    }
+
+    img.startTime = Math.round(newStart * 10) / 10;
+    img.endTime = Math.round(newEnd * 10) / 10;
+  }
+
+  function onPointerUp(e: PointerEvent) {
+    if (dragging) {
+      projectStore.saveToDB();
+      dragging = null;
+    }
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+  }
 </script>
 
-<div class="h-32 border-t border-neutral-800 bg-neutral-900/95 flex flex-col shrink-0 select-none z-20">
+<div class="h-48 border-t border-neutral-800 bg-neutral-900/95 flex flex-col shrink-0 select-none z-20">
   <!-- Timeline Header / Controls -->
   <div class="h-8 border-b border-neutral-800/80 px-3 sm:px-4 flex items-center justify-between text-xs text-neutral-400">
     <div class="flex items-center gap-2 sm:gap-3">
@@ -146,8 +230,12 @@
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div 
+      bind:this={timelineContainer}
       class="h-10 w-full bg-neutral-950/80 rounded-lg border border-neutral-800 relative cursor-pointer overflow-hidden group"
       onclick={handleTimelineClick}
+      onpointermove={onPointerMove}
+      onpointerup={onPointerUp}
+      onpointercancel={onPointerUp}
     >
       {#if projectStore.isProcessingAudio}
         <div class="absolute inset-0 flex items-center justify-center gap-2 bg-neutral-950/90 text-cyan-400 text-xs">
@@ -225,6 +313,40 @@
       {/if}
     </div>
 
+    <!-- Image Overlays Track (CapCut-style drag) -->
+    {#if projectStore.project.overlays.images && projectStore.project.overlays.images.length > 0 && projectStore.project.audio.duration > 0}
+      {@const totalDur = projectStore.project.audio.duration}
+      <div class="h-8 w-full bg-neutral-950/60 rounded-lg border border-neutral-800/80 relative overflow-hidden">
+        <div class="absolute left-1 top-0.5 text-[9px] text-fuchsia-400 font-medium flex items-center gap-1 pointer-events-none z-10">
+          <ImageIcon class="w-3 h-3" />
+          Images
+        </div>
+        {#each projectStore.project.overlays.images as img, idx (img.id)}
+          {@const { start, end } = getImageStartEnd(img, totalDur)}
+          {@const leftPct = (start / totalDur) * 100}
+          {@const widthPct = Math.max(0.5, ((end - start) / totalDur) * 100)}
+          <div
+            class="absolute top-1 bottom-1 rounded bg-fuchsia-500/80 border border-fuchsia-400/60 hover:bg-fuchsia-500 cursor-move flex items-center justify-center text-[8px] text-white font-medium truncate px-1 select-none"
+            style={`left: ${leftPct}%; width: ${widthPct}%;`}
+            title={`${img.name}\n${formatTime(start)} → ${formatTime(end)} (${(end - start).toFixed(1)}s)\nDrag tengah: pindah | Drag ujung: ubah durasi`}
+            onpointerdown={(e) => onImagePointerDown(e, img, 'move')}
+          >
+            <!-- Left resize handle -->
+            <div
+              class="absolute left-0 top-0 bottom-0 w-1.5 cursor-ew-resize hover:bg-white/40 rounded-l"
+              onpointerdown={(e) => onImagePointerDown(e, img, 'left')}
+            ></div>
+            <span class="pointer-events-none truncate">{img.name.replace(/\.[^/.]+$/, '')}</span>
+            <!-- Right resize handle -->
+            <div
+              class="absolute right-0 top-0 bottom-0 w-1.5 cursor-ew-resize hover:bg-white/40 rounded-r"
+              onpointerdown={(e) => onImagePointerDown(e, img, 'right')}
+            ></div>
+          </div>
+        {/each}
+      </div>
+    {/if}
+
     <!-- Multi-track Layer Overview (Compact single line) -->
     <div class="grid grid-cols-4 gap-1.5 text-[10px]">
       <div class="px-2 py-1 rounded bg-neutral-950/80 border border-neutral-800/80 flex items-center justify-between text-neutral-400">
@@ -252,4 +374,3 @@
     </div>
   </div>
 </div>
-

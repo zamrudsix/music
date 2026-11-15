@@ -101,6 +101,11 @@
         <option value="Space Grotesk">Space Grotesk (Futuristic)</option>
         <option value="Playfair Display">Playfair Display (Serif)</option>
         <option value="Roboto Mono">Roboto Mono (Monospace)</option>
+      <option value="Anton">Anton</option>
+      <option value="Bangers">Bangers</option>
+      <option value="Pacifico">Pacifico</option>
+      <option value="Orbitron">Orbitron</option>
+      <option value="Press Start 2P">Press Start 2P</option>
       </select>
     </div>
 

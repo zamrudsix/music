@@ -155,6 +155,19 @@
       <option value="Space Grotesk">Space Grotesk (Tech)</option>
       <option value="Playfair Display">Playfair Display (Serif)</option>
       <option value="Roboto Mono">Roboto Mono (Monospace)</option>
+      <option value="Anton">Anton (Heavy Impact)</option>
+      <option value="Archivo Black">Archivo Black</option>
+      <option value="Righteous">Righteous</option>
+      <option value="Bangers">Bangers (Comic)</option>
+      <option value="Pacifico">Pacifico (Script)</option>
+      <option value="Permanent Marker">Permanent Marker</option>
+      <option value="Caveat">Caveat (Handwritten)</option>
+      <option value="Lobster">Lobster</option>
+      <option value="Orbitron">Orbitron (Futuristic)</option>
+      <option value="Press Start 2P">Press Start 2P (Pixel)</option>
+      <option value="Creepster">Creepster (Horror)</option>
+      <option value="Special Elite">Special Elite (Typewriter)</option>
+      <option value="Monoton">Monoton (Neon)</option>
       {#if projectStore.project.customFonts}
         {#each projectStore.project.customFonts as cf}
           <option value={cf.name}>{cf.name} (Custom)</option>
