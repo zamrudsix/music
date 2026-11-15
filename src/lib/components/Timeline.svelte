@@ -95,17 +95,45 @@
   let rangeDrag = $state<{ startX: number; startTime: number } | null>(null);
 
   function onTimelinePointerDown(e: PointerEvent) {
-    if (e.button !== 0) return; // left click only
+    if (e.button !== 0) return;
     if (dragging) return;
     if (!timelineContainer || !projectStore.audioBuffer) return;
 
-    isScrubbing = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    seekFromEvent(e);
+
+    if (e.shiftKey) {
+      // Shift + drag = set trim range
+      const rect = timelineContainer.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const progress = Math.max(0, Math.min(1, x / rect.width));
+      const t = progress * (projectStore.project.audio.duration || 1);
+      rangeDrag = { startX: e.clientX, startTime: t };
+      if (!projectStore.project.exportSettings.exportRange) {
+        projectStore.project.exportSettings.exportRange = { enabled: true, startTime: t, endTime: t };
+      }
+      const range = projectStore.project.exportSettings.exportRange;
+      range.enabled = true;
+      range.startTime = t;
+      range.endTime = t;
+    } else {
+      // Normal drag = scrub
+      isScrubbing = true;
+      seekFromEvent(e);
+    }
   }
 
   function onTimelinePointerMove(e: PointerEvent) {
-    if (isScrubbing) {
+    if (rangeDrag && timelineContainer) {
+      const rect = timelineContainer.getBoundingClientRect();
+      const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+      const progress = x / rect.width;
+      const t = progress * (projectStore.project.audio.duration || 1);
+      const range = projectStore.project.exportSettings.exportRange;
+      if (range) {
+        range.startTime = Math.min(rangeDrag.startTime, t);
+        range.endTime = Math.max(rangeDrag.startTime, t);
+      }
+    } else if (isScrubbing) {
       seekFromEvent(e);
     } else {
       onPointerMove(e);
@@ -272,6 +300,9 @@
         >
           ↩ Undo
         </button>
+        <span class="text-[9px] text-neutral-500 hidden sm:inline" title="Klik+geser = scrub | Shift+klik+geser = cut | Ctrl+Z = undo">
+          Geser=scrub · Shift+geser=cut
+        </span>
         <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-cyan-400 font-mono">
           <span class="text-neutral-400">Posisi:</span>
           <span class="text-cyan-300">{Math.floor(projectStore.currentTime / 60)}:{(Math.floor(projectStore.currentTime % 60)).toString().padStart(2, '0')}</span>
