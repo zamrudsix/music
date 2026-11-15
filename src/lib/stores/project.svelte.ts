@@ -221,23 +221,32 @@ class ProjectState {
   }
 
   async undo() {
-    if (this.undoStack.length === 0 && !this.originalAudioBackup) return;
+    if (!this.originalAudioBackup && this.undoStack.length === 0) return;
+
+    // Restore project config if we have a snapshot
     const prev = this.undoStack.pop();
     if (prev) {
-      this.project = prev;
+      this.project = structuredClone(prev);
     }
-    // Restore original audio if we have a backup
-    if (this.originalAudioBackup) {
+
+    // Always restore original audio duration if backup exists
+    if (this.originalAudioBackup && this.originalAudioBackup.buffer) {
       this.audioBuffer = this.originalAudioBackup.buffer;
-      this.project.audio.tracks = this.originalAudioBackup.tracks;
-      this.project.audio.duration = this.audioBuffer?.duration || 0;
+      this.project.audio.duration = this.audioBuffer.duration;
+      this.project.audio.tracks = structuredClone(this.originalAudioBackup.tracks);
       this.trackBuffers.clear();
-      if (this.audioBuffer && this.project.audio.tracks?.[0]) {
+      if (this.project.audio.tracks?.[0]) {
         this.trackBuffers.set(this.project.audio.tracks[0].id, this.audioBuffer);
       }
-      this.originalAudioBackup = null;
+      // Reset any active trim range
+      if (this.project.exportSettings.exportRange) {
+        this.project.exportSettings.exportRange.enabled = false;
+        this.project.exportSettings.exportRange.startTime = 0;
+        this.project.exportSettings.exportRange.endTime = this.audioBuffer.duration;
+      }
     }
     await this.saveToDB();
+    alert(`Undo: durasi kembali ke ${Math.round(this.project.audio.duration)} detik`);
   }
 
   /**
@@ -420,6 +429,11 @@ class ProjectState {
       this.audioBuffer = merged;
       this.project.audio.fileName = `${this.project.audio.tracks.length} Tracks Combined (${Math.round(merged.duration)}s)`;
       this.project.audio.duration = merged.duration;
+      // Always keep a fresh original backup when audio is loaded
+      this.originalAudioBackup = {
+        buffer: merged,
+        tracks: structuredClone(this.project.audio.tracks || []),
+      };
       this.project.updatedAt = Date.now();
 
       // Free individual track buffers from memory immediately!
