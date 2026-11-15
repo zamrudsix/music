@@ -210,6 +210,7 @@ class ProjectState {
   project = $state<ProjectConfig>(structuredClone(DEFAULT_PROJECT));
   private undoStack: ProjectConfig[] = [];
   private readonly MAX_UNDO = 30;
+  private originalAudioBackup: { buffer: AudioBuffer | null; tracks: any[] } | null = null;
 
   pushUndo() {
     try {
@@ -220,16 +221,23 @@ class ProjectState {
   }
 
   async undo() {
-    if (this.undoStack.length === 0) return;
+    if (this.undoStack.length === 0 && !this.originalAudioBackup) return;
     const prev = this.undoStack.pop();
     if (prev) {
       this.project = prev;
-      // Restore original audio by rebuilding from tracks
-      this.trackBuffers.clear();
-      this.audioBuffer = null;
-      await this.rebuildMergedAudio();
-      await this.saveToDB();
     }
+    // Restore original audio if we have a backup
+    if (this.originalAudioBackup) {
+      this.audioBuffer = this.originalAudioBackup.buffer;
+      this.project.audio.tracks = this.originalAudioBackup.tracks;
+      this.project.audio.duration = this.audioBuffer?.duration || 0;
+      this.trackBuffers.clear();
+      if (this.audioBuffer && this.project.audio.tracks?.[0]) {
+        this.trackBuffers.set(this.project.audio.tracks[0].id, this.audioBuffer);
+      }
+      this.originalAudioBackup = null;
+    }
+    await this.saveToDB();
   }
 
   /**
@@ -241,6 +249,13 @@ class ProjectState {
     if (!range || !range.enabled || !this.audioBuffer) return;
 
     this.pushUndo();
+    // Backup original audio before first trim
+    if (!this.originalAudioBackup && this.audioBuffer) {
+      this.originalAudioBackup = {
+        buffer: this.audioBuffer,
+        tracks: structuredClone(this.project.audio.tracks || []),
+      };
+    }
 
     const start = Math.max(0, range.startTime);
     const end = Math.min(this.audioBuffer.duration, range.endTime);

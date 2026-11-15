@@ -1,5 +1,30 @@
 export const SPECTRUM_STYLE_CATEGORIES = [
   {
+    category: 'Ponco Spectrum',
+    styles: [
+      'Ponco Neon Bars',
+      'Ponco Circular Glow',
+      'Ponco Wave Pulse',
+      'Ponco Mirror Dual',
+      'Ponco LED Rain',
+      'Ponco Radial Burst',
+      'Ponco Aurora Flow',
+      'Ponco Cyber Grid',
+      'Ponco Particle Ring',
+      'Ponco Bass Drop',
+      'Ponco Neon Outline',
+      'Ponco Double Helix',
+      'Ponco Fire Wave',
+      'Ponco Galaxy Spin',
+      'Ponco Pulse Bars',
+      'Ponco Tunnel Dive',
+      'Ponco Sparkle EQ',
+      'Ponco Liquid Bars',
+      'Ponco Holo Circle',
+      'Ponco Energy Field',
+    ],
+  },
+  {
     category: 'Bars & Equalizer',
     styles: [
       'bars',

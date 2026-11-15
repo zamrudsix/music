@@ -105,7 +105,7 @@
 <header class="h-14 border-b border-neutral-800 bg-neutral-900/80 backdrop-blur-md px-4 flex items-center justify-between shrink-0 z-30 gap-2">
   <div class="flex items-center gap-3 shrink-0">
     <div class="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shadow-lg shadow-cyan-500/20 border border-cyan-500/30 shrink-0">
-      <img src="/logo.svg" alt="BeatCanvas Logo" class="w-full h-full object-cover" />
+      <img src="/logo.svg" alt="poncomod" class="w-full h-full object-cover" />
     </div>
     <div class="flex flex-col max-w-[200px] lg:max-w-[280px]">
       <div class="flex items-center gap-1.5">

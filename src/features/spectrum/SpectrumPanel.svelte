@@ -55,7 +55,7 @@
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-1.5 font-medium text-xs text-neutral-200">
         <Sliders class="w-3.5 h-3.5 text-cyan-400" />
-        Daftar Spektrum ({projectStore.project.overlays.spectrums?.length || 1})
+        Ponco Spectrum ({projectStore.project.overlays.spectrums?.length || 1})
       </div>
       <button 
         type="button" 
