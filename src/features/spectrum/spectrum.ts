@@ -142,13 +142,6 @@ export class SpectrumRenderer {
       // default Ponco fallback - unique per style name hash
       const hue = style.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 360;
       for (let i = 0; i < 32; i++) {
-        const h = (data[i % data.length] / 255) * height * 0.7;
-        ctx.fillStyle = `hsl(${(hue + i * 10) % 360}, 90%, 55%)`;
-        ctx.fillRect((i / 32) * width, height - h, width / 40, h);
-      }
-      return;
-    }
-
         // Real unique Ponco styles
     if (style === 'Ponco Bars Glow') {
       const barW = width / 48;
@@ -2392,4 +2385,4 @@ export class SpectrumRenderer {
     }
   }
 }
-
+}
