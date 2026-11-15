@@ -77,6 +77,31 @@ const BUILTIN_FONT_URLS: Record<string, string> = {
   'Noto Sans': 'https://fonts.gstatic.com/s/notosans/v42/o-0mIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjcz6L1SoM-jCpoiyD9A99d.ttf',
   'IBM Plex Sans': 'https://fonts.gstatic.com/s/ibmplexsans/v23/zYXGKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1swZSAXcomDVmadSD6llzAA.ttf',
   'IBM Plex Serif': 'https://fonts.gstatic.com/s/ibmplexserif/v20/jizDREVNn1dOx-zrZ2X3pZvkThUY.ttf',
+
+  // More display / serif
+  'Abril Fatface': 'https://fonts.gstatic.com/s/abrilfatface/v25/zOL64pLDlL1D99S8g8PtiKchm-A.ttf',
+  'Alfa Slab One': 'https://fonts.gstatic.com/s/alfaslabone/v21/6NUQ8FmMKwSEKjnm5-4v-4Jh6dU.ttf',
+  'Black Ops One': 'https://fonts.gstatic.com/s/blackopsone/v21/qWcsB6-ypo7xBdr6Xshe96H3WDw.ttf',
+  'Bungee': 'https://fonts.gstatic.com/s/bungee/v17/N0bU2SZBIuF2PU_ECg.ttf',
+  'Fredoka': 'https://fonts.gstatic.com/s/fredoka/v17/X7nP4b87HvSqjb_WIi2yDCRwoQ_k7367_B-i2yQag0-mac3O8SLMFg.ttf',
+  'Lilita One': 'https://fonts.gstatic.com/s/lilitaone/v17/i7dPIFZ9Zz-WBtRtedDbUEY.ttf',
+  'Luckiest Guy': 'https://fonts.gstatic.com/s/luckiestguy/v25/_gP_1RrxsjcxVyin9l9n_j2RSg.ttf',
+  'Passion One': 'https://fonts.gstatic.com/s/passionone/v20/PbynFmL8HhTPqbjUzux3JHuW.ttf',
+  'Patua One': 'https://fonts.gstatic.com/s/patuaone/v22/ZXuke1cDvLCKLDcimxBI5A.ttf',
+  'Russo One': 'https://fonts.gstatic.com/s/russoone/v18/Z9XUDmZRWg6M1LvRYsH-yA.ttf',
+  'Staatliches': 'https://fonts.gstatic.com/s/staatliches/v15/HI_OiY8KO6hCsQSoAPmtMbec.ttf',
+  'Teko': 'https://fonts.gstatic.com/s/teko/v23/LYjYdG7kmE0gV69VVPPdFl06VN8XG7Sy.ttf',
+  'Alegreya': 'https://fonts.gstatic.com/s/alegreya/v41/4UacrEBBsBhlBjvfkQjt71kZfyBzPgNG9hUI_A.ttf',
+  'Cormorant Garamond': 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_v86GnM.ttf',
+  'EB Garamond': 'https://fonts.gstatic.com/s/ebgaramond/v33/SlGDmQSNjdsmc35JDF1K5E55YMjF_7DPuGi-6_RUAw.ttf',
+  'Libre Caslon Text': 'https://fonts.gstatic.com/s/librecaslontext/v5/DdT878IGsGw1aF1JU10PUbTvNNaDMcq_.ttf',
+  'Spectral': 'https://fonts.gstatic.com/s/spectral/v15/rnCr-xNNww_2s0amA-M-.ttf',
+  'Cardo': 'https://fonts.gstatic.com/s/cardo/v21/wlp_gwjKBV1pqiv_.ttf',
+  'Neuton': 'https://fonts.gstatic.com/s/neuton/v24/UMBTrPtMoH62xUZyyA.ttf',
+  'Old Standard TT': 'https://fonts.gstatic.com/s/oldstandardtt/v22/MwQubh3o1vLImiwAVvYawgcf2eVurQ.ttf',
+  'Cinzel': 'https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-tbnTYo.ttf',
+  'Playfair Display SC': 'https://fonts.gstatic.com/s/playfairdisplaysc/v18/ke85OhoaMkR6-hSn7kbHVoFf7ZfgMPr_pb4.ttf',
+  'MedievalSharp': 'https://fonts.gstatic.com/s/medievalsharp/v28/EvOJzAlL3oU5AQl2mP5KdgptAq8.ttf',
 };
 
 export class FontManager {

@@ -137,6 +137,27 @@
               <option value="Noto Sans">Noto Sans</option>
               <option value="IBM Plex Sans">IBM Plex Sans</option>
               <option value="IBM Plex Serif">IBM Plex Serif</option>
+              
+              <option value="Abril Fatface">Abril Fatface</option>
+              <option value="Alfa Slab One">Alfa Slab One</option>
+              <option value="Black Ops One">Black Ops One</option>
+              <option value="Bungee">Bungee</option>
+              <option value="Fredoka">Fredoka</option>
+              <option value="Lilita One">Lilita One</option>
+              <option value="Luckiest Guy">Luckiest Guy</option>
+              <option value="Passion One">Passion One</option>
+              <option value="Patua One">Patua One</option>
+              <option value="Russo One">Russo One</option>
+              <option value="Staatliches">Staatliches</option>
+              <option value="Teko">Teko</option>
+              <option value="Alegreya">Alegreya</option>
+              <option value="Cormorant Garamond">Cormorant Garamond</option>
+              <option value="EB Garamond">EB Garamond</option>
+              <option value="Libre Caslon Text">Libre Caslon Text</option>
+              <option value="Spectral">Spectral</option>
+              <option value="Cinzel">Cinzel</option>
+              <option value="Playfair Display SC">Playfair Display SC</option>
+              <option value="MedievalSharp">MedievalSharp</option>
               {#if projectStore.project.customFonts}
                 {#each projectStore.project.customFonts as cf}
                   <option value={cf.name}>{cf.name} (Custom)</option>

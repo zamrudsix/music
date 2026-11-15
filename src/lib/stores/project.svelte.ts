@@ -208,6 +208,25 @@ const DEFAULT_PROJECT: ProjectConfig = {
 
 class ProjectState {
   project = $state<ProjectConfig>(structuredClone(DEFAULT_PROJECT));
+  private undoStack: ProjectConfig[] = [];
+  private readonly MAX_UNDO = 30;
+
+  pushUndo() {
+    try {
+      const snap = structuredClone(this.project);
+      this.undoStack.push(snap);
+      if (this.undoStack.length > this.MAX_UNDO) this.undoStack.shift();
+    } catch {}
+  }
+
+  undo() {
+    if (this.undoStack.length === 0) return;
+    const prev = this.undoStack.pop();
+    if (prev) {
+      this.project = prev;
+      this.saveToDB();
+    }
+  }
   currentTime = $state<number>(0);
   isPlaying = $state<boolean>(false);
   activeTab = $state<'background' | 'particles' | 'spectrum' | 'lyrics' | 'images' | 'texts' | 'tracklist-overlay' | 'tracklist-png' | 'export'>('background');

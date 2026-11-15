@@ -107,7 +107,7 @@
     const range = projectStore.project.exportSettings.exportRange;
     if (!range) return;
     const parsed = parseTimeToSeconds(startInputStr, range.startTime);
-    range.startTime = Math.max(0, Math.min(parsed, Math.max(0, range.endTime - 1)));
+    projectStore.pushUndo(); range.startTime = Math.max(0, Math.min(parsed, Math.max(0, range.endTime - 1)));
     startInputStr = secondsToTimeString(range.startTime);
     projectStore.saveToDB();
   }
@@ -117,7 +117,7 @@
     if (!range) return;
     const maxDur = Math.round(projectStore.project.audio.duration || 3600);
     const parsed = parseTimeToSeconds(endInputStr, range.endTime);
-    range.endTime = Math.min(maxDur, Math.max(range.startTime + 1, parsed));
+    projectStore.pushUndo(); range.endTime = Math.min(maxDur, Math.max(range.startTime + 1, parsed));
     endInputStr = secondsToTimeString(range.endTime);
     projectStore.saveToDB();
   }

@@ -235,6 +235,13 @@
     <!-- Audio Track Summary & Counter -->
     <div class="flex items-center gap-2 sm:gap-3">
       {#if projectStore.project.audio.tracks && projectStore.project.audio.tracks.length > 0}
+        <button 
+          onclick={() => projectStore.undo()}
+          class="px-1.5 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-[10px] flex items-center gap-1 border border-neutral-700"
+          title="Undo (Ctrl+Z)"
+        >
+          ↩ Undo
+        </button>
         <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-cyan-400 font-mono">
           <span class="text-neutral-400">Posisi:</span>
           <span class="text-cyan-300">{Math.floor(projectStore.currentTime / 60)}:{(Math.floor(projectStore.currentTime % 60)).toString().padStart(2, '0')}</span>
