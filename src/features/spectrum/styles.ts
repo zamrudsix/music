@@ -27,6 +27,16 @@ export const SPECTRUM_STYLE_CATEGORIES = [
     ],
   },
   {
+    category: 'Trending Color Spectrum (20 New)',
+    styles: [
+      'Bars Rainbow Flow', 'Bars Aurora Glow', 'Bars Cyber Neon', 'Bars Sunset',
+      'Bars Ocean', 'Bars Candy', 'Bars Fire', 'Bars Ice', 'Bars Galaxy',
+      'Bars Toxic', 'Bars Gold', 'Bars Pink Pulse', 'Bars RGB Wave',
+      'Bars Gradient Pill', 'Bars Mirror Neon', 'Bars Peak Glow',
+      'Bars Retro LED', 'Bars Glass', 'Bars Dual Tone', 'Bars Stacked',
+    ],
+  },
+  {
     category: 'LED & Blocks',
     styles: [
       'digital-eq',

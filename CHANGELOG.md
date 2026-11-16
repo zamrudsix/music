@@ -1,3 +1,10 @@
+## [v4.3.12] - 2026-11-16
+
+### 🌈 Spectrum Visualizer Upgrade
+- Tambah 20 preset Spectrum berwarna: Rainbow Flow, Aurora Glow, Cyber Neon, Sunset, Ocean, Candy, Fire, Ice, Galaxy, Toxic, Gold, Pink Pulse, RGB Wave, Gradient Pill, Mirror Neon, Peak Glow, Retro LED, Glass, Dual Tone, dan Stacked.
+- Preset baru memakai palet warna multiwarna; beberapa style menambahkan glow, pill bars, RGB hue animation, peak accent, dan stacked segments.
+- Style baru terintegrasi ke renderer Bars yang sudah ada, sehingga tetap mengikuti data frekuensi audio dan pengaturan posisi, ukuran, jumlah bar, mirror, serta beat.
+
 # Changelog
 
 Semua perubahan dan catatan rilis pada proyek **Beras Visualizer** dicatat dalam dokumen ini.
