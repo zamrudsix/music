@@ -293,7 +293,27 @@ export interface SpectrumConfig {
   scale: number;
 }
 
-export type LyricStyle = 'karaoke' | 'fade-line' | 'typewriter' | 'bounce-word' | 'bottom-bar';
+export type LyricStyle = 
+  | 'karaoke' 
+  | 'fade-line' 
+  | 'typewriter' 
+  | 'bounce-word' 
+  | 'bottom-bar'
+  | 'neon-glow'
+  | 'outline-bold'
+  | 'gradient-fill'
+  | 'shadow-heavy'
+  | 'wave-bounce'
+  | 'slide-in'
+  | 'scale-pop'
+  | 'rainbow-word'
+  | 'minimal-clean'
+  | 'karaoke-classic'
+  | 'center-focus'
+  | 'bar-progress'
+  | 'floating-words'
+  | 'glitch-text'
+  | 'soft-fade';
 
 export interface LyricSegment {
   id: string;

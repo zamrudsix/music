@@ -2,6 +2,19 @@
 
 Semua perubahan dan catatan rilis pada proyek **Beras Visualizer** dicatat dalam dokumen ini.
 
+## [v4.3.7] - 2026-11-16
+
+### 🎤 Karaoke Styles
+- Tambah 15 style lyric/karaoke baru: Neon Glow, Outline Bold, Gradient Fill, Heavy Shadow, Wave Bounce, Slide In, Scale Pop, Rainbow Word, Minimal Clean, Karaoke Classic, Center Focus, Bar Progress, Floating Words, Glitch Text, Soft Fade
+
+### 📉 CBR Compression
+- Preset CBR diturunkan biar file lebih kecil:
+  - 720p → 1.8 Mbps
+  - 1080p → 3.5 Mbps
+- Tetap bisa pilih 720 atau 1080
+
+---
+
 ## [v4.3.6] - 2026-11-16
 
 ### 🔧 Perbaikan
