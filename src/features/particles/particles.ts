@@ -238,6 +238,58 @@ export class ParticleSystem {
       vx = -Math.abs((Math.random() * 2.5 + 2) * config.speed * scaleFactor);
       vy = (Math.random() * 2.5 + 2) * config.speed * scaleFactor;
       color = config.color && config.color !== '#ffffff' ? config.color : '#fbbf24';
+    } else if (preset === 'Audio Sphere' || preset === 'Interactive Orbit') {
+      size = Math.max(2 * scaleFactor, (Math.random() * 1.2 + 0.4) * baseSize);
+      const ang = Math.random() * Math.PI * 2;
+      const r = 80 + Math.random() * 120;
+      vx = Math.cos(ang) * config.speed * 0.8 * scaleFactor;
+      vy = Math.sin(ang) * config.speed * 0.8 * scaleFactor;
+      color = config.color && config.color !== '#ffffff' ? config.color : `hsl(${200 + Math.random()*80}, 90%, 65%)`;
+      shape = 'circle';
+    } else if (preset === 'Frequency Swarm' || preset === 'Audio Cloud' || preset === 'Color Shift Swarm') {
+      size = Math.max(1.5 * scaleFactor, (Math.random() * 1.0 + 0.3) * baseSize);
+      vx = (Math.random() - 0.5) * config.speed * 1.5 * scaleFactor;
+      vy = (Math.random() - 0.5) * config.speed * 1.5 * scaleFactor;
+      color = `hsl(${Math.random()*360}, 85%, 60%)`;
+      shape = Math.random() > 0.7 ? 'star' : 'circle';
+    } else if (preset === 'Beat Explosion' || preset === 'Circular Burst' || preset === 'Shockwave Rings') {
+      size = Math.max(2 * scaleFactor, (Math.random() * 1.5 + 0.5) * baseSize);
+      const ang = Math.random() * Math.PI * 2;
+      const mag = (Math.random() * 3 + 1) * config.speed * scaleFactor;
+      vx = Math.cos(ang) * mag;
+      vy = Math.sin(ang) * mag;
+      color = config.color && config.color !== '#ffffff' ? config.color : '#f43f5e';
+      shape = 'spark';
+    } else if (preset === 'Rising Bubbles' || preset === 'Particle Fountain' || preset === 'Music Note Rain') {
+      size = Math.max(3 * scaleFactor, (Math.random() * 1.4 + 0.6) * baseSize * 1.5);
+      vx = (Math.random() - 0.5) * config.speed * 0.4 * scaleFactor;
+      vy = -Math.abs((Math.random() * 0.8 + 0.4) * config.speed * scaleFactor);
+      color = config.color && config.color !== '#ffffff' ? config.color : '#67e8f9';
+      shape = 'circle';
+    } else if (preset === 'Neon Fireflies' || preset === 'Treble Sparkles') {
+      size = Math.max(1.2 * scaleFactor, (Math.random() * 0.6 + 0.2) * baseSize);
+      vx = (Math.random() - 0.5) * config.speed * 0.7 * scaleFactor;
+      vy = (Math.random() - 0.5) * config.speed * 0.7 * scaleFactor;
+      color = `hsl(${100 + Math.random()*60}, 100%, 65%)`;
+      shape = 'star';
+    } else if (preset === 'Galaxy Spiral' || preset === 'Gravity Well' || preset === 'Magnetic Flow') {
+      size = Math.max(1.8 * scaleFactor, (Math.random() * 0.9 + 0.3) * baseSize);
+      vx = (Math.random() - 0.5) * config.speed * scaleFactor;
+      vy = (Math.random() - 0.5) * config.speed * scaleFactor;
+      color = config.color && config.color !== '#ffffff' ? config.color : '#a855f7';
+      shape = 'circle';
+    } else if (preset === 'Bass Pulse' || preset === 'Midrange Drift' || preset === 'Waveform Dust') {
+      size = Math.max(2.5 * scaleFactor, (Math.random() * 1.1 + 0.5) * baseSize);
+      vx = (Math.random() - 0.5) * config.speed * 0.9 * scaleFactor;
+      vy = (Math.random() - 0.5) * config.speed * 0.9 * scaleFactor;
+      color = config.color && config.color !== '#ffffff' ? config.color : '#f59e0b';
+      shape = 'circle';
+    } else if (preset === 'Trail Comets') {
+      size = Math.max(2 * scaleFactor, (Math.random() * 0.8 + 0.4) * baseSize);
+      vx = (Math.random() - 0.3) * config.speed * 1.8 * scaleFactor;
+      vy = (Math.random() - 0.5) * config.speed * 0.6 * scaleFactor;
+      color = '#fbbf24';
+      shape = 'line';
     } else {
       // floating-dust, Bintik (Dust)
       if (config.gravity === 'up') vy = -Math.abs(vy) - 0.5 * config.speed * scaleFactor;
@@ -333,8 +385,20 @@ export class ParticleSystem {
       this.renderSparkles(ctx, effectiveConfig, beatFactor, scaleFactor);
     } else if (p === 'NCS Particles' || p === 'Particle Burst') {
       this.renderBurst(ctx, effectiveConfig, beatFactor, scaleFactor);
+    } else if (p === 'Beat Explosion' || p === 'Circular Burst' || p === 'Shockwave Rings') {
+      this.renderBurst(ctx, effectiveConfig, beatFactor, scaleFactor);
+    } else if (p === 'Galaxy Spiral' || p === 'Gravity Well' || p === 'Magnetic Flow' || p === 'Interactive Orbit' || p === 'Audio Sphere') {
+      this.renderVortex(ctx, effectiveConfig, beatFactor, scaleFactor);
+    } else if (p === 'Neon Fireflies' || p === 'Treble Sparkles' || p === 'Frequency Swarm' || p === 'Color Shift Swarm') {
+      this.renderSparkles(ctx, effectiveConfig, beatFactor, scaleFactor);
+    } else if (p === 'Rising Bubbles' || p === 'Particle Fountain' || p === 'Music Note Rain') {
+      this.renderFloatingDust(ctx, effectiveConfig, beatFactor, scaleFactor); // uses gravity up-like
+    } else if (p === 'Trail Comets' || p === 'Meteor Shower') {
+      this.renderMeteor(ctx, effectiveConfig, beatFactor, scaleFactor);
+    } else if (p === 'Bass Pulse' || p === 'Midrange Drift' || p === 'Waveform Dust' || p === 'Audio Cloud') {
+      this.renderFloatingDust(ctx, effectiveConfig, beatFactor, scaleFactor);
     } else {
-      // floating-dust, Bintik (Dust), Particles Rise
+      // floating-dust, Bintik (Dust), Particles Rise, and remaining new styles
       this.renderFloatingDust(ctx, effectiveConfig, beatFactor, scaleFactor);
     }
 

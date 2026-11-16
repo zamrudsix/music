@@ -75,7 +75,28 @@ export type ParticlePreset =
   | 'Meteor Shower'
   | 'Orbit Dust'
   | 'Galaxy Dust'
-  | 'Beat Spark';
+  | 'Beat Spark'
+  // New audio-reactive styles inspired by Interactive Particles Music Visualizer & Audio-Controlled Particles
+  | 'Audio Sphere'
+  | 'Frequency Swarm'
+  | 'Beat Explosion'
+  | 'Rising Bubbles'
+  | 'Neon Fireflies'
+  | 'Galaxy Spiral'
+  | 'Shockwave Rings'
+  | 'Magnetic Flow'
+  | 'Bass Pulse'
+  | 'Treble Sparkles'
+  | 'Midrange Drift'
+  | 'Particle Fountain'
+  | 'Audio Cloud'
+  | 'Waveform Dust'
+  | 'Circular Burst'
+  | 'Gravity Well'
+  | 'Trail Comets'
+  | 'Color Shift Swarm'
+  | 'Interactive Orbit'
+  | 'Music Note Rain';
 
 export interface ParticleConfig {
   enabled: boolean;
@@ -466,6 +487,8 @@ export interface ExportSettings {
   fps: 24 | 30 | 60;
   format: 'mp4' | 'webm';
   videoBitrate: number;
+  bitrateMode?: 'variable' | 'constant'; // VBR default, CBR for stable streaming like CBR Fix
+  keyframeIntervalSeconds?: number; // 1,2,3,4 for CBR mode
   audioBitrate: number;
   customExportDir?: string;
   exportRange?: ExportRange;
