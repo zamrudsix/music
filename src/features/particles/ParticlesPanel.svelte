@@ -20,6 +20,11 @@
       onchange={() => projectStore.saveToDB(500)}
       class="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2 text-neutral-200 focus:border-cyan-500 outline-none cursor-pointer"
     >
+      <option value="Audio Sphere">🌟 Audio Sphere (New)</option>
+      <option value="Frequency Swarm">🎵 Frequency Swarm (New)</option>
+      <option value="Beat Explosion">💥 Beat Explosion (New)</option>
+      <option value="Galaxy Spiral">🌌 Galaxy Spiral (New)</option>
+      <option value="Neon Fireflies">✨ Neon Fireflies (New)</option>
       <option value="Bintik (Dust)">Bintik (Dust)</option>
       <option value="Sparkles">Sparkles</option>
       <option value="Stars">Stars</option>
