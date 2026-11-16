@@ -70,40 +70,12 @@ export type ParticlePreset =
   | 'Ponco Triangles'
   | 'Ponco Squares'
   | 'Ponco Diamonds'
-  | 'Ponco Neon Dust'
-  | 'Ponco Fireflies'
-  | 'Ponco Galaxy Dust'
-  | 'Ponco Rain Glow'
-  | 'Ponco Spark Burst'
-  | 'Ponco Lightning'
-  | 'Ponco Snow'
-  | 'Ponco Fire'
   | 'Particle Burst'
   | 'Vortex Particles'
   | 'Meteor Shower'
   | 'Orbit Dust'
   | 'Galaxy Dust'
-  | 'Beat Spark'
-  | 'Audio Sphere'
-  | 'Frequency Swarm'
-  | 'Beat Explosion'
-  | 'Rising Bubbles'
-  | 'Neon Fireflies'
-  | 'Galaxy Spiral'
-  | 'Shockwave Rings'
-  | 'Magnetic Flow'
-  | 'Bass Pulse'
-  | 'Treble Sparkles'
-  | 'Midrange Drift'
-  | 'Particle Fountain'
-  | 'Audio Cloud'
-  | 'Waveform Dust'
-  | 'Circular Burst'
-  | 'Gravity Well'
-  | 'Trail Comets'
-  | 'Color Shift Swarm'
-  | 'Interactive Orbit'
-  | 'Music Note Rain';
+  | 'Beat Spark';
 
 export interface ParticleConfig {
   enabled: boolean;
@@ -131,25 +103,6 @@ export type SpectrumStyle =
   | 'dots-ring' 
   | 'pulse-rings'
   // Extended Styles List (96 styles)
-  | 'Bars Rainbow Flow'
-  | 'Bars Aurora Glow'
-  | 'Bars Cyber Neon'
-  | 'Bars Sunset'
-  | 'Bars Ocean'
-  | 'Bars Candy'
-  | 'Bars Fire'
-  | 'Bars Ice'
-  | 'Bars Toxic'
-  | 'Bars Gold'
-  | 'Bars Pink Pulse'
-  | 'Bars RGB Wave'
-  | 'Bars Gradient Pill'
-  | 'Bars Mirror Neon'
-  | 'Bars Peak Glow'
-  | 'Bars Retro LED'
-  | 'Bars Glass'
-  | 'Bars Dual Tone'
-  | 'Bars Stacked'
   | 'Bars Round'
   | 'Bars Dense'
   | 'Octave Bars'
@@ -312,27 +265,7 @@ export interface SpectrumConfig {
   scale: number;
 }
 
-export type LyricStyle = 
-  | 'karaoke' 
-  | 'fade-line' 
-  | 'typewriter' 
-  | 'bounce-word' 
-  | 'bottom-bar'
-  | 'neon-glow'
-  | 'outline-bold'
-  | 'gradient-fill'
-  | 'shadow-heavy'
-  | 'wave-bounce'
-  | 'slide-in'
-  | 'scale-pop'
-  | 'rainbow-word'
-  | 'minimal-clean'
-  | 'karaoke-classic'
-  | 'center-focus'
-  | 'bar-progress'
-  | 'floating-words'
-  | 'glitch-text'
-  | 'soft-fade';
+export type LyricStyle = 'karaoke' | 'fade-line' | 'typewriter' | 'bounce-word' | 'bottom-bar';
 
 export interface LyricSegment {
   id: string;
@@ -533,8 +466,6 @@ export interface ExportSettings {
   fps: 24 | 30 | 60;
   format: 'mp4' | 'webm';
   videoBitrate: number;
-  bitrateMode?: 'variable' | 'constant'; // VBR default, CBR for stable streaming like CBR Fix
-  keyframeIntervalSeconds?: number; // 1,2,3,4 for CBR mode
   audioBitrate: number;
   customExportDir?: string;
   exportRange?: ExportRange;

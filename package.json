@@ -1,7 +1,7 @@
 {
   "name": "poncomod",
   "private": true,
-  "version": "4.3.12",
+  "version": "4.3.6",
   "type": "module",
   "scripts": {
     "dev": "vite",

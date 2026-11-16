@@ -139,7 +139,60 @@ export class SpectrumRenderer {
       
       
       
-      // Real unique Ponco styles
+          // Viral Colorful styles
+    if (style.trim() === 'Neon Rainbow Bars') {
+      const barW = width / 40;
+      for (let i = 0; i < 40; i++) {
+        const h = (freqData[i % freqData.length] / 255) * height * 0.8;
+        ctx.fillStyle = `hsl(${(i * 9) % 360}, 100%, 55%)`;
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.shadowBlur = 10;
+        ctx.fillRect(i * barW, height - h, barW - 2, h);
+      }
+      ctx.shadowBlur = 0;
+      return;
+    }
+    if (style.trim() === 'Cyber Pulse Wave') {
+      ctx.beginPath();
+      for (let x = 0; x < width; x += 2) {
+        const idx = Math.floor((x / width) * freqData.length);
+        const y = height / 2 + Math.sin(x * 0.02 + Date.now() / 200) * (freqData[idx] / 255) * 60;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = '#00ffcc';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      return;
+    }
+    if (style.trim() === 'Fire Spectrum') {
+      for (let i = 0; i < 32; i++) {
+        const h = (freqData[i % freqData.length] / 255) * height * 0.7;
+        const x = (i / 32) * width;
+        const grd = ctx.createLinearGradient(0, height - h, 0, height);
+        grd.addColorStop(0, '#ff4500');
+        grd.addColorStop(0.5, '#ff8c00');
+        grd.addColorStop(1, '#ffd700');
+        ctx.fillStyle = grd;
+        ctx.fillRect(x, height - h, width / 35, h);
+      }
+      return;
+    }
+    if (style.trim() === 'Rainbow Radial') {
+      const cx = width / 2, cy = height / 2;
+      for (let i = 0; i < 36; i++) {
+        const a = (i / 36) * Math.PI * 2;
+        const len = 40 + (freqData[i % freqData.length] / 255) * 100;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len);
+        ctx.strokeStyle = `hsl(${(i * 10) % 360}, 100%, 55%)`;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+      return;
+    }
+
+    // Real unique Ponco styles
     if (style === 'Ponco Bars Glow') {
       const barW = width / 48;
       for (let i = 0; i < 48; i++) {
@@ -149,7 +202,7 @@ export class SpectrumRenderer {
         grd.addColorStop(0, `hsl(${(i * 7) % 360}, 100%, 60%)`);
         grd.addColorStop(1, `hsl(${(i * 7 + 40) % 360}, 100%, 40%)`);
         ctx.fillStyle = grd;
-        ctx.shadowColor = `hsl(${(i * 7) % 360}, 100%, 60%)`;
+        ctx.shadowColor = grd;
         ctx.shadowBlur = 8;
         ctx.fillRect(x + 1, height - h, barW - 2, h);
       }
@@ -202,32 +255,7 @@ export class SpectrumRenderer {
     const barWidth = isThin 
       ? Math.max(1.5 * scaleFactor, 2.5 * scaleFactor)
       : Math.max(2 * scaleFactor, totalWidth / count - gap);
-    const isRound = style === 'Bars Round' || isFat || style === 'Bars Gradient Pill';
-    const colorThemes: Record<string, string[]> = {
-      'Bars Rainbow Flow': ['#ff3b8d', '#ff9f1c', '#ffe45e', '#35d07f', '#22d3ee', '#6477ff', '#b967ff'],
-      'Bars Aurora Glow': ['#00f5d4', '#00bbf9', '#7b2ff7', '#f72585'],
-      'Bars Cyber Neon': ['#00f0ff', '#ff00e5', '#a3ff12'],
-      'Bars Sunset': ['#ff416c', '#ff7e5f', '#feb47b'],
-      'Bars Ocean': ['#03045e', '#0077b6', '#00b4d8', '#90e0ef'],
-      'Bars Candy': ['#ff70a6', '#ff9770', '#ffd670', '#e9ff70', '#70d6ff'],
-      'Bars Fire': ['#7f0000', '#dc2626', '#f97316', '#facc15'],
-      'Bars Ice': ['#dff7ff', '#7dd3fc', '#38bdf8', '#6366f1'],
-      'Bars Galaxy': ['#312e81', '#7c3aed', '#d946ef', '#38bdf8'],
-      'Bars Toxic': ['#14532d', '#22c55e', '#a3e635', '#ecfccb'],
-      'Bars Gold': ['#713f12', '#ca8a04', '#facc15', '#fef3c7'],
-      'Bars Pink Pulse': ['#831843', '#ec4899', '#f9a8d4', '#fce7f3'],
-      'Bars RGB Wave': ['#ff1744', '#00e676', '#2979ff'],
-      'Bars Gradient Pill': ['#8b5cf6', '#ec4899', '#f97316'],
-      'Bars Mirror Neon': ['#00f5d4', '#3b82f6', '#a855f7'],
-      'Bars Peak Glow': ['#06b6d4', '#8b5cf6', '#f0abfc'],
-      'Bars Retro LED': ['#39ff14', '#00e5ff', '#ff00ff'],
-      'Bars Glass': ['#bae6fd', '#c4b5fd', '#fbcfe8'],
-      'Bars Dual Tone': [config.color, config.secondaryColor],
-      'Bars Stacked': ['#22d3ee', '#a78bfa', '#f472b6', '#fbbf24'],
-    };
-    const theme = colorThemes[style];
-    const isNewColorStyle = !!theme;
-    const isGlowStyle = style.includes('Glow') || style.includes('Neon') || style.includes('Pulse');
+    const isRound = style === 'Bars Round' || isFat;
     const isOutline = style === 'Outline';
     const isAlpha = style === 'Alpha Bars';
     const isMatrix = style === 'Matrix Rain';
@@ -239,7 +267,7 @@ export class SpectrumRenderer {
 
     // Fast Single Shared Gradient (created once per frame for standard bars, not 64-128x per frame)
     let sharedGrad: CanvasGradient | null = null;
-    if (isStandardBars && !isNewColorStyle) {
+    if (isStandardBars) {
       const maxH = Math.max(10, config.height * scale * multiplier);
       sharedGrad = ctx.createLinearGradient(0, posY, 0, posY - maxH);
       sharedGrad.addColorStop(0, config.color);
@@ -283,33 +311,11 @@ export class SpectrumRenderer {
       } else if (isLumi) {
         const lum = Math.floor(rawVal * 255);
         fillColor = `rgba(${lum}, 245, 255, ${0.4 + rawVal * 0.6})`;
-      } else if (theme) {
-        const colorIndex = Math.floor((i / Math.max(1, count - 1)) * (theme.length - 1));
-        fillColor = theme[colorIndex] || config.color;
-        if (style === 'Bars RGB Wave') {
-          fillColor = `hsl(${(i * 13 + time * 35) % 360}, 100%, 58%)`;
-        }
-        if (style === 'Bars Stacked') {
-          const segment = Math.max(1, Math.floor(barHeight / (5 * scaleFactor)));
-          ctx.fillStyle = fillColor;
-          for (let block = 0; block < segment; block++) {
-            ctx.fillStyle = theme[Math.min(theme.length - 1, Math.floor(block / Math.max(1, segment) * theme.length))] || fillColor;
-            ctx.fillRect(x, posY - (block + 1) * 5 * scaleFactor, barWidth, 4 * scaleFactor);
-          }
-          continue;
-        }
-        if (style === 'Bars Dual Tone') {
-          fillColor = i % 2 === 0 ? theme[0] : theme[1];
-        }
       } else if (sharedGrad) {
         fillColor = sharedGrad;
       }
 
       ctx.fillStyle = fillColor;
-      if (isGlowStyle && typeof fillColor === 'string') {
-        ctx.shadowColor = fillColor;
-        ctx.shadowBlur = 10 * scaleFactor;
-      }
 
       if (isAlpha) {
         ctx.globalAlpha = config.opacity * (0.2 + rawVal * 0.8);
@@ -327,10 +333,8 @@ export class SpectrumRenderer {
         ctx.fillRect(x, y, barWidth, barHeight);
       }
 
-      if (isGlowStyle) ctx.shadowBlur = 0;
-
-      // Peak dots for Bars Peak Neon and the new Peak Glow preset
-      if (style === 'Bars Peak Neon' || style === 'Bars Peak Glow') {
+      // Peak dots for Bars Peak Neon
+      if (style === 'Bars Peak Neon') {
         ctx.fillStyle = config.secondaryColor;
         ctx.fillRect(x, y - 6 * scaleFactor, barWidth, 3 * scaleFactor);
       }

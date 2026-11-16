@@ -253,21 +253,6 @@
       <option value="typewriter">Typewriter Effect</option>
       <option value="bounce-word">Bounce on Beat</option>
       <option value="bottom-bar">Classic Bottom Bar</option>
-      <option value="neon-glow">Neon Glow</option>
-      <option value="outline-bold">Outline Bold</option>
-      <option value="gradient-fill">Gradient Fill</option>
-      <option value="shadow-heavy">Heavy Shadow</option>
-      <option value="wave-bounce">Wave Bounce</option>
-      <option value="slide-in">Slide In</option>
-      <option value="scale-pop">Scale Pop</option>
-      <option value="rainbow-word">Rainbow Word</option>
-      <option value="minimal-clean">Minimal Clean</option>
-      <option value="karaoke-classic">Karaoke Classic</option>
-      <option value="center-focus">Center Focus</option>
-      <option value="bar-progress">Bar Progress</option>
-      <option value="floating-words">Floating Words</option>
-      <option value="glitch-text">Glitch Text</option>
-      <option value="soft-fade">Soft Fade</option>
     </select>
   </div>
 

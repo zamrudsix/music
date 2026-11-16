@@ -34,15 +34,20 @@ const BUILTIN_FONT_URLS: Record<string, string> = {
   'Rubik': 'https://fonts.gstatic.com/s/rubik/v28/iJWZBXyIfDnIV5PNhY1KTN7Z-Yh-B4i1UA.ttf',
 
   // Handwritten / Script / Fun
+  'Pacifico': 'https://fonts.gstatic.com/s/pacifico/v22/FwZY7-Qmy14u9lezJ-6H6MmBp0u-.ttf',
   'Permanent Marker': 'https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004La2Cfw.ttf',
+  'Pacifico': 'https://fonts.gstatic.com/s/pacifico/v22/FwZY7-Qmy14u9lezJ-6H6MmBp0u-.ttf',
   'Dancing Script': 'https://fonts.gstatic.com/s/dancingscript/v25/If2cXTr6YS-AZTq9ZjY.ttf',
   'Great Vibes': 'https://fonts.gstatic.com/s/greatvibes/v18/RWmMoKWR9v4ksMfaWd_JN9XFiaQ.ttf',
+  'Lobster': 'https://fonts.gstatic.com/s/lobster/v30/neILzCirqoswsqX9zoKmM.ttf',
   'Satisfy': 'https://fonts.gstatic.com/s/satisfy/v17/rP2Hp2yn6lkG50LoCZOIHQ.ttf',
   'Caveat': 'https://fonts.gstatic.com/s/caveat/v17/WnznHAc5bAfYB2QRah7pcpNvOx-pjcB.ttf',
   'Indie Flower': 'https://fonts.gstatic.com/s/indieflower/v21/m8JVjfNVeKWVnh3QMuKkFcZlbkGG1dKE.ttf',
   'Amatic SC': 'https://fonts.gstatic.com/s/amaticsc/v26/TUZyzwprpvBS1mzmAoa.ttf',
   'Shadows Into Light': 'https://fonts.gstatic.com/s/shadowsintolight/v19/UqyNK9UOIntux_czAvDQx_ZcHqZXBNQzdcD5.ttf',
   'Kalam': 'https://fonts.gstatic.com/s/kalam/v16/YA9dr0Wd4kDdMthQOCfzsw.ttf',
+  'Caveat': 'https://fonts.gstatic.com/s/caveat/v17/WnznHAc5bAfYB2QRah7pcpNvOx-pjfJ9eIWpZA.ttf',
+  'Lobster': 'https://fonts.gstatic.com/s/lobster/v30/neILzCirqoswsqX9zoKmM4MwWJU.ttf',
   'Comfortaa': 'https://fonts.gstatic.com/s/comfortaa/v45/1Pt_g8LJRfWJmhDAuUsSQamb1W0lwk4S4WjMPrQVIT9c2c8.ttf',
 
   // Futuristic / Tech / Special

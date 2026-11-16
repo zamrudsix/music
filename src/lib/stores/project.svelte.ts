@@ -197,8 +197,6 @@ const DEFAULT_PROJECT: ProjectConfig = {
     fps: 30,
     format: 'mp4',
     videoBitrate: 8_000_000,
-    bitrateMode: 'variable',
-    keyframeIntervalSeconds: 2,
     audioBitrate: 192_000,
     exportRange: {
       enabled: false,

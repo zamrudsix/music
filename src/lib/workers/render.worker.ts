@@ -682,7 +682,6 @@ self.onmessage = async (e: MessageEvent<RenderRequest | { type: 'CANCEL' }>) => 
       width,
       height,
       bitrate: videoBitrate || defaultBitrate,
-      bitrateMode: project.exportSettings.bitrateMode === 'constant' ? 'constant' : 'variable',
       framerate: fps,
       hardwareAcceleration: 'prefer-hardware',
       latencyMode: 'quality',
@@ -742,8 +741,7 @@ self.onmessage = async (e: MessageEvent<RenderRequest | { type: 'CANCEL' }>) => 
         const outputTime = frameIdx / fps;
         const currentTime = renderStart + outputTime;
         const timestampMicroseconds = Math.round(outputTime * 1_000_000);
-        const kfInterval = project.exportSettings.keyframeIntervalSeconds || 2;
-        const isKeyFrame = frameIdx % Math.round(fps * kfInterval) === 0;
+        const isKeyFrame = frameIdx % (fps * 2) === 0;
 
         // 1. Determine Beat Hit (O(1) cursor with smooth exponential decay and clean resting clamp)
         let rawBeatFactor = 1.0;

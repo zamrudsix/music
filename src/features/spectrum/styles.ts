@@ -1,5 +1,30 @@
 export const SPECTRUM_STYLE_CATEGORIES = [
   {
+    category: 'Viral Colorful',
+    styles: [
+      'Neon Rainbow Bars',
+      'Cyber Pulse Wave',
+      'Galaxy Spiral Color',
+      'Fire Spectrum',
+      'Ocean Wave Bars',
+      'Sunset Gradient',
+      'Electric Arc',
+      'Prism Burst',
+      'Aurora Bars',
+      'Laser Grid',
+      'Candy Wave',
+      'Plasma Circle',
+      'Neon Outline Bars',
+      'Rainbow Radial',
+      'Glitch Color Bars',
+      'Holo Wave',
+      'Bass Color Drop',
+      'Vaporwave Bars',
+      'Synthwave Line',
+      'RGB Mirror',
+    ],
+  },
+  {
     category: 'Ponco Spectrum',
     styles: [
       'Ponco Bars Glow',
@@ -24,16 +49,6 @@ export const SPECTRUM_STYLE_CATEGORIES = [
       'Bar Level Color',
       'Bar Index Color',
       'Matrix Rain',
-    ],
-  },
-  {
-    category: 'Trending Color Spectrum (20 New)',
-    styles: [
-      'Bars Rainbow Flow', 'Bars Aurora Glow', 'Bars Cyber Neon', 'Bars Sunset',
-      'Bars Ocean', 'Bars Candy', 'Bars Fire', 'Bars Ice', 'Bars Galaxy',
-      'Bars Toxic', 'Bars Gold', 'Bars Pink Pulse', 'Bars RGB Wave',
-      'Bars Gradient Pill', 'Bars Mirror Neon', 'Bars Peak Glow',
-      'Bars Retro LED', 'Bars Glass', 'Bars Dual Tone', 'Bars Stacked',
     ],
   },
   {
