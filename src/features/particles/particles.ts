@@ -193,28 +193,6 @@ export class ParticleSystem {
       p.size = Math.random() * 4 + 2;
       p.color = `hsl(${Math.random() * 30}, 100%, 50%)`;
       (p as any).shape = 'fire';
-    } else if (preset === 'Ponco Fireflies') {
-      p.vx = Math.sin(Math.random() * 6) * 0.3;
-      p.vy = Math.cos(Math.random() * 6) * 0.2;
-      p.size = Math.random() * 3 + 1;
-      p.color = `hsl(${40 + Math.random() * 20}, 100%, 60%)`;
-    } else if (preset === 'Ponco Galaxy Dust') {
-      p.vx = (Math.random() - 0.5) * 0.2;
-      p.vy = (Math.random() - 0.5) * 0.2;
-      p.size = Math.random() * 1.5 + 0.5;
-      p.color = `hsl(${Math.random() * 360}, 80%, 70%)`;
-    } else if (preset === 'Ponco Rain Glow') {
-      p.vx = 0;
-      p.vy = Math.random() * 2 + 1;
-      p.size = Math.random() * 1 + 0.5;
-      p.color = `hsl(200, 100%, 60%)`;
-    } else if (preset === 'Ponco Spark Burst') {
-      const a = Math.random() * Math.PI * 2;
-      const s = Math.random() * 2 + 0.5;
-      p.vx = Math.cos(a) * s;
-      p.vy = Math.sin(a) * s;
-      p.size = Math.random() * 2 + 1;
-      p.color = `hsl(${Math.random() * 60}, 100%, 60%)`;
     } else if (preset === 'Ponco Triangles') {
       p.vx = (Math.random() - 0.5) * 0.5;
       p.vy = -Math.random() * 0.8;
@@ -392,7 +370,7 @@ export class ParticleSystem {
       this.renderSparkles(ctx, effectiveConfig, beatFactor, scaleFactor);
     } else if (p === 'Rising Bubbles' || p === 'Particle Fountain' || p === 'Music Note Rain') {
       this.renderFloatingDust(ctx, effectiveConfig, beatFactor, scaleFactor); // uses gravity up-like
-    } else if (p === 'Trail Comets' || p === 'Meteor Shower') {
+    } else if (p === 'Trail Comets') {
       this.renderMeteor(ctx, effectiveConfig, beatFactor, scaleFactor);
     } else if (p === 'Bass Pulse' || p === 'Midrange Drift' || p === 'Waveform Dust' || p === 'Audio Cloud') {
       this.renderFloatingDust(ctx, effectiveConfig, beatFactor, scaleFactor);

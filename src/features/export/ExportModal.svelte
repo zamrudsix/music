@@ -596,9 +596,7 @@
               </div>
             </div>
 
-            </div>
-
-            <!-- Encoding Mode: Standard VBR or CBR (alternative like CBR Fix tool) -->
+            <!-- Encoding Mode: Standard VBR or CBR -->
             <div class="mt-3 p-3 rounded-xl bg-neutral-950/60 border border-neutral-800 text-xs">
               <div class="flex items-center justify-between mb-2">
                 <span class="text-neutral-300 font-semibold flex items-center gap-1.5">
@@ -610,51 +608,27 @@
                 </span>
               </div>
               <div class="flex gap-2 mb-2">
-                <button 
-                  type="button"
-                  onclick={() => { 
-                    projectStore.project.exportSettings.bitrateMode = 'variable'; 
-                    projectStore.saveToDB(); 
-                  }}
-                  class={`flex-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold border cursor-pointer ${projectStore.project.exportSettings.bitrateMode !== 'constant' ? 'border-cyan-500 bg-cyan-500/15 text-cyan-300' : 'border-neutral-800 text-neutral-400 hover:border-neutral-700'}`}
-                >
-                  Standard (VBR)
-                </button>
-                <button 
-                  type="button"
-                  onclick={() => { 
-                    projectStore.project.exportSettings.bitrateMode = 'constant'; 
-                    if (!projectStore.project.exportSettings.keyframeIntervalSeconds) projectStore.project.exportSettings.keyframeIntervalSeconds = 2;
-                    projectStore.saveToDB(); 
-                  }}
-                  class={`flex-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold border cursor-pointer ${projectStore.project.exportSettings.bitrateMode === 'constant' ? 'border-yellow-500 bg-yellow-500/15 text-yellow-300' : 'border-neutral-800 text-neutral-400 hover:border-neutral-700'}`}
-                >
-                  CBR (Stabil / Live)
-                </button>
+                <button type="button" onclick={() => { projectStore.project.exportSettings.bitrateMode = 'variable'; projectStore.saveToDB(); }} class={`flex-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold border cursor-pointer ${projectStore.project.exportSettings.bitrateMode !== 'constant' ? 'border-cyan-500 bg-cyan-500/15 text-cyan-300' : 'border-neutral-800 text-neutral-400'}`}>Standard (VBR)</button>
+                <button type="button" onclick={() => { projectStore.project.exportSettings.bitrateMode = 'constant'; if (!projectStore.project.exportSettings.keyframeIntervalSeconds) projectStore.project.exportSettings.keyframeIntervalSeconds = 2; projectStore.saveToDB(); }} class={`flex-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold border cursor-pointer ${projectStore.project.exportSettings.bitrateMode === 'constant' ? 'border-yellow-500 bg-yellow-500/15 text-yellow-300' : 'border-neutral-800 text-neutral-400'}`}>CBR (Stabil / Live)</button>
               </div>
               {#if projectStore.project.exportSettings.bitrateMode === 'constant'}
                 <div class="space-y-2 pt-1 border-t border-neutral-800/60">
-                  <div class="text-[10px] text-neutral-400">Target CBR (seperti CBR Fix):</div>
+                  <div class="text-[10px] text-neutral-400">Target CBR:</div>
                   <div class="flex gap-1.5 flex-wrap">
-                    <button type="button" onclick={() => { projectStore.project.exportSettings.videoBitrate = 2_500_000; projectStore.project.exportSettings.audioBitrate = 160_000; projectStore.saveToDB(); }} class="px-2 py-0.5 rounded text-[9px] border border-yellow-700/50 bg-yellow-950/30 text-yellow-300 hover:bg-yellow-900/40">720p - 2500kbps</button>
-                    <button type="button" onclick={() => { projectStore.project.exportSettings.videoBitrate = 6_500_000; projectStore.project.exportSettings.audioBitrate = 160_000; projectStore.saveToDB(); }} class="px-2 py-0.5 rounded text-[9px] border border-yellow-700/50 bg-yellow-950/30 text-yellow-300 hover:bg-yellow-900/40">1080p - 6500kbps</button>
-                    <button type="button" onclick={() => { projectStore.project.exportSettings.videoBitrate = 4_000_000; projectStore.project.exportSettings.audioBitrate = 160_000; projectStore.saveToDB(); }} class="px-2 py-0.5 rounded text-[9px] border border-neutral-700 text-neutral-300 hover:border-neutral-600">Custom 4Mbps</button>
+                    <button type="button" onclick={() => { projectStore.project.exportSettings.videoBitrate = 2500000; projectStore.project.exportSettings.audioBitrate = 160000; projectStore.saveToDB(); }} class="px-2 py-0.5 rounded text-[9px] border border-yellow-700/50 bg-yellow-950/30 text-yellow-300">720p - 2500kbps</button>
+                    <button type="button" onclick={() => { projectStore.project.exportSettings.videoBitrate = 6500000; projectStore.project.exportSettings.audioBitrate = 160000; projectStore.saveToDB(); }} class="px-2 py-0.5 rounded text-[9px] border border-yellow-700/50 bg-yellow-950/30 text-yellow-300">1080p - 6500kbps</button>
                   </div>
                   <div class="flex items-center gap-2 text-[10px]">
-                    <span class="text-neutral-500">KeyFrame (KF):</span>
+                    <span class="text-neutral-500">KeyFrame:</span>
                     {#each [1,2,3,4] as kf}
                       <button type="button" onclick={() => { projectStore.project.exportSettings.keyframeIntervalSeconds = kf; projectStore.saveToDB(); }} class={`px-1.5 py-0.5 rounded border text-[9px] ${projectStore.project.exportSettings.keyframeIntervalSeconds === kf ? 'border-yellow-500 bg-yellow-500/20 text-yellow-300' : 'border-neutral-800 text-neutral-400'}`}>{kf}s</button>
                     {/each}
-                  </div>
-                  <div class="text-[9px] text-neutral-500 leading-tight">
-                    Mode CBR cocok untuk streaming stabil (YouTube Live dll). Original VBR tetap ada, ini alternatif. Audio diset AAC 160k saat pilih preset.
                   </div>
                 </div>
               {/if}
             </div>
 
             <!-- Windows Turbo Mode: Auto-minimize toggle with warning -->
-
             {#if isWindows()}
               <div class="mt-3 p-2.5 rounded-xl bg-cyan-950/20 border border-cyan-800/40 text-xs flex flex-col gap-2">
                 <label class="flex items-center gap-2.5 cursor-pointer select-none">

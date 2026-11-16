@@ -149,7 +149,7 @@ export class SpectrumRenderer {
         grd.addColorStop(0, `hsl(${(i * 7) % 360}, 100%, 60%)`);
         grd.addColorStop(1, `hsl(${(i * 7 + 40) % 360}, 100%, 40%)`);
         ctx.fillStyle = grd;
-        ctx.shadowColor = grd;
+        ctx.shadowColor = `hsl(${(i * 7) % 360}, 100%, 60%)`;
         ctx.shadowBlur = 8;
         ctx.fillRect(x + 1, height - h, barW - 2, h);
       }

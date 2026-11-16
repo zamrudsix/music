@@ -2,6 +2,16 @@
 
 Semua perubahan dan catatan rilis pada proyek **Beras Visualizer** dicatat dalam dokumen ini.
 
+## [v4.3.6] - 2026-11-16
+
+### 🔧 Perbaikan
+- Fix TypeScript errors di ParticlePreset (semua style termasuk Ponco*)
+- Fix unmatched HTML tags di ExportModal (CBR section)
+- Fix pre-existing errors di spectrum.ts dan fontManager.ts
+- Build frontend sekarang lulus (`npm run build` sukses)
+
+---
+
 ## [v4.3.5] - 2026-11-16
 
 ### 🚀 Fitur Baru
