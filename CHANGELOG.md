@@ -2,6 +2,23 @@
 
 Semua perubahan dan catatan rilis pada proyek **Beras Visualizer** dicatat dalam dokumen ini.
 
+## [v4.3.5] - 2026-11-16
+
+### 🚀 Fitur Baru
+- **Mode Export CBR (Constant Bitrate)** sebagai alternatif dari VBR:
+  - Preset 720p-2500kbps dan 1080p-6500kbps (mirip CBR Fix)
+  - Keyframe interval 1s/2s/3s/4s
+  - Audio AAC 160k saat pakai preset CBR
+  - Mode Standard (VBR) tetap tersedia sebagai default
+- **20 Particle Style baru** yang lebih audio-reactive:
+  Audio Sphere, Frequency Swarm, Beat Explosion, Rising Bubbles, Neon Fireflies, Galaxy Spiral, Shockwave Rings, Magnetic Flow, Bass Pulse, Treble Sparkles, Midrange Drift, Particle Fountain, Audio Cloud, Waveform Dust, Circular Burst, Gravity Well, Trail Comets, Color Shift Swarm, Interactive Orbit, Music Note Rain
+
+### 🔧 Perbaikan
+- Update type `ParticlePreset` dan dropdown di Particles Panel
+- Routing render particle ke renderer yang sesuai (Vortex, Burst, Sparkles, dll)
+
+---
+
 ---
 
 ## [v3.3.0] - 2026-11-04

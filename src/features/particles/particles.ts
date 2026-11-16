@@ -241,7 +241,6 @@ export class ParticleSystem {
     } else if (preset === 'Audio Sphere' || preset === 'Interactive Orbit') {
       size = Math.max(2 * scaleFactor, (Math.random() * 1.2 + 0.4) * baseSize);
       const ang = Math.random() * Math.PI * 2;
-      const r = 80 + Math.random() * 120;
       vx = Math.cos(ang) * config.speed * 0.8 * scaleFactor;
       vy = Math.sin(ang) * config.speed * 0.8 * scaleFactor;
       color = config.color && config.color !== '#ffffff' ? config.color : `hsl(${200 + Math.random()*80}, 90%, 65%)`;
