@@ -50,6 +50,10 @@ export interface BackgroundConfig {
 }
 
 export type ParticlePreset = 
+  | 'Orbit Pulse'
+  | 'Ring Burst'
+  | 'Center Bloom'
+
   | 'floating-dust' 
   | 'confetti' 
   | 'bokeh' 
@@ -70,12 +74,40 @@ export type ParticlePreset =
   | 'Ponco Triangles'
   | 'Ponco Squares'
   | 'Ponco Diamonds'
+  | 'Ponco Neon Dust'
+  | 'Ponco Fireflies'
+  | 'Ponco Galaxy Dust'
+  | 'Ponco Rain Glow'
+  | 'Ponco Spark Burst'
+  | 'Ponco Lightning'
+  | 'Ponco Snow'
+  | 'Ponco Fire'
   | 'Particle Burst'
   | 'Vortex Particles'
   | 'Meteor Shower'
   | 'Orbit Dust'
   | 'Galaxy Dust'
-  | 'Beat Spark';
+  | 'Beat Spark'
+  | 'Audio Sphere'
+  | 'Frequency Swarm'
+  | 'Beat Explosion'
+  | 'Rising Bubbles'
+  | 'Neon Fireflies'
+  | 'Galaxy Spiral'
+  | 'Shockwave Rings'
+  | 'Magnetic Flow'
+  | 'Bass Pulse'
+  | 'Treble Sparkles'
+  | 'Midrange Drift'
+  | 'Particle Fountain'
+  | 'Audio Cloud'
+  | 'Waveform Dust'
+  | 'Circular Burst'
+  | 'Gravity Well'
+  | 'Trail Comets'
+  | 'Color Shift Swarm'
+  | 'Interactive Orbit'
+  | 'Music Note Rain';
 
 export interface ParticleConfig {
   enabled: boolean;
@@ -265,7 +297,27 @@ export interface SpectrumConfig {
   scale: number;
 }
 
-export type LyricStyle = 'karaoke' | 'fade-line' | 'typewriter' | 'bounce-word' | 'bottom-bar';
+export type LyricStyle = 
+  | 'karaoke' 
+  | 'fade-line' 
+  | 'typewriter' 
+  | 'bounce-word' 
+  | 'bottom-bar'
+  | 'neon-glow'
+  | 'outline-bold'
+  | 'gradient-fill'
+  | 'shadow-heavy'
+  | 'wave-bounce'
+  | 'slide-in'
+  | 'scale-pop'
+  | 'rainbow-word'
+  | 'minimal-clean'
+  | 'karaoke-classic'
+  | 'center-focus'
+  | 'bar-progress'
+  | 'floating-words'
+  | 'glitch-text'
+  | 'soft-fade';
 
 export interface LyricSegment {
   id: string;
@@ -466,6 +518,8 @@ export interface ExportSettings {
   fps: 24 | 30 | 60;
   format: 'mp4' | 'webm';
   videoBitrate: number;
+  bitrateMode?: 'variable' | 'constant'; // VBR default, CBR for stable streaming like CBR Fix
+  keyframeIntervalSeconds?: number; // 1,2,3,4 for CBR mode
   audioBitrate: number;
   customExportDir?: string;
   exportRange?: ExportRange;

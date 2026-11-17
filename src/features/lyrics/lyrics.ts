@@ -256,6 +256,47 @@ export class LyricRenderer {
       ctx.restore();
     }
     // 5. BOTTOM-BAR / CLASSIC SUBTITLE STYLE
+
+    else if (style === 'neon-glow' || style === 'glitch-text') {
+      ctx.shadowColor = config.highlightColor || '#00ffff';
+      ctx.shadowBlur = 20 * scaleFactor;
+      renderTextWithEffects(activeSeg.text, anchorX, posY, true);
+    }
+    else if (style === 'outline-bold') {
+      ctx.lineWidth = 4 * scaleFactor;
+      ctx.strokeStyle = '#000';
+      renderTextWithEffects(activeSeg.text, anchorX, posY, false);
+    }
+    else if (style === 'gradient-fill' || style === 'rainbow-word') {
+      const grd = ctx.createLinearGradient(0, posY - 20, 0, posY + 20);
+      grd.addColorStop(0, config.highlightColor || '#ff00ff');
+      grd.addColorStop(1, config.color || '#00ffff');
+      ctx.fillStyle = grd;
+      renderTextWithEffects(activeSeg.text, anchorX, posY, true);
+    }
+    else if (style === 'shadow-heavy') {
+      ctx.shadowColor = 'rgba(0,0,0,0.8)';
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 4;
+      renderTextWithEffects(activeSeg.text, anchorX, posY, false);
+    }
+    else if (style === 'wave-bounce' || style === 'scale-pop') {
+      const bounce = Math.sin(currentTime * 8) * 8 * scaleFactor;
+      renderTextWithEffects(activeSeg.text, anchorX, posY + bounce, true);
+    }
+    else if (style === 'slide-in') {
+      const progress = Math.min(1, (currentTime - activeSeg.start) / 0.3);
+      const offset = (1 - progress) * 100 * scaleFactor;
+      renderTextWithEffects(activeSeg.text, anchorX + offset, posY, false);
+    }
+    else if (style === 'minimal-clean' || style === 'soft-fade') {
+      ctx.globalAlpha = 0.85;
+      renderTextWithEffects(activeSeg.text, anchorX, posY, false);
+    }
+    else if (style === 'karaoke-classic' || style === 'center-focus' || style === 'bar-progress' || style === 'floating-words') {
+      // Reuse karaoke or simple highlight
+      renderTextWithEffects(activeSeg.text, anchorX, posY, true);
+    }
     else if (style === 'bottom-bar') {
       ctx.save();
       const textMetrics = ctx.measureText(activeSeg.text);

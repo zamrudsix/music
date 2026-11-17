@@ -1,29 +1,15 @@
 export const SPECTRUM_STYLE_CATEGORIES = [
   {
-    category: 'Viral Colorful',
+    category: 'New Unique 2026',
     styles: [
-      'Neon Rainbow Bars',
-      'Cyber Pulse Wave',
-      'Galaxy Spiral Color',
-      'Fire Spectrum',
-      'Ocean Wave Bars',
-      'Sunset Gradient',
-      'Electric Arc',
-      'Prism Burst',
-      'Aurora Bars',
-      'Laser Grid',
-      'Candy Wave',
-      'Plasma Circle',
-      'Neon Outline Bars',
-      'Rainbow Radial',
-      'Glitch Color Bars',
-      'Holo Wave',
-      'Bass Color Drop',
-      'Vaporwave Bars',
-      'Synthwave Line',
-      'RGB Mirror',
+      'Orbit Rings',
+      'Pulse Spikes',
+      'Frequency Ribbons',
+      'Beat Orbs',
+      'Sonic Ripple',
     ],
   },
+
   {
     category: 'Ponco Spectrum',
     styles: [

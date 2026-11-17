@@ -21,6 +21,16 @@
   {#each items as item}
     {@const Icon = item.icon}
     {@const isActive = projectStore.activeTab === item.id}
+    {@const colorClass = 
+      item.id === 'background' ? 'text-emerald-400' :
+      item.id === 'spectrum' ? 'text-fuchsia-400' :
+      item.id === 'particles' ? 'text-amber-400' :
+      item.id === 'images' ? 'text-sky-400' :
+      item.id === 'texts' ? 'text-rose-400' :
+      item.id === 'lyrics' ? 'text-violet-400' :
+      item.id === 'tracklist-overlay' ? 'text-lime-400' :
+      item.id === 'export' ? 'text-cyan-400' :
+      'text-neutral-400'}
     <button
       onclick={() => projectStore.activeTab = item.id as any}
       class={`w-[60px] h-[58px] rounded-xl flex flex-col items-center justify-center gap-1 transition-all cursor-pointer relative group ${
@@ -35,7 +45,7 @@
         <span class="absolute left-0 top-2 bottom-2 w-1 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-r-full shadow-sm shadow-cyan-400/50"></span>
       {/if}
 
-      <Icon class={`w-5 h-5 transition-transform group-hover:scale-110 ${isActive ? 'text-cyan-400' : 'text-neutral-400'}`} />
+      <Icon class={`w-5 h-5 transition-transform group-hover:scale-110 ${isActive ? 'text-cyan-400' : colorClass}`} />
       <span class={`text-[10px] font-medium tracking-tight truncate max-w-[56px] text-center ${isActive ? 'text-cyan-300 font-semibold' : 'text-neutral-400'}`}>
         {item.label}
       </span>

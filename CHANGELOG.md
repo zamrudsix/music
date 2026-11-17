@@ -2,6 +2,46 @@
 
 Semua perubahan dan catatan rilis pada proyek **Beras Visualizer** dicatat dalam dokumen ini.
 
+## [v4.3.7] - 2026-11-16
+
+### 🎤 Karaoke Styles
+- Tambah 15 style lyric/karaoke baru: Neon Glow, Outline Bold, Gradient Fill, Heavy Shadow, Wave Bounce, Slide In, Scale Pop, Rainbow Word, Minimal Clean, Karaoke Classic, Center Focus, Bar Progress, Floating Words, Glitch Text, Soft Fade
+
+### 📉 CBR Compression
+- Preset CBR diturunkan biar file lebih kecil:
+  - 720p → 1.8 Mbps
+  - 1080p → 3.5 Mbps
+- Tetap bisa pilih 720 atau 1080
+
+---
+
+## [v4.3.6] - 2026-11-16
+
+### 🔧 Perbaikan
+- Fix TypeScript errors di ParticlePreset (semua style termasuk Ponco*)
+- Fix unmatched HTML tags di ExportModal (CBR section)
+- Fix pre-existing errors di spectrum.ts dan fontManager.ts
+- Build frontend sekarang lulus (`npm run build` sukses)
+
+---
+
+## [v4.3.5] - 2026-11-16
+
+### 🚀 Fitur Baru
+- **Mode Export CBR (Constant Bitrate)** sebagai alternatif dari VBR:
+  - Preset 720p-2500kbps dan 1080p-6500kbps (mirip CBR Fix)
+  - Keyframe interval 1s/2s/3s/4s
+  - Audio AAC 160k saat pakai preset CBR
+  - Mode Standard (VBR) tetap tersedia sebagai default
+- **20 Particle Style baru** yang lebih audio-reactive:
+  Audio Sphere, Frequency Swarm, Beat Explosion, Rising Bubbles, Neon Fireflies, Galaxy Spiral, Shockwave Rings, Magnetic Flow, Bass Pulse, Treble Sparkles, Midrange Drift, Particle Fountain, Audio Cloud, Waveform Dust, Circular Burst, Gravity Well, Trail Comets, Color Shift Swarm, Interactive Orbit, Music Note Rain
+
+### 🔧 Perbaikan
+- Update type `ParticlePreset` dan dropdown di Particles Panel
+- Routing render particle ke renderer yang sesuai (Vortex, Burst, Sparkles, dll)
+
+---
+
 ---
 
 ## [v3.3.0] - 2026-11-04

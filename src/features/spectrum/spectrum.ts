@@ -73,6 +73,8 @@ export class SpectrumRenderer {
       this.renderGeometric(ctx, width, height, posX, posY, scale, scaleFactor, config, freqData, count, beatFactor, spectrumBeatMultiplier, style);
     } else if (this.isAvantGardeFamily(style)) {
       this.renderAvantGarde(ctx, width, height, posX, posY, scale, scaleFactor, config, freqData, count, beatFactor, spectrumBeatMultiplier, style);
+    } else if (style === 'Orbit Rings' || style === 'Pulse Spikes' || style === 'Frequency Ribbons' || style === 'Beat Orbs' || style === 'Sonic Ripple') {
+      this.renderNewUnique(ctx, width, height, posX, posY, scale, scaleFactor, config, freqData, count, beatFactor, style);
     } else {
       this.renderSpecialFX(ctx, width, height, posX, posY, scale, scaleFactor, config, freqData, count, beatFactor, spectrumBeatMultiplier, style);
     }
@@ -139,60 +141,7 @@ export class SpectrumRenderer {
       
       
       
-          // Viral Colorful styles
-    if (style.trim() === 'Neon Rainbow Bars') {
-      const barW = width / 40;
-      for (let i = 0; i < 40; i++) {
-        const h = (freqData[i % freqData.length] / 255) * height * 0.8;
-        ctx.fillStyle = `hsl(${(i * 9) % 360}, 100%, 55%)`;
-        ctx.shadowColor = ctx.fillStyle;
-        ctx.shadowBlur = 10;
-        ctx.fillRect(i * barW, height - h, barW - 2, h);
-      }
-      ctx.shadowBlur = 0;
-      return;
-    }
-    if (style.trim() === 'Cyber Pulse Wave') {
-      ctx.beginPath();
-      for (let x = 0; x < width; x += 2) {
-        const idx = Math.floor((x / width) * freqData.length);
-        const y = height / 2 + Math.sin(x * 0.02 + Date.now() / 200) * (freqData[idx] / 255) * 60;
-        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = '#00ffcc';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-      return;
-    }
-    if (style.trim() === 'Fire Spectrum') {
-      for (let i = 0; i < 32; i++) {
-        const h = (freqData[i % freqData.length] / 255) * height * 0.7;
-        const x = (i / 32) * width;
-        const grd = ctx.createLinearGradient(0, height - h, 0, height);
-        grd.addColorStop(0, '#ff4500');
-        grd.addColorStop(0.5, '#ff8c00');
-        grd.addColorStop(1, '#ffd700');
-        ctx.fillStyle = grd;
-        ctx.fillRect(x, height - h, width / 35, h);
-      }
-      return;
-    }
-    if (style.trim() === 'Rainbow Radial') {
-      const cx = width / 2, cy = height / 2;
-      for (let i = 0; i < 36; i++) {
-        const a = (i / 36) * Math.PI * 2;
-        const len = 40 + (freqData[i % freqData.length] / 255) * 100;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len);
-        ctx.strokeStyle = `hsl(${(i * 10) % 360}, 100%, 55%)`;
-        ctx.lineWidth = 3;
-        ctx.stroke();
-      }
-      return;
-    }
-
-    // Real unique Ponco styles
+      // Real unique Ponco styles
     if (style === 'Ponco Bars Glow') {
       const barW = width / 48;
       for (let i = 0; i < 48; i++) {
@@ -202,7 +151,7 @@ export class SpectrumRenderer {
         grd.addColorStop(0, `hsl(${(i * 7) % 360}, 100%, 60%)`);
         grd.addColorStop(1, `hsl(${(i * 7 + 40) % 360}, 100%, 40%)`);
         ctx.fillStyle = grd;
-        ctx.shadowColor = grd;
+        ctx.shadowColor = `hsl(${(i * 7) % 360}, 100%, 60%)`;
         ctx.shadowBlur = 8;
         ctx.fillRect(x + 1, height - h, barW - 2, h);
       }
@@ -2434,5 +2383,76 @@ export class SpectrumRenderer {
       this.renderWave(ctx, width, height, posX, posY, scale, scaleFactor, config, freqData, count, multiplier, style);
     }
   }
+  private renderNewUnique(
+    ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+    width: number, height: number, posX: number, posY: number,
+    scale: number, scaleFactor: number, config: any, freqData: Uint8Array,
+    count: number, beatFactor: number, style: string
+  ) {
+    const cx = posX;
+    const cy = posY;
+    const baseR = Math.min(width, height) * 0.18 * scale;
+
+    if (style === 'Orbit Rings') {
+      for (let ring = 0; ring < 5; ring++) {
+        const r = baseR + ring * 22 * scaleFactor;
+        const val = freqData[Math.floor(ring * count / 5) % count] / 255;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r + val * 30 * scaleFactor, 0, Math.PI * 2);
+        ctx.strokeStyle = `hsla(${(ring * 60 + beatFactor * 40) % 360}, 100%, 60%, 0.7)`;
+        ctx.lineWidth = 2 + val * 4;
+        ctx.stroke();
+      }
+    } else if (style === 'Pulse Spikes') {
+      ctx.save();
+      ctx.translate(cx, cy);
+      for (let i = 0; i < count; i++) {
+        const ang = (i / count) * Math.PI * 2;
+        const val = freqData[i] / 255;
+        const len = baseR + val * 80 * scaleFactor * beatFactor;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(ang) * baseR, Math.sin(ang) * baseR);
+        ctx.lineTo(Math.cos(ang) * len, Math.sin(ang) * len);
+        ctx.strokeStyle = `hsl(${(i * 7) % 360}, 100%, 55%)`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+      ctx.restore();
+    } else if (style === 'Frequency Ribbons') {
+      ctx.beginPath();
+      for (let i = 0; i < count; i++) {
+        const x = posX - width * 0.35 + (i / count) * width * 0.7;
+        const val = freqData[i] / 255;
+        const y = posY + Math.sin(i * 0.3 + beatFactor) * val * 60 * scaleFactor;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = config.color || '#22d3ee';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    } else if (style === 'Beat Orbs') {
+      for (let i = 0; i < 8; i++) {
+        const ang = (i / 8) * Math.PI * 2 + beatFactor;
+        const dist = baseR + freqData[i * 4 % count] / 255 * 50 * scaleFactor;
+        const x = cx + Math.cos(ang) * dist;
+        const y = cy + Math.sin(ang) * dist;
+        const size = 8 + freqData[i * 3 % count] / 255 * 16;
+        ctx.beginPath();
+        ctx.arc(x, y, size * scaleFactor, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${(i * 45) % 360}, 90%, 60%, 0.8)`;
+        ctx.fill();
+      }
+    } else if (style === 'Sonic Ripple') {
+      for (let r = 0; r < 6; r++) {
+        const radius = baseR * 0.4 + r * 28 * scaleFactor + (freqData[r * 5 % count] / 255) * 20;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `hsla(${200 + r * 30}, 100%, 60%, ${0.6 - r * 0.08})`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    }
+  }
+
 }
 

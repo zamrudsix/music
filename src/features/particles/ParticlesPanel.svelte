@@ -20,6 +20,14 @@
       onchange={() => projectStore.saveToDB(500)}
       class="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2 text-neutral-200 focus:border-cyan-500 outline-none cursor-pointer"
     >
+      <option value="Audio Sphere">🌟 Audio Sphere (New)</option>
+      <option value="Frequency Swarm">🎵 Frequency Swarm (New)</option>
+      <option value="Beat Explosion">💥 Beat Explosion (New)</option>
+      <option value="Galaxy Spiral">🌌 Galaxy Spiral (New)</option>
+      <option value="Neon Fireflies">✨ Neon Fireflies (New)</option>
+      <option value="Orbit Pulse">🌀 Orbit Pulse (New)</option>
+      <option value="Ring Burst">💫 Ring Burst (New)</option>
+      <option value="Center Bloom">🌸 Center Bloom (New)</option>
       <option value="Bintik (Dust)">Bintik (Dust)</option>
       <option value="Sparkles">Sparkles</option>
       <option value="Stars">Stars</option>
@@ -47,6 +55,27 @@
       <option value="Ponco Triangles">Ponco Triangles</option>
       <option value="Ponco Squares">Ponco Squares</option>
       <option value="Ponco Diamonds">Ponco Diamonds</option>
+      <!-- New Audio-Reactive Styles (20) -->
+      <option value="Audio Sphere">Audio Sphere</option>
+      <option value="Frequency Swarm">Frequency Swarm</option>
+      <option value="Beat Explosion">Beat Explosion</option>
+      <option value="Rising Bubbles">Rising Bubbles</option>
+      <option value="Neon Fireflies">Neon Fireflies</option>
+      <option value="Galaxy Spiral">Galaxy Spiral</option>
+      <option value="Shockwave Rings">Shockwave Rings</option>
+      <option value="Magnetic Flow">Magnetic Flow</option>
+      <option value="Bass Pulse">Bass Pulse</option>
+      <option value="Treble Sparkles">Treble Sparkles</option>
+      <option value="Midrange Drift">Midrange Drift</option>
+      <option value="Particle Fountain">Particle Fountain</option>
+      <option value="Audio Cloud">Audio Cloud</option>
+      <option value="Waveform Dust">Waveform Dust</option>
+      <option value="Circular Burst">Circular Burst</option>
+      <option value="Gravity Well">Gravity Well</option>
+      <option value="Trail Comets">Trail Comets</option>
+      <option value="Color Shift Swarm">Color Shift Swarm</option>
+      <option value="Interactive Orbit">Interactive Orbit</option>
+      <option value="Music Note Rain">Music Note Rain</option>
     </select>
   </div>
 
