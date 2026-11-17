@@ -1,3 +1,10 @@
+## 4.3.16 - Ponco Visualizer & Particle Pack
+
+- Added 30 selectable spectrum visualizer presets, mapped to the existing Canvas renderer families.
+- Added 40 selectable particle presets, mapped to existing particle motion/render families.
+- Added particle RGB hue cycling and glow controls, plus bass/treble sensitivity preference fields.
+- Retained existing presets and project compatibility through optional config fields.
+
 # Changelog
 
 Semua perubahan dan catatan rilis pada proyek **Beras Visualizer** dicatat dalam dokumen ini.

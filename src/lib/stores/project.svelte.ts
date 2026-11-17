@@ -96,6 +96,10 @@ const DEFAULT_PROJECT: ProjectConfig = {
       gravity: 'float',
       followBeat: true,
       beatSensitivity: 1.0,
+      bassSensitivity: 1.0,
+      trebleSensitivity: 1.0,
+      glow: true,
+      rainbow: false,
     },
     spectrum: {
       id: 'spectrum-default',

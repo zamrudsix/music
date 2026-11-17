@@ -20,6 +20,46 @@
       onchange={() => projectStore.saveToDB(500)}
       class="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2 text-neutral-200 focus:border-cyan-500 outline-none cursor-pointer"
     >
+      <option value="Classic Particle Visualizer">Classic Particle Visualizer</option>
+      <option value="Floating Particles">Floating Particles</option>
+      <option value="Galaxy Particles">Galaxy Particles</option>
+      <option value="Starfield Particles">Starfield Particles</option>
+      <option value="Firefly Particles">Firefly Particles</option>
+      <option value="Neon Particle Explosion">Neon Particle Explosion</option>
+      <option value="Audio Reactive Particles">Audio Reactive Particles</option>
+      <option value="Circular Particle Ring">Circular Particle Ring</option>
+      <option value="Particle Waveform">Particle Waveform</option>
+      <option value="Particle Spectrum">Particle Spectrum</option>
+      <option value="3D Particle Sphere">3D Particle Sphere</option>
+      <option value="Particle Tunnel">Particle Tunnel</option>
+      <option value="Cosmic Dust Particles">Cosmic Dust Particles</option>
+      <option value="Sparkle Particles">Sparkle Particles</option>
+      <option value="Snowfall Particles">Snowfall Particles</option>
+      <option value="Rain Particles">Rain Particles</option>
+      <option value="Fire Particles">Fire Particles</option>
+      <option value="Smoke Particles">Smoke Particles</option>
+      <option value="Water Bubble Particles">Water Bubble Particles</option>
+      <option value="Magic Dust Particles">Magic Dust Particles</option>
+      <option value="Glowing Orb Particles">Glowing Orb Particles</option>
+      <option value="DNA Particle Animation">DNA Particle Animation</option>
+      <option value="Digital Matrix Particles">Digital Matrix Particles</option>
+      <option value="Electric Spark Particles">Electric Spark Particles</option>
+      <option value="Rainbow Particle Flow">Rainbow Particle Flow</option>
+      <option value="Liquid Particle Flow">Liquid Particle Flow</option>
+      <option value="Particle Vortex">Particle Vortex</option>
+      <option value="Particle Swarm">Particle Swarm</option>
+      <option value="Meteor Shower Particles">Meteor Shower Particles</option>
+      <option value="Holographic Particle Field">Holographic Particle Field</option>
+      <option value="Aurora Particle Flow">Aurora Particle Flow</option>
+      <option value="Plasma Particle Storm">Plasma Particle Storm</option>
+      <option value="Golden Dust Particles">Golden Dust Particles</option>
+      <option value="Cyberpunk Particle Grid">Cyberpunk Particle Grid</option>
+      <option value="3D Galaxy Spiral">3D Galaxy Spiral</option>
+      <option value="Magnetic Particle Field">Magnetic Particle Field</option>
+      <option value="Particle Heartbeat">Particle Heartbeat</option>
+      <option value="Neon DNA Helix">Neon DNA Helix</option>
+      <option value="Quantum Particle Cloud">Quantum Particle Cloud</option>
+      <option value="Infinity Particle Loop">Infinity Particle Loop</option>
       <option value="Audio Sphere">🌟 Audio Sphere (New)</option>
       <option value="Frequency Swarm">🎵 Frequency Swarm (New)</option>
       <option value="Beat Explosion">💥 Beat Explosion (New)</option>
@@ -152,6 +192,25 @@
     </div>
   </div>
 
+
+  <div class="grid grid-cols-2 gap-3 p-3 bg-neutral-950/60 rounded-lg border border-neutral-800/80">
+    <label class="flex items-center gap-2 text-neutral-300 text-sm">
+      <input type="checkbox" checked={projectStore.project.overlays.particle.rainbow ?? false} onchange={(e) => { projectStore.project.overlays.particle.rainbow = e.currentTarget.checked; projectStore.saveToDB(300); }} class="accent-cyan-500" />
+      RGB / Rainbow
+    </label>
+    <label class="flex items-center gap-2 text-neutral-300 text-sm">
+      <input type="checkbox" checked={projectStore.project.overlays.particle.glow ?? true} onchange={(e) => { projectStore.project.overlays.particle.glow = e.currentTarget.checked; projectStore.saveToDB(300); }} class="accent-cyan-500" />
+      Glow / Neon
+    </label>
+    <div class="col-span-2">
+      <div class="flex justify-between text-neutral-400 text-xs mb-1"><span>Bass Sensitivity</span><span>{(projectStore.project.overlays.particle.bassSensitivity ?? 1).toFixed(1)}x</span></div>
+      <input type="range" min="0.2" max="3" step="0.1" value={projectStore.project.overlays.particle.bassSensitivity ?? 1} oninput={(e) => { projectStore.project.overlays.particle.bassSensitivity = Number(e.currentTarget.value); projectStore.saveToDB(400); }} class="w-full accent-cyan-500" />
+    </div>
+    <div class="col-span-2">
+      <div class="flex justify-between text-neutral-400 text-xs mb-1"><span>Treble Sensitivity</span><span>{(projectStore.project.overlays.particle.trebleSensitivity ?? 1).toFixed(1)}x</span></div>
+      <input type="range" min="0.2" max="3" step="0.1" value={projectStore.project.overlays.particle.trebleSensitivity ?? 1} oninput={(e) => { projectStore.project.overlays.particle.trebleSensitivity = Number(e.currentTarget.value); projectStore.saveToDB(400); }} class="w-full accent-cyan-500" />
+    </div>
+  </div>
   <!-- Follow Beat -->
   <div class="p-3 bg-neutral-950/60 rounded-lg border border-neutral-800/80 space-y-2">
     <div class="flex items-center justify-between">

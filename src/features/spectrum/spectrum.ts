@@ -7,6 +7,8 @@ const GALAXY_PALETTE = ['#4c1d95', '#7c3aed', '#c084fc', '#e879f9', '#38bdf8'];
 const NEON_PALETTE = ['#00f5d4', '#7b2cbf', '#f72585', '#4cc9f0', '#fee440'];
 const PRISM_PALETTE = ['#e0e7ff', '#a5b4fc', '#818cf8', '#6366f1', '#4f46e5'];
 
+const PONCO_SPECTRUM_STYLE_MAP: Record<string, string> = {"Classic Spectrum Visualizer": "bars", "Rainbow Equalizer Visualizer": "Bars Rainbow", "Circular Spectrum Visualizer": "circular", "Radial Spectrum Visualizer": "Radial", "Neon Waveform Visualizer": "neon-wave", "3D Spectrum Visualizer": "Cyber Grid", "Particle Visualizer": "Starburst", "Neon Tunnel Visualizer": "Deep Tunnel", "Line Waveform Visualizer": "Graph Thin", "Dot Matrix Visualizer": "LED Classic", "Minimal Bars Visualizer": "Bars Thin", "Oscilloscope Visualizer": "waveform", "Pulse Rings Visualizer": "pulse-rings", "Liquid Wave Visualizer": "Ripple Waves", "Geometric Visualizer": "Kaleidoscope", "Fire Spectrum Visualizer": "LED Fire", "Aurora Visualizer": "Aurora", "Orbit Visualizer": "Orbit Rings", "3D Wave Mesh Visualizer": "Sine Sphere", "Laser Visualizer": "Neon Pulse", "Plasma Wave Visualizer": "Plasma Ring", "Galaxy Spectrum Visualizer": "Bars Galaxy", "Digital Glitch Visualizer": "Matrix Rain", "DNA Audio Visualizer": "DNA Helix", "Infinity Loop Visualizer": "Infinity Loop", "LED Wall Equalizer": "LED Prism", "VU Meter Visualizer": "LED Classic", "Holographic Spectrum Visualizer": "Plasma Orb", "Electric Lightning Visualizer": "Lichtenberg Tree", "Water Ripple Visualizer": "Sonic Ripple"};
+
 export class SpectrumRenderer {
   // Reusable static Uint8Array mirror buffer to guarantee zero heap allocation per frame
   private mirrorBuffer = new Uint8Array(512);
@@ -52,7 +54,7 @@ export class SpectrumRenderer {
       freqData = this.mirrorBuffer;
     }
 
-    const style = config.style;
+    const style = PONCO_SPECTRUM_STYLE_MAP[config.style] || config.style;
 
     // Dispatch by category / family to maximize Canvas 2D render speed
     if (style === 'Orbit Rings' || style === 'Pulse Spikes' || style === 'Frequency Ribbons' || style === 'Beat Orbs' || style === 'Sonic Ripple') {

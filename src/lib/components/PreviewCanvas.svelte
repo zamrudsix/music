@@ -224,7 +224,7 @@
     );
 
     // 5. Render Particle, Spectrum, Lyrics
-    particles.updateAndRender(ctx, projectStore.project.overlays.particle, beatFactor, projectStore.isPlaying);
+    particles.updateAndRender(ctx, projectStore.project.overlays.particle, beatFactor, projectStore.isPlaying, currentFreq);
     if (projectStore.project.overlays.spectrums && projectStore.project.overlays.spectrums.length > 0) {
       for (let i = 0; i < projectStore.project.overlays.spectrums.length; i++) {
         spectrum.render(ctx, width, height, projectStore.project.overlays.spectrums[i], currentFreq, beatFactor);

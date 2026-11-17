@@ -849,7 +849,7 @@ self.onmessage = async (e: MessageEvent<RenderRequest | { type: 'CANCEL' }>) => 
         }
 
         // 6. Render Layers (Particles, Spectrum, Lyrics)
-        particles.updateAndRender(ctx, project.overlays.particle, rawBeatFactor);
+        particles.updateAndRender(ctx, project.overlays.particle, rawBeatFactor, true, currentFreq);
         if (project.overlays.spectrums && project.overlays.spectrums.length > 0) {
           for (let sIdx = 0; sIdx < project.overlays.spectrums.length; sIdx++) {
             spectrum.render(ctx, width, height, project.overlays.spectrums[sIdx], currentFreq, rawBeatFactor);

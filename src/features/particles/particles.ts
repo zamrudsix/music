@@ -18,6 +18,8 @@ const CONFETTI_COLORS = ['#38bdf8', '#f43f5e', '#fbbf24', '#34d399', '#a855f7', 
 const SPARK_COLORS = ['#ffedd5', '#fed7aa', '#fef08a', '#f59e0b', '#ef4444'];
 const BOKEH_COLORS = ['#67e8f9', '#a78bfa', '#f472b6', '#fde047', '#6ee7b7'];
 
+const PONCO_PARTICLE_PRESET_MAP: Record<string, string> = {"Classic Particle Visualizer": "Bintik (Dust)", "Floating Particles": "floating-dust", "Galaxy Particles": "Galaxy Dust", "Starfield Particles": "Stars", "Firefly Particles": "Ponco Fireflies", "Neon Particle Explosion": "Beat Explosion", "Audio Reactive Particles": "Frequency Swarm", "Circular Particle Ring": "Orbit Pulse", "Particle Waveform": "Waveform Dust", "Particle Spectrum": "Frequency Swarm", "3D Particle Sphere": "Audio Sphere", "Particle Tunnel": "Vortex Particles", "Cosmic Dust Particles": "Galaxy Dust", "Sparkle Particles": "Sparkles", "Snowfall Particles": "Gentle Snow", "Rain Particles": "Hujan Neon", "Fire Particles": "Ponco Fire", "Smoke Particles": "Asap", "Water Bubble Particles": "Rising Bubbles", "Magic Dust Particles": "Ponco Neon Dust", "Glowing Orb Particles": "Audio Sphere", "DNA Particle Animation": "Galaxy Spiral", "Digital Matrix Particles": "Hujan Neon", "Electric Spark Particles": "Ponco Lightning", "Rainbow Particle Flow": "Color Shift Swarm", "Liquid Particle Flow": "Magnetic Flow", "Particle Vortex": "Vortex Particles", "Particle Swarm": "Frequency Swarm", "Meteor Shower Particles": "Meteor Shower", "Holographic Particle Field": "Color Shift Swarm", "Aurora Particle Flow": "Galaxy Spiral", "Plasma Particle Storm": "Beat Explosion", "Golden Dust Particles": "Sparkles", "Cyberpunk Particle Grid": "Ponco Squares", "3D Galaxy Spiral": "Galaxy Spiral", "Magnetic Particle Field": "Magnetic Flow", "Particle Heartbeat": "Bass Pulse", "Neon DNA Helix": "Galaxy Spiral", "Quantum Particle Cloud": "Audio Cloud", "Infinity Particle Loop": "Orbit Pulse"};
+
 export class ParticleSystem {
   particles: Particle[] = [];
   width: number = 1920;
@@ -63,7 +65,7 @@ export class ParticleSystem {
     let vRot = (Math.random() - 0.5) * 0.08;
     let shape: Particle['shape'] = 'circle';
 
-    const preset = config.preset;
+    const preset = PONCO_PARTICLE_PRESET_MAP[config.preset] || config.preset;
 
     if (preset === 'bokeh') {
       size = Math.max(8 * scaleFactor, (Math.random() * 1.5 + 0.8) * baseSize * 2.5);
@@ -309,7 +311,8 @@ export class ParticleSystem {
     ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
     config: ParticleConfig,
     rawBeatFactor: number = 1.0,
-    isMoving: boolean = true
+    isMoving: boolean = true,
+    audioBands?: Uint8Array
   ) {
     if (!config.enabled) return;
 
@@ -320,9 +323,23 @@ export class ParticleSystem {
     const scaleFactor = Math.min(this.width / 1920, this.height / 1080);
     const sensitivity = config.beatSensitivity ?? 1.0;
     // When paused, beat factor resting state is 1.0
-    const beatFactor = isMoving ? (1.0 + (rawBeatFactor - 1.0) * sensitivity) : 1.0;
+    const beatBase = isMoving ? (1.0 + (rawBeatFactor - 1.0) * sensitivity) : 1.0;
+    let bassLevel = 0;
+    let trebleLevel = 0;
+    if (audioBands?.length) {
+      const bassEnd = Math.max(1, Math.floor(audioBands.length * 0.12));
+      const trebleStart = Math.floor(audioBands.length * 0.68);
+      for (let i = 0; i < bassEnd; i++) bassLevel += audioBands[i];
+      for (let i = trebleStart; i < audioBands.length; i++) trebleLevel += audioBands[i];
+      bassLevel = bassLevel / bassEnd / 255;
+      trebleLevel = trebleLevel / Math.max(1, audioBands.length - trebleStart) / 255;
+    }
+    const bandBoost = 1 + (bassLevel * (config.bassSensitivity ?? 1) + trebleLevel * (config.trebleSensitivity ?? 1)) * 0.22;
+    const beatFactor = beatBase * bandBoost;
 
     ctx.save();
+    if (config.glow) { ctx.shadowBlur = 10 * scaleFactor; ctx.shadowColor = config.color || '#38bdf8'; }
+    if (config.rainbow) { ctx.filter = `hue-rotate(${Math.floor(Date.now() / 30) % 360}deg)`; }
 
     // When paused, temporarily zero out velocities so NO particles advance their coordinates!
     let savedVelocities: Float32Array | null = null;
@@ -340,7 +357,7 @@ export class ParticleSystem {
     }
 
     const effectiveConfig = isMoving ? config : { ...config, speed: 0 };
-    const p = config.preset;
+    const p = PONCO_PARTICLE_PRESET_MAP[config.preset] || config.preset;
 
     if (p === 'bokeh') {
       this.renderBokeh(ctx, effectiveConfig, beatFactor, scaleFactor);
