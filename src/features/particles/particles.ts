@@ -46,19 +46,7 @@ export class ParticleSystem {
     for (let i = 0; i < targetCount; i++) {
       if (i < existingLen) {
         this.resetParticle(this.particles[i], config);
-  
-    } else if (preset === 'Orbit Pulse' || preset === 'Ring Burst' || preset === 'Center Bloom') {
-      size = Math.max(2 * scaleFactor, (Math.random() * 1.5 + 0.5) * baseSize);
-      const ang = Math.random() * Math.PI * 2;
-      const mag = (0.5 + Math.random()) * config.speed * scaleFactor;
-      vx = Math.cos(ang) * mag;
-      vy = Math.sin(ang) * mag;
-      color = config.color && config.color !== '#ffffff' ? config.color : `hsl(${Math.random()*60+180}, 100%, 60%)`;
-      shape = 'circle';
-
-    } else if (p === 'Orbit Pulse' || p === 'Ring Burst' || p === 'Center Bloom') {
-      this.renderBurst(ctx, effectiveConfig, beatFactor, scaleFactor);
-    } else {
+      } else {
         this.particles.push(this.createParticle(config));
       }
     }

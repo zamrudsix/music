@@ -55,7 +55,9 @@ export class SpectrumRenderer {
     const style = config.style;
 
     // Dispatch by category / family to maximize Canvas 2D render speed
-    if (this.isBarsFamily(style)) {
+    if (style === 'Orbit Rings' || style === 'Pulse Spikes' || style === 'Frequency Ribbons' || style === 'Beat Orbs' || style === 'Sonic Ripple') {
+      this.renderNewUnique(ctx, width, height, posX, posY, scale, scaleFactor, config, freqData, count, beatFactor, style);
+    } else if (this.isBarsFamily(style)) {
       this.renderBars(ctx, width, height, posX, posY, scale, scaleFactor, config, freqData, count, spectrumBeatMultiplier, style);
     } else if (this.isLEDFamily(style)) {
       this.renderLED(ctx, width, height, posX, posY, scale, scaleFactor, config, freqData, count, beatFactor, spectrumBeatMultiplier, style);
@@ -73,8 +75,6 @@ export class SpectrumRenderer {
       this.renderGeometric(ctx, width, height, posX, posY, scale, scaleFactor, config, freqData, count, beatFactor, spectrumBeatMultiplier, style);
     } else if (this.isAvantGardeFamily(style)) {
       this.renderAvantGarde(ctx, width, height, posX, posY, scale, scaleFactor, config, freqData, count, beatFactor, spectrumBeatMultiplier, style);
-    } else if (style === 'Orbit Rings' || style === 'Pulse Spikes' || style === 'Frequency Ribbons' || style === 'Beat Orbs' || style === 'Sonic Ripple') {
-      this.renderNewUnique(ctx, width, height, posX, posY, scale, scaleFactor, config, freqData, count, beatFactor, style);
     } else {
       this.renderSpecialFX(ctx, width, height, posX, posY, scale, scaleFactor, config, freqData, count, beatFactor, spectrumBeatMultiplier, style);
     }
@@ -112,7 +112,7 @@ export class SpectrumRenderer {
   }
 
   private isGeometricFamily(s: string): boolean {
-    return s.startsWith('Spiral') || s === 'Galaxy Spiral' || s === 'DNA Helix' || s === 'Vortex' || s === 'Orbit Rings' || s === 'Deep Tunnel' || s === 'Hex Pulse' || s === 'Lissajous' || s === 'Spectrum Arc' || s === 'Neon Flower' || s === 'Warp Speed' || s === 'Diamond Lattice' || s === 'Cyber Grid' || s === 'Superformula' || s === 'Sine Sphere' || s === 'Hex Lattice' || s === 'Spirograph' || s === 'Tesseract 4D' || s === 'Torus Knot' || s === 'Superellipse' || s === 'Black Hole Accretion';
+    return s.startsWith('Spiral') || s === 'Galaxy Spiral' || s === 'DNA Helix' || s === 'Vortex' || s === 'Deep Tunnel' || s === 'Hex Pulse' || s === 'Lissajous' || s === 'Spectrum Arc' || s === 'Neon Flower' || s === 'Warp Speed' || s === 'Diamond Lattice' || s === 'Cyber Grid' || s === 'Superformula' || s === 'Sine Sphere' || s === 'Hex Lattice' || s === 'Spirograph' || s === 'Tesseract 4D' || s === 'Torus Knot' || s === 'Superellipse' || s === 'Black Hole Accretion';
   }
 
   private isAvantGardeFamily(s: string): boolean {
@@ -2391,7 +2391,7 @@ export class SpectrumRenderer {
   ) {
     const cx = posX;
     const cy = posY;
-    const baseR = Math.min(width, height) * 0.18 * scale;
+    const baseR = Math.min(width, height) * 0.25 * scale;
 
     if (style === 'Orbit Rings') {
       for (let ring = 0; ring < 5; ring++) {

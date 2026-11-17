@@ -123,6 +123,12 @@ export interface ParticleConfig {
 }
 
 export type SpectrumStyle = 
+  | 'Orbit Rings'
+  | 'Pulse Spikes'
+  | 'Frequency Ribbons'
+  | 'Beat Orbs'
+  | 'Sonic Ripple'
+
   // Legacy styles
   | 'bars' 
   | 'waveform' 
