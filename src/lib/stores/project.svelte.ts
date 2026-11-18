@@ -14,19 +14,19 @@ export function registerAudioPlaybackStopper(cb: () => void) {
 
 /**
  * Decode audio at a controlled sample rate to avoid allocating enormous PCM
- * buffers for long music files. If the browser cannot decode at 22.05 kHz,
- * retry at 16 kHz before falling back to the browser default.
+ * buffers for long music files. Tries low sample rates first (22.05 → 16 → 8 kHz),
+ * then falls back to the browser default. After a successful decode, the buffer
+ * is immediately reduced to 16 kHz mono to keep peak and retained memory low.
  */
 async function decodeAudioDataResilient(source: Blob | ArrayBuffer): Promise<AudioBuffer> {
   const arrayBuf = source instanceof Blob ? await source.arrayBuffer() : source;
   const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
   if (!AudioCtxClass) throw new Error('Browser ini tidak mendukung Web Audio API.');
 
-  let lastError: unknown;
-  for (const sampleRate of [22050, 16000] as const) {
+  const tryDecode = async (sampleRate?: number): Promise<AudioBuffer> => {
     let ctx: AudioContext | null = null;
     try {
-      ctx = new AudioCtxClass({ sampleRate });
+      ctx = sampleRate != null ? new AudioCtxClass({ sampleRate }) : new AudioCtxClass();
       if (ctx.state === 'suspended') await ctx.resume().catch(() => {});
       // decodeAudioData may detach its input buffer; always pass a fresh copy.
       const bufferCopy = arrayBuf.slice(0);
@@ -52,15 +52,58 @@ async function decodeAudioDataResilient(source: Blob | ArrayBuffer): Promise<Aud
         }
       });
       return decoded;
-    } catch (error) {
-      lastError = error;
     } finally {
       if (ctx && ctx.state !== 'closed') await ctx.close().catch(() => {});
     }
+  };
+
+  const rates: (number | undefined)[] = [22050, 16000, 8000, undefined];
+  let lastError: unknown;
+  let decoded: AudioBuffer | null = null;
+
+  for (const rate of rates) {
+    try {
+      decoded = await tryDecode(rate);
+      break;
+    } catch (error) {
+      lastError = error;
+    }
   }
 
-  const detail = lastError instanceof Error ? lastError.message : String(lastError || 'unknown error');
-  throw new Error(`Audio tidak dapat di-decode pada 22.05 kHz maupun 16 kHz. File mungkin rusak atau melebihi kapasitas memori perangkat. Detail: ${detail}`);
+  if (!decoded) {
+    const detail = lastError instanceof Error ? lastError.message : String(lastError || 'unknown error');
+    throw new Error(
+      `Audio tidak dapat di-decode (dicoba 22.05/16/8 kHz dan rate default). File mungkin rusak atau melebihi kapasitas memori perangkat. Detail: ${detail}`
+    );
+  }
+
+  // Immediately reduce to 16 kHz mono to free memory for long tracks
+  return reduceTo16kMono(decoded);
+}
+
+/**
+ * Resample + mix-down to 16 kHz mono using OfflineAudioContext.
+ * No-op if the buffer is already ≤16 kHz and mono.
+ */
+async function reduceTo16kMono(buffer: AudioBuffer): Promise<AudioBuffer> {
+  if (buffer.sampleRate <= 16000 && buffer.numberOfChannels === 1) return buffer;
+
+  const targetRate = 16000;
+  const targetLength = Math.max(1, Math.round(buffer.duration * targetRate));
+  const OfflineCtx = window.OfflineAudioContext || (window as any).webkitOfflineAudioContext;
+  if (!OfflineCtx) return buffer; // best-effort fallback
+
+  try {
+    const offline = new OfflineCtx(1, targetLength, targetRate);
+    const source = offline.createBufferSource();
+    source.buffer = buffer;
+    source.connect(offline.destination);
+    source.start(0);
+    return await offline.startRendering();
+  } catch {
+    // If resampling fails, return the original (caller already succeeded at decoding)
+    return buffer;
+  }
 }
 
 const DEFAULT_PROJECT: ProjectConfig = {
