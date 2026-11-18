@@ -13,51 +13,54 @@ export function registerAudioPlaybackStopper(cb: () => void) {
 }
 
 /**
- * Resilient Web Audio decoder supporting WebKit/Safari/Tauri desktop
+ * Decode audio at a controlled sample rate to avoid allocating enormous PCM
+ * buffers for long music files. If the browser cannot decode at 22.05 kHz,
+ * retry at 16 kHz before falling back to the browser default.
  */
 async function decodeAudioDataResilient(source: Blob | ArrayBuffer): Promise<AudioBuffer> {
   const arrayBuf = source instanceof Blob ? await source.arrayBuffer() : source;
   const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
-  const ctx = new AudioCtxClass();
-  try {
-    if (ctx.state === 'suspended') {
-      await ctx.resume().catch(() => {});
-    }
-    const bufferCopy = arrayBuf.slice(0);
-    return await new Promise<AudioBuffer>((resolve, reject) => {
-      let settled = false;
-      const res = ctx.decodeAudioData(
-        bufferCopy,
-        (buf) => {
-          if (!settled) {
-            settled = true;
-            resolve(buf);
+  if (!AudioCtxClass) throw new Error('Browser ini tidak mendukung Web Audio API.');
+
+  let lastError: unknown;
+  for (const sampleRate of [22050, 16000] as const) {
+    let ctx: AudioContext | null = null;
+    try {
+      ctx = new AudioCtxClass({ sampleRate });
+      if (ctx.state === 'suspended') await ctx.resume().catch(() => {});
+      // decodeAudioData may detach its input buffer; always pass a fresh copy.
+      const bufferCopy = arrayBuf.slice(0);
+      const decoded = await new Promise<AudioBuffer>((resolve, reject) => {
+        let settled = false;
+        const finish = (fn: (value: any) => void, value: any) => {
+          if (settled) return;
+          settled = true;
+          fn(value);
+        };
+        try {
+          const result = ctx!.decodeAudioData(
+            bufferCopy,
+            (buffer) => finish(resolve, buffer),
+            (error) => finish(reject, error || new Error('Format audio tidak dapat dibaca.'))
+          );
+          if (result && typeof result.then === 'function') {
+            result.then((buffer) => finish(resolve, buffer))
+              .catch((error) => finish(reject, error));
           }
-        },
-        (err) => {
-          if (!settled) {
-            settled = true;
-            reject(err);
-          }
+        } catch (error) {
+          finish(reject, error);
         }
-      );
-      if (res && typeof res.then === 'function') {
-        res.then((buf) => {
-          if (!settled) {
-            settled = true;
-            resolve(buf);
-          }
-        }).catch((err) => {
-          if (!settled) {
-            settled = true;
-            reject(err);
-          }
-        });
-      }
-    });
-  } finally {
-    await ctx.close().catch(() => {});
+      });
+      return decoded;
+    } catch (error) {
+      lastError = error;
+    } finally {
+      if (ctx && ctx.state !== 'closed') await ctx.close().catch(() => {});
+    }
   }
+
+  const detail = lastError instanceof Error ? lastError.message : String(lastError || 'unknown error');
+  throw new Error(`Audio tidak dapat di-decode pada 22.05 kHz maupun 16 kHz. File mungkin rusak atau melebihi kapasitas memori perangkat. Detail: ${detail}`);
 }
 
 const DEFAULT_PROJECT: ProjectConfig = {

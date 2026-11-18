@@ -30,6 +30,8 @@
     if (!target.files || target.files.length === 0) return;
 
     await projectStore.addAudioTracks(target.files);
+    // Allow selecting the same file again after a failed import.
+    target.value = '';
   }
 
   let isConfirmingClear = $state(false);
