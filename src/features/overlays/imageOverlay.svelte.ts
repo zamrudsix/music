@@ -121,8 +121,9 @@ export class ImageOverlayManager {
       const beatFactor = 1.0 + (rawBeatFactor - 1.0) * sensitivity;
 
       const isFull = !!item.isFullScreen;
-      const posX = isFull ? width / 2 : (item.x ?? 0.5) * width;
-      let posY = (isFull ? height / 2 : (item.y ?? 0.5) * height) + transState.offsetY;
+      // Allow shifting even in full screen
+      const posX = (item.x ?? 0.5) * width;
+      let posY = ((item.y ?? 0.5) * height) + transState.offsetY;
       let rawOpacity = typeof item.opacity === 'number' && Number.isFinite(item.opacity) ? item.opacity : 1.0;
       let drawAlpha = Math.max(0, Math.min(1, rawOpacity * transState.alphaMultiplier));
       let animScale = 1.0 * transState.scaleMultiplier;

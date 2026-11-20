@@ -1,3 +1,10 @@
+## [v4.3.23] - 2026-11-20
+
+### 🔧 Perbaikan
+- Overlay fullscreen sekarang bisa digeser kiri/kanan/atas/bawah (posisi X/Y tetap aktif).
+- Randomize overlay memakai scale lebih besar (lebih full layar) + offset pan.
+- Lyrics otomatis di-generate sebelum export jika belum ada (selama Groq API key tersimpan).
+
 ## [v4.3.22] - 2026-11-20
 
 ### 🔧 Perbaikan

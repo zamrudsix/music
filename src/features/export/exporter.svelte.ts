@@ -17,14 +17,17 @@ function applyRandomizations(project: any): any {
   if (settings.randomizeOverlayScalePos) {
     const randomizeItem = (item: any) => {
       if (!item) return;
-      // Position: keep reasonably centered but vary
-      item.x = 0.25 + Math.random() * 0.5;
-      item.y = 0.25 + Math.random() * 0.5;
-
-      // Scale: aim for screen-filling like 16:9 UI (0.75 - 1.15 range, not tiny)
-      // Examples: 80%, 85%, 95%, 105% of a good base
-      const scales = [0.75, 0.8, 0.85, 0.9, 0.95, 1.0, 1.05, 1.1];
+      // Larger scales that fill more of the screen (like 16:9 full), still allow pan
+      const scales = [1.15, 1.25, 1.35, 1.45, 1.55, 1.7, 1.85];
       item.scale = scales[Math.floor(Math.random() * scales.length)];
+
+      // Position offset so user can still shift left/right/up/down when large
+      item.x = 0.35 + Math.random() * 0.3; // 35-65%
+      item.y = 0.35 + Math.random() * 0.3;
+
+      // Prefer fullscreen-like coverage
+      item.isFullScreen = true;
+      item.fitMode = 'cover';
 
       // Random facing left or right (mirror)
       if (Math.random() > 0.5) {

@@ -24,6 +24,7 @@
     Scissors
   } from '@lucide/svelte';
   import { licenseManager } from '../licensing';
+  import { GroqService } from '../lyrics/groq';
   import { isWindows, isDesktop } from '../../lib/utils/platform';
   import { sweepOpfsTempFiles } from '../../lib/utils/storage';
 
@@ -229,10 +230,25 @@
       // Ensure lyrics exist for bulk/random exports
       if ((!projectStore.project.lyrics?.segments || projectStore.project.lyrics.segments.length === 0) && typeof localStorage !== 'undefined') {
         const apiKey = localStorage.getItem('groq_api_key');
-        if (apiKey && projectStore.project.audio?.tracks?.length) {
-          console.log('Auto-generating lyrics before bulk export...');
-          // Trigger generation if possible (user must have key set)
-          // Note: full auto-gen is best done from Lyrics panel; this just forces enabled + center
+        if (apiKey && projectStore.audioBuffer) {
+          console.log('Auto-generating lyrics before export...');
+          try {
+            const segments = await GroqService.transcribeAudioBuffer(
+              projectStore.audioBuffer,
+              apiKey,
+              'whisper-large-v3',
+              undefined,
+              (status, pct) => console.log(`Lyrics: ${status} (${pct}%)`),
+              projectStore.project.lyrics?.config?.language || 'auto'
+            );
+            if (segments && segments.length > 0) {
+              projectStore.project.lyrics.segments = segments;
+              projectStore.saveToDB();
+              console.log(`Generated ${segments.length} lyric lines`);
+            }
+          } catch (e) {
+            console.warn('Auto lyrics generation failed:', e);
+          }
         }
       }
       // Force center + enabled for all bulk renders

@@ -268,18 +268,19 @@
             {/if}
           </div>
 
-          {#if !vid.isFullScreen}
-            <div class="grid grid-cols-2 gap-2 text-[11px]">
-              <div>
-                <span class="text-neutral-500 block mb-1">X: {Math.round(vid.x * 100)}%</span>
-                <input type="range" min="0.0" max="1.0" step="0.01" bind:value={vid.x} onchange={() => projectStore.saveToDB()} class="w-full accent-cyan-500 cursor-pointer" />
-              </div>
-              <div>
-                <span class="text-neutral-500 block mb-1">Y: {Math.round(vid.y * 100)}%</span>
-                <input type="range" min="0.0" max="1.0" step="0.01" bind:value={vid.y} onchange={() => projectStore.saveToDB()} class="w-full accent-cyan-500 cursor-pointer" />
-              </div>
+          <!-- Position always available (even in fullscreen) so you can pan left/right/up/down -->
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div>
+              <span class="text-neutral-500 block mb-1">X: {Math.round(vid.x * 100)}% (geser kiri/kanan)</span>
+              <input type="range" min="0.0" max="1.0" step="0.01" bind:value={vid.x} onchange={() => projectStore.saveToDB()} class="w-full accent-cyan-500 cursor-pointer" />
             </div>
+            <div>
+              <span class="text-neutral-500 block mb-1">Y: {Math.round(vid.y * 100)}% (geser atas/bawah)</span>
+              <input type="range" min="0.0" max="1.0" step="0.01" bind:value={vid.y} onchange={() => projectStore.saveToDB()} class="w-full accent-cyan-500 cursor-pointer" />
+            </div>
+          </div>
 
+          {#if !vid.isFullScreen}
             <!-- Scale & Animation Mode -->
             <div class="grid grid-cols-2 gap-2 text-[11px]">
               <div>
