@@ -1,3 +1,14 @@
+## [v4.3.22] - 2026-11-20
+
+### 🔧 Perbaikan
+- Hapus semua pilihan folder export. Video selalu langsung tersimpan ke Folder Downloads tanpa perlu memilih folder.
+
+## [v4.3.21] - 2026-11-20
+
+### ✨ Fitur Baru
+- Kontrol **Naikkan Volume Lagu** di Export (slider 1.0x – 3.0x, default 1.5x). Hasil render lebih keras dari MP3 asli.
+- Overlay saat randomize/bulk: scale sekarang lebih sesuai layar 16:9 (75%–110%), posisi lebih rapi, dan otomatis acak **hadap kiri / hadap kanan** (mirror).
+
 ## [v4.3.20] - 2026-11-20
 
 ### ✨ Perbaikan

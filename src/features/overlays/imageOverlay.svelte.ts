@@ -181,6 +181,11 @@ export class ImageOverlayManager {
         ctx.rotate((item.rotation * Math.PI) / 180);
       }
 
+      // Mirror support (immediate)
+      if (item.mirrorMode === 'immediate' || item.mirrorEnabled) {
+        ctx.scale(-1, 1);
+      }
+
       ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
       ctx.restore();
     }

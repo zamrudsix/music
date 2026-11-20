@@ -13,16 +13,27 @@ function applyRandomizations(project: any): any {
   const p = JSON.parse(JSON.stringify(project)); // deep clone
   const settings = p.exportSettings || {};
 
-  // Randomize overlay scale and position
+  // Randomize overlay scale, position, and facing (left/right)
   if (settings.randomizeOverlayScalePos) {
     const randomizeItem = (item: any) => {
       if (!item) return;
-      // Random position 10%-90% to avoid edges
-      item.x = 0.1 + Math.random() * 0.8;
-      item.y = 0.1 + Math.random() * 0.8;
-      // Random scale 0.4 to 1.8, or relative to original
-      const base = item.scale || 1;
-      item.scale = Math.max(0.2, Math.min(3, base * (0.5 + Math.random() * 1.5)));
+      // Position: keep reasonably centered but vary
+      item.x = 0.25 + Math.random() * 0.5;
+      item.y = 0.25 + Math.random() * 0.5;
+
+      // Scale: aim for screen-filling like 16:9 UI (0.75 - 1.15 range, not tiny)
+      // Examples: 80%, 85%, 95%, 105% of a good base
+      const scales = [0.75, 0.8, 0.85, 0.9, 0.95, 1.0, 1.05, 1.1];
+      item.scale = scales[Math.floor(Math.random() * scales.length)];
+
+      // Random facing left or right (mirror)
+      if (Math.random() > 0.5) {
+        item.mirrorMode = 'immediate';
+        item.mirrorEnabled = true;
+      } else {
+        item.mirrorMode = 'off';
+        item.mirrorEnabled = false;
+      }
     };
     if (p.overlays?.images) p.overlays.images.forEach(randomizeItem);
     if (p.overlays?.videos) p.overlays.videos.forEach(randomizeItem);
@@ -230,10 +241,11 @@ export class VideoExporter {
         for (let ch = 0; ch < numChannels; ch++) {
           const channelData = projectStore.audioBuffer.getChannelData(ch);
           const sliced = channelData.slice(startSample, endSample);
-          // Volume boost +1 level (~1.25x)
+          // Volume boost from export settings (default 1.5x louder)
+          const boost = projectStore.project.exportSettings.volumeBoost ?? 1.5;
           const boosted = new Float32Array(sliced.length);
           for (let i = 0; i < sliced.length; i++) {
-            boosted[i] = Math.max(-1, Math.min(1, sliced[i] * 1.25));
+            boosted[i] = Math.max(-1, Math.min(1, sliced[i] * boost));
           }
           audioRawData.push(boosted);
         }
@@ -447,14 +459,13 @@ export class VideoExporter {
             reader.readAsDataURL(slice);
           });
 
-          const customDir = projectStore?.project?.exportSettings?.customExportDir || localStorage.getItem('beras_custom_export_dir') || undefined;
-
+          // Always save to default Downloads (no custom folder)
           lastPath = await invoke<string>('save_video_chunk', {
             filename,
             base64Chunk,
             isFirst,
             isLast,
-            customDir,
+            customDir: undefined,
           });
 
           offset = end;

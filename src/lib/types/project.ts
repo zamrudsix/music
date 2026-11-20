@@ -615,6 +615,8 @@ export interface ExportSettings {
   randomizeBackdrop?: boolean;
   /** If true, shuffle playlist/songs order for each bulk render */
   randomizePlaylist?: boolean;
+  /** Volume boost multiplier for export (1.0 = original, 1.5 = 50% louder, etc.) */
+  volumeBoost?: number;
 }
 
 export interface ProjectConfig {

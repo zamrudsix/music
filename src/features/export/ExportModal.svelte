@@ -47,6 +47,9 @@
     if (!projectStore.project.exportSettings.bulkCount) {
       projectStore.project.exportSettings.bulkCount = 1;
     }
+    if (!projectStore.project.exportSettings.volumeBoost) {
+      projectStore.project.exportSettings.volumeBoost = 1.5;
+    }
     if (!projectStore.project.exportSettings.exportRange) {
       const totalDur = Math.max(1, Math.round(projectStore.project.audio.duration || 30));
       projectStore.project.exportSettings.exportRange = {
@@ -129,6 +132,9 @@
     const totalDur = Math.max(1, Math.round(projectStore.project.audio.duration || 30));
     if (!projectStore.project.exportSettings.bulkCount) {
       projectStore.project.exportSettings.bulkCount = 1;
+    }
+    if (!projectStore.project.exportSettings.volumeBoost) {
+      projectStore.project.exportSettings.volumeBoost = 1.5;
     }
     if (!projectStore.project.exportSettings.exportRange) {
       projectStore.project.exportSettings.exportRange = { enabled: true, startTime: 0, endTime: totalDur };
@@ -388,6 +394,9 @@
                       if (!projectStore.project.exportSettings.bulkCount) {
       projectStore.project.exportSettings.bulkCount = 1;
     }
+    if (!projectStore.project.exportSettings.volumeBoost) {
+      projectStore.project.exportSettings.volumeBoost = 1.5;
+    }
     if (!projectStore.project.exportSettings.exportRange) {
                         projectStore.project.exportSettings.exportRange = { enabled: false, startTime: 0, endTime: Math.round(projectStore.project.audio.duration || 30) };
                       }
@@ -403,6 +412,9 @@
                     onclick={() => {
                       if (!projectStore.project.exportSettings.bulkCount) {
       projectStore.project.exportSettings.bulkCount = 1;
+    }
+    if (!projectStore.project.exportSettings.volumeBoost) {
+      projectStore.project.exportSettings.volumeBoost = 1.5;
     }
     if (!projectStore.project.exportSettings.exportRange) {
                         projectStore.project.exportSettings.exportRange = { enabled: true, startTime: 0, endTime: Math.min(30, Math.round(projectStore.project.audio.duration || 30)) };
@@ -577,6 +589,30 @@
             </div>
 
             <!-- Other Formats Selector -->
+            <!-- Volume Boost -->
+            <div class="p-3 rounded-xl bg-neutral-900/40 border border-neutral-800 space-y-2 text-[11px]">
+              <div class="flex items-center justify-between">
+                <span class="text-neutral-300 font-medium">Naikkan Volume Lagu</span>
+                <span class="text-cyan-400 font-mono">{(projectStore.project.exportSettings.volumeBoost ?? 1.5).toFixed(1)}x</span>
+              </div>
+              <input 
+                type="range" 
+                min="1.0" 
+                max="3.0" 
+                step="0.1" 
+                bind:value={projectStore.project.exportSettings.volumeBoost}
+                onchange={() => projectStore.saveToDB()}
+                class="w-full accent-cyan-500 cursor-pointer"
+              />
+              <div class="flex justify-between text-[9px] text-neutral-500">
+                <span>1.0x (asli)</span>
+                <span>1.5x</span>
+                <span>2.0x</span>
+                <span>3.0x (keras)</span>
+              </div>
+              <div class="text-[9px] text-neutral-500">Hasil render akan lebih keras dari file MP3 asli.</div>
+            </div>
+
             <!-- Bulk / Mass Render -->
             <div class="p-3 rounded-xl bg-neutral-900/40 border border-neutral-800 space-y-2 text-[11px]">
               <div class="flex items-center justify-between">
@@ -706,10 +742,7 @@
               </div>
             {/if}
 
-            <!-- Export selalu ke Folder Downloads (tidak perlu pilih folder) -->
-            <div class="mt-3 p-2 rounded-lg bg-neutral-950/60 border border-neutral-800 text-[10px] text-neutral-400 text-center">
-              Video akan otomatis tersimpan di Folder Downloads
-            </div>
+
           </div>
         {:else}
           <!-- Video Specs Card During Render -->
@@ -825,13 +858,7 @@
                   <div class="break-all select-all font-mono text-[10px]">
                     📁 <strong>{savedFilePath}</strong>
                   </div>
-                  <button
-                    type="button"
-                    onclick={openSavedFileLocation}
-                    class="px-2.5 py-1 bg-emerald-700/60 hover:bg-emerald-600 text-white rounded text-[10px] font-semibold shrink-0 cursor-pointer transition-colors"
-                  >
-                    Buka di Folder
-                  </button>
+                  <!-- File tersimpan otomatis di Downloads -->
                 </div>
               {/if}
             </div>

@@ -65,47 +65,6 @@
     </div>
   </div>
 
-  <!-- Custom Export Destination Folder (Item 4) -->
-  <div class="space-y-2">
-    <div class="flex items-center justify-between text-xs font-medium text-neutral-300">
-      <span class="flex items-center gap-1.5">
-        <FolderOpen class="w-3.5 h-3.5 text-cyan-400" />
-        Folder Tujuan Export
-      </span>
-      {#if projectStore.project.exportSettings.customExportDir}
-        <button 
-          type="button" 
-          onclick={handleResetFolder}
-          class="text-[10px] text-neutral-500 hover:text-neutral-300 flex items-center gap-1 cursor-pointer"
-        >
-          <RotateCcw class="w-2.5 h-2.5" />
-          Reset Default
-        </button>
-      {/if}
-    </div>
-
-    <div class="p-2.5 rounded-lg bg-neutral-950 border border-neutral-800 space-y-2 text-xs">
-      <div class="text-[11px] text-neutral-400 break-all select-all font-mono">
-        {projectStore.project.exportSettings.customExportDir || 'Folder Downloads Sistem (Default)'}
-      </div>
-
-      {#if isDesktop()}
-        <button 
-          type="button"
-          onclick={handleSelectFolder}
-          class="w-full py-1.5 px-3 rounded-md bg-neutral-900 hover:bg-neutral-800 border border-neutral-700/80 text-cyan-400 hover:text-cyan-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-        >
-          <FolderOpen class="w-3.5 h-3.5" />
-          Pilih Folder Sendiri...
-        </button>
-      {:else}
-        <div class="text-[10px] text-neutral-500">
-          Di browser web, video otomatis terunduh melalui download manager browser.
-        </div>
-      {/if}
-    </div>
-  </div>
-
   <div class="p-3 bg-neutral-950/60 rounded-lg border border-neutral-800 text-[11px] text-neutral-400 space-y-1">
     <div class="text-neutral-300 font-medium">Native High-Performance Render Engine</div>
     <div>Rendering chunked off-thread di Web Worker dengan GPU Hardware acceleration & zero memory leak.</div>
