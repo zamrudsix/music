@@ -46,6 +46,17 @@ function applyRandomizations(project: any): any {
     }
   }
 
+  // Force good lyrics defaults for bulk/random exports
+  if (p.lyrics?.config) {
+    p.lyrics.config.enabled = true;
+    p.lyrics.config.position = 'center';
+    p.lyrics.config.x = 0.5;
+    p.lyrics.config.y = 0.48; // slightly above exact center for better look
+    // Font size proportional to screen (roughly 70% of a "10" scale → larger on bigger screens)
+    const w = p.exportSettings?.width || 1280;
+    p.lyrics.config.fontSize = Math.round(Math.min(72, Math.max(42, w / 18))); // ~70px on 1280, scales
+  }
+
   return p;
 }
 
@@ -218,7 +229,13 @@ export class VideoExporter {
         audioRawData = [];
         for (let ch = 0; ch < numChannels; ch++) {
           const channelData = projectStore.audioBuffer.getChannelData(ch);
-          audioRawData.push(channelData.slice(startSample, endSample));
+          const sliced = channelData.slice(startSample, endSample);
+          // Volume boost +1 level (~1.25x)
+          const boosted = new Float32Array(sliced.length);
+          for (let i = 0; i < sliced.length; i++) {
+            boosted[i] = Math.max(-1, Math.min(1, sliced[i] * 1.25));
+          }
+          audioRawData.push(boosted);
         }
         console.log(`✅ Audio ready for export (${isRange ? 'Partial Range' : 'Full'}): ${numChannels} channels, ${sampleRate}Hz, duration: ${((endSample - startSample) / sampleRate).toFixed(1)}s`);
       } else {

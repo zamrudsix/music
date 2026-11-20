@@ -1,3 +1,11 @@
+## [v4.3.20] - 2026-11-20
+
+### ✨ Perbaikan
+- Volume audio dinaikkan 1 tingkat (~1.25x) saat export
+- Export selalu langsung ke Folder Downloads (tidak perlu pilih folder)
+- Lyrics otomatis di-force enable + posisi tengah + font size proporsional saat render massal/acak
+- Penanganan teks lyric panjang lebih profesional (ukuran otomatis menyesuaikan)
+
 ## [v4.3.19] - 2026-11-20
 
 ### ✨ Fitur Baru

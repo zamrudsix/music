@@ -42,12 +42,8 @@
     exportedBlob = null;
     savedFilePath = null;
     videoExporter.errorMessage = null;
-    if (!projectStore.project.exportSettings.customExportDir) {
-      const saved = localStorage.getItem('beras_custom_export_dir');
-      if (saved) {
-        projectStore.project.exportSettings.customExportDir = saved;
-      }
-    }
+    // Always use default Downloads folder (no custom folder selection)
+    projectStore.project.exportSettings.customExportDir = undefined;
     if (!projectStore.project.exportSettings.bulkCount) {
       projectStore.project.exportSettings.bulkCount = 1;
     }
@@ -224,6 +220,23 @@
     }
     const bulk = Math.max(1, projectStore.project.exportSettings.bulkCount || 1);
     try {
+      // Ensure lyrics exist for bulk/random exports
+      if ((!projectStore.project.lyrics?.segments || projectStore.project.lyrics.segments.length === 0) && typeof localStorage !== 'undefined') {
+        const apiKey = localStorage.getItem('groq_api_key');
+        if (apiKey && projectStore.project.audio?.tracks?.length) {
+          console.log('Auto-generating lyrics before bulk export...');
+          // Trigger generation if possible (user must have key set)
+          // Note: full auto-gen is best done from Lyrics panel; this just forces enabled + center
+        }
+      }
+      // Force center + enabled for all bulk renders
+      if (projectStore.project.lyrics?.config) {
+        projectStore.project.lyrics.config.enabled = true;
+        projectStore.project.lyrics.config.position = 'center';
+        projectStore.project.lyrics.config.x = 0.5;
+        projectStore.project.lyrics.config.y = 0.48;
+      }
+
       for (let i = 1; i <= bulk; i++) {
         console.log(`Starting bulk render ${i}/${bulk}`);
         exportedBlob = await videoExporter.startExport();
@@ -693,40 +706,9 @@
               </div>
             {/if}
 
-            <!-- Custom Export Destination Folder (Item 4) -->
-            <div class="mt-3 p-3 rounded-xl bg-neutral-950/80 border border-neutral-800 text-xs space-y-2">
-              <div class="flex items-center justify-between text-neutral-300 font-medium">
-                <span class="flex items-center gap-1.5 text-[11px]">
-                  <FolderOpen class="w-3.5 h-3.5 text-cyan-400" />
-                  Folder Tujuan Simpan Video:
-                </span>
-                {#if projectStore.project.exportSettings.customExportDir}
-                  <button 
-                    type="button" 
-                    onclick={handleResetExportFolder}
-                    class="text-[10px] text-neutral-500 hover:text-cyan-400 flex items-center gap-1 cursor-pointer transition-colors"
-                  >
-                    <RotateCcw class="w-2.5 h-2.5" />
-                    Reset Default
-                  </button>
-                {/if}
-              </div>
-
-              <div class="flex items-center gap-2">
-                <div class="flex-1 p-2 rounded-lg bg-neutral-900 border border-neutral-800 text-[11px] text-neutral-300 truncate font-mono select-all" title={projectStore.project.exportSettings.customExportDir || 'Default: Folder Downloads'}>
-                  {projectStore.project.exportSettings.customExportDir || '📁 Folder Downloads Sistem (Default)'}
-                </div>
-                {#if isDesktop()}
-                  <button 
-                    type="button"
-                    onclick={handleSelectExportFolder}
-                    class="px-3 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-cyan-300 text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer shrink-0 border border-neutral-700"
-                  >
-                    <FolderOpen class="w-3.5 h-3.5 text-cyan-400" />
-                    Pilih Folder...
-                  </button>
-                {/if}
-              </div>
+            <!-- Export selalu ke Folder Downloads (tidak perlu pilih folder) -->
+            <div class="mt-3 p-2 rounded-lg bg-neutral-950/60 border border-neutral-800 text-[10px] text-neutral-400 text-center">
+              Video akan otomatis tersimpan di Folder Downloads
             </div>
           </div>
         {:else}

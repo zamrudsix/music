@@ -68,11 +68,21 @@ export class LyricRenderer {
       height * 0.85
     );
 
-    const baseFontSize = (config.fontSize || 36) * scaleFactor;
-    const lineSpacing = (config.lineSpacing ?? 1.25); // default lebih longgar
+    // Proportional font: aim for ~70% of a comfortable size relative to width
+    const proportionalBase = Math.min(80, Math.max(36, width / 16));
+    const baseFontSize = (config.fontSize || proportionalBase) * scaleFactor;
+    const lineSpacing = (config.lineSpacing ?? 1.25);
     let finalFontSize = config.followBeat 
       ? baseFontSize * (1 + (beatFactor - 1) * 0.2) 
       : baseFontSize;
+
+    // If text is very long, reduce size a bit so it stays professional
+    if (activeSeg.text && activeSeg.text.length > 60) {
+      finalFontSize *= 0.85;
+    }
+    if (activeSeg.text && activeSeg.text.length > 100) {
+      finalFontSize *= 0.9;
+    }
 
     // Global line animation override if configured
     if (config.animation === 'pulse-beat') {
