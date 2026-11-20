@@ -102,7 +102,7 @@
       let segments: LyricSegment[];
       let trackFileName = projectStore.project.audio.fileName || 'track_subtitles';
 
-        const lang = projectStore.project.lyrics.config.language || selectedLanguage || 'id';
+        const lang = projectStore.project.lyrics.config.language || selectedLanguage || 'auto';
 
         if (projectStore.audioBuffer) {
           segments = await GroqService.transcribeAudioBuffer(

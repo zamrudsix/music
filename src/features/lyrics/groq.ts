@@ -23,6 +23,44 @@ export interface GroqTranscriptionResponse {
 }
 
 export class GroqService {
+
+  /**
+   * Quick language detection using the first ~30 seconds of audio.
+   * Returns the detected language code (e.g. "id", "en") or "auto" on failure.
+   */
+  private static async detectLanguage(
+    audioBuffer: AudioBuffer,
+    apiKey: string,
+    model: string,
+    signal?: AbortSignal
+  ): Promise<string> {
+    try {
+      const sampleDur = Math.min(30, audioBuffer.duration);
+      if (sampleDur < 3) return 'auto';
+
+      const sampleRate = audioBuffer.sampleRate;
+      const channels = audioBuffer.numberOfChannels;
+      const endSample = Math.floor(sampleDur * sampleRate);
+
+      const tempCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const sampleBuffer = tempCtx.createBuffer(channels, endSample, sampleRate);
+      for (let ch = 0; ch < channels; ch++) {
+        sampleBuffer.getChannelData(ch).set(audioBuffer.getChannelData(ch).subarray(0, endSample));
+      }
+      await tempCtx.close();
+
+      const wavBlob = AudioAnalyzer.audioBufferToWavBlob(sampleBuffer, 16000);
+      const data = await this.transcribeChunk(wavBlob, apiKey, model, signal, 1, 'auto');
+      const detected = (data.language || '').toLowerCase().trim();
+      if (detected && detected !== 'auto' && detected.length <= 5) {
+        return detected;
+      }
+    } catch (e) {
+      console.warn('Language detection failed, falling back to auto:', e);
+    }
+    return 'auto';
+  }
+
   /**
    * Transcribes a single audio chunk (<= 25MB) with Whisper Turbo with auto-retry and 120s timeout.
    */
@@ -106,6 +144,16 @@ export class GroqService {
     language: string = 'auto'
   ): Promise<LyricSegment[]> {
     if (!apiKey) throw new Error('Groq API Key diperlukan.');
+
+    // Auto-detect language from a short sample when requested
+    if (!language || language === 'auto') {
+      onProgress?.('Mendeteksi bahasa audio...', 5);
+      const detected = await this.detectLanguage(audioBuffer, apiKey, model, signal);
+      if (detected && detected !== 'auto') {
+        language = detected;
+        onProgress?.(`Bahasa terdeteksi: ${detected.toUpperCase()}`, 10);
+      }
+    }
 
     const totalDuration = audioBuffer.duration;
     // Chunk size: 3 minutes (180s) to guarantee Whisper never hits the 448-token generation ceiling on dense audio
