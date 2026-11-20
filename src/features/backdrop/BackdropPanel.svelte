@@ -260,6 +260,20 @@
 </script>
 
 <div class="space-y-4">
+  <!-- Randomize Backdrop on Export -->
+  <div class="p-2 rounded bg-neutral-900/60 border border-neutral-800 text-[11px]">
+    <label class="flex items-center justify-between cursor-pointer">
+      <span class="text-neutral-300 font-medium">Acak Urutan Backdrop Images saat Render Massal</span>
+      <input 
+        type="checkbox" 
+        bind:checked={projectStore.project.exportSettings.randomizeBackdrop}
+        onchange={() => projectStore.saveToDB()}
+        class="accent-cyan-500 w-4 h-4 cursor-pointer"
+      />
+    </label>
+    <div class="text-[9px] text-neutral-500 mt-1">Jika dicentang, setiap render akan mengacak urutan gambar backdrop (tidak ada yang sama urutannya).</div>
+  </div>
+
   <div>
     <span class="block text-neutral-400 mb-1.5 font-medium">Type</span>
     <select 

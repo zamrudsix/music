@@ -92,6 +92,8 @@
         beatSensitivity: 1.0,
         playbackRate: 1.0,
         mirrorEnabled: false,
+        mirrorMode: "off",
+        mirrorAfterMinutes: 1,
         mirrorInterval: 60,
       };
 
@@ -131,6 +133,20 @@
 </script>
 
 <div class="space-y-6">
+  <!-- Randomize Overlay on Export -->
+  <div class="p-2 rounded bg-neutral-900/60 border border-neutral-800 text-[11px]">
+    <label class="flex items-center justify-between cursor-pointer">
+      <span class="text-neutral-300 font-medium">Acak Scale & Posisi Overlay saat Render Massal</span>
+      <input 
+        type="checkbox" 
+        bind:checked={projectStore.project.exportSettings.randomizeOverlayScalePos}
+        onchange={() => projectStore.saveToDB()}
+        class="accent-cyan-500 w-4 h-4 cursor-pointer"
+      />
+    </label>
+    <div class="text-[9px] text-neutral-500 mt-1">Jika dicentang, setiap render massal akan mendapatkan scale dan posisi overlay yang acak (tidak sama).</div>
+  </div>
+
   <!-- VIDEO OVERLAYS -->
   <div class="space-y-3">
     <div class="flex items-center justify-between">
@@ -372,18 +388,43 @@
             </div>
           </div>
 
-          <!-- Alternating Mirror Effect -->
+          <!-- Mirror Effect -->
           <div class="p-2 rounded bg-neutral-900/60 border border-neutral-800 space-y-2 text-[11px]">
-            <label class="flex items-center justify-between cursor-pointer">
-              <span class="text-neutral-300 font-medium">Mirror Bolak-Balik</span>
-              <input 
-                type="checkbox" 
-                bind:checked={vid.mirrorEnabled}
-                onchange={() => projectStore.saveToDB()}
-                class="accent-cyan-500 w-4 h-4 cursor-pointer"
-              />
-            </label>
-            {#if vid.mirrorEnabled}
+            <div class="flex items-center justify-between">
+              <span class="text-neutral-300 font-medium">Mirror</span>
+              <select 
+                bind:value={vid.mirrorMode}
+                onchange={() => {
+                  if (vid.mirrorMode === 'off') vid.mirrorEnabled = false;
+                  else vid.mirrorEnabled = true;
+                  projectStore.saveToDB();
+                }}
+                class="bg-neutral-900 border border-neutral-800 rounded p-1 text-neutral-200 outline-none cursor-pointer text-[10px]"
+              >
+                <option value="off">Off</option>
+                <option value="immediate">Langsung Dibalk (Immediate)</option>
+                <option value="after-minutes">Setelah Berapa Menit</option>
+                <option value="alternating">Bolak-Balik (Alternating)</option>
+              </select>
+            </div>
+            {#if vid.mirrorMode === 'after-minutes'}
+              <div class="space-y-1">
+                <div class="flex justify-between text-neutral-400">
+                  <span>Setelah (menit)</span>
+                  <span class="text-cyan-400 font-mono">{(vid.mirrorAfterMinutes ?? 1)} menit</span>
+                </div>
+                <input 
+                  type="number" 
+                  min="0.1" 
+                  max="60" 
+                  step="0.1" 
+                  bind:value={vid.mirrorAfterMinutes}
+                  onchange={() => projectStore.saveToDB()} 
+                  class="w-full bg-neutral-900 border border-neutral-800 rounded p-1 text-neutral-200 outline-none"
+                />
+              </div>
+            {/if}
+            {#if vid.mirrorMode === 'alternating'}
               <div class="space-y-1">
                 <div class="flex justify-between text-neutral-400">
                   <span>Interval (detik)</span>

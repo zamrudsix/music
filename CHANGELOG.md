@@ -1,3 +1,15 @@
+## [v4.3.19] - 2026-11-20
+
+### ✨ Fitur Baru
+- Mirror Overlay: opsi **Langsung Dibalk (Immediate)** dan **Setelah Berapa Menit** (selain Bolak-Balik)
+- Checkbox acak Scale & Posisi Overlay saat Render Massal
+- Checkbox acak urutan Backdrop Images saat Render Massal
+- Checkbox acak urutan Lagu/Playlist saat Render Massal
+- Render Massal (Bulk): bisa export banyak video sekaligus (contoh 10x), setiap render mendapat randomisasi independen + filename suffix _1, _2, dst.
+
+### 🔧 Perbaikan
+- Long audio handling (dari versi sebelumnya)
+
 ## 4.3.16 - Ponco Visualizer & Particle Pack
 
 - Added 30 selectable spectrum visualizer presets, mapped to the existing Canvas renderer families.

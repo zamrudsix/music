@@ -8,6 +8,47 @@ import { db } from '../../lib/db/database';
 import { sweepOpfsTempFiles } from '../../lib/utils/storage';
 
 
+
+function applyRandomizations(project: any): any {
+  const p = JSON.parse(JSON.stringify(project)); // deep clone
+  const settings = p.exportSettings || {};
+
+  // Randomize overlay scale and position
+  if (settings.randomizeOverlayScalePos) {
+    const randomizeItem = (item: any) => {
+      if (!item) return;
+      // Random position 10%-90% to avoid edges
+      item.x = 0.1 + Math.random() * 0.8;
+      item.y = 0.1 + Math.random() * 0.8;
+      // Random scale 0.4 to 1.8, or relative to original
+      const base = item.scale || 1;
+      item.scale = Math.max(0.2, Math.min(3, base * (0.5 + Math.random() * 1.5)));
+    };
+    if (p.overlays?.images) p.overlays.images.forEach(randomizeItem);
+    if (p.overlays?.videos) p.overlays.videos.forEach(randomizeItem);
+  }
+
+  // Shuffle backdrop images (Fisher-Yates)
+  if (settings.randomizeBackdrop && p.background?.items && p.background.items.length > 1) {
+    const items = p.background.items;
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [items[i], items[j]] = [items[j], items[i]];
+    }
+  }
+
+  // Shuffle playlist tracks
+  if (settings.randomizePlaylist && p.audio?.tracks && p.audio.tracks.length > 1) {
+    const tracks = p.audio.tracks;
+    for (let i = tracks.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [tracks[i], tracks[j]] = [tracks[j], tracks[i]];
+    }
+  }
+
+  return p;
+}
+
 export class VideoExporter {
   private worker: Worker | null = null;
   private timerInterval: any = null;
@@ -310,10 +351,12 @@ export class VideoExporter {
         transferables.push(flatFrequencyBuffer.buffer);
       }
 
-      // Send payload to worker
+      // Send payload to worker (with optional randomizations applied)
+      const projectSnapshot = $state.snapshot(projectStore.project);
+      const projectToRender = applyRandomizations(projectSnapshot);
       this.worker.postMessage({
         type: 'START_RENDER',
-        project: $state.snapshot(projectStore.project),
+        project: projectToRender,
         flatFrequencyBuffer,
         frequencyFrames: flatFrequencyBuffer ? undefined : Array.from(projectStore.frequencyFrames),
         beats: Array.from(projectStore.beats),

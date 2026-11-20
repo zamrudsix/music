@@ -81,6 +81,16 @@
 
       <!-- Action Toolbar -->
       <div class="p-3 bg-neutral-950/80 border-b border-neutral-800/80 flex items-center justify-between">
+        <label class="flex items-center gap-2 text-[11px] text-neutral-300 cursor-pointer">
+          <input 
+            type="checkbox" 
+            bind:checked={projectStore.project.exportSettings.randomizePlaylist}
+            onchange={() => projectStore.saveToDB()}
+            class="accent-cyan-500 w-4 h-4"
+          />
+          Acak Urutan Lagu saat Render Massal
+        </label>
+
         <div class="flex items-center gap-2">
           <button 
             onclick={() => fileInput?.click()}

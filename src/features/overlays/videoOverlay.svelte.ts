@@ -210,13 +210,24 @@ export class VideoOverlayManager {
       ctx.globalCompositeOperation = (item.blendMode as GlobalCompositeOperation) || 'source-over';
       ctx.translate(posX, posY);
 
-      // Alternating mirror (normal → mirror → normal → ...)
-      if (item.mirrorEnabled) {
-        const interval = Math.max(1, item.mirrorInterval ?? 60);
+      // Mirror effect with modes
+      const mode = item.mirrorMode || (item.mirrorEnabled ? 'alternating' : 'off');
+      if (mode !== 'off') {
         const start = item.startTime ?? 0;
         const elapsed = Math.max(0, currentTime - start);
-        const cycle = Math.floor(elapsed / interval);
-        const isMirrored = cycle % 2 === 1;
+        let isMirrored = false;
+
+        if (mode === 'immediate') {
+          isMirrored = true;
+        } else if (mode === 'after-minutes') {
+          const delaySec = Math.max(1, (item.mirrorAfterMinutes ?? 1) * 60);
+          isMirrored = elapsed >= delaySec;
+        } else if (mode === 'alternating') {
+          const interval = Math.max(1, item.mirrorInterval ?? 60);
+          const cycle = Math.floor(elapsed / interval);
+          isMirrored = cycle % 2 === 1;
+        }
+
         if (isMirrored) {
           ctx.scale(-1, 1); // horizontal flip
         }

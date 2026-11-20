@@ -48,6 +48,9 @@
         projectStore.project.exportSettings.customExportDir = saved;
       }
     }
+    if (!projectStore.project.exportSettings.bulkCount) {
+      projectStore.project.exportSettings.bulkCount = 1;
+    }
     if (!projectStore.project.exportSettings.exportRange) {
       const totalDur = Math.max(1, Math.round(projectStore.project.audio.duration || 30));
       projectStore.project.exportSettings.exportRange = {
@@ -128,6 +131,9 @@
 
   function setPartialRangePreset(type: '30s' | '1m' | '3m' | '5m' | 'round-minute' | 'nudge-minus' | 'nudge-plus' | 'preview' | 'full') {
     const totalDur = Math.max(1, Math.round(projectStore.project.audio.duration || 30));
+    if (!projectStore.project.exportSettings.bulkCount) {
+      projectStore.project.exportSettings.bulkCount = 1;
+    }
     if (!projectStore.project.exportSettings.exportRange) {
       projectStore.project.exportSettings.exportRange = { enabled: true, startTime: 0, endTime: totalDur };
     }
@@ -216,10 +222,24 @@
       e.preventDefault();
       e.stopPropagation();
     }
+    const bulk = Math.max(1, projectStore.project.exportSettings.bulkCount || 1);
     try {
-      exportedBlob = await videoExporter.startExport();
-      if (exportedBlob) {
-        await handleDownload();
+      for (let i = 1; i <= bulk; i++) {
+        console.log(`Starting bulk render ${i}/${bulk}`);
+        exportedBlob = await videoExporter.startExport();
+        if (exportedBlob) {
+          // Custom download with suffix for bulk
+          const sanitizedTitle = (projectStore.project.title || 'visualizer')
+            .toLowerCase()
+            .replace(/[^a-z0-9_-]/g, '_');
+          const now = new Date();
+          const pad = (n: number) => n.toString().padStart(2, '0');
+          const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+          const suffix = bulk > 1 ? `_${i}` : '';
+          savedFilePath = await videoExporter.downloadBlob(exportedBlob, `${timestamp}_${sanitizedTitle}${suffix}.mp4`);
+        }
+        // Small delay between renders to let GC settle
+        if (i < bulk) await new Promise(r => setTimeout(r, 1000));
       }
     } catch (err: any) {
       console.error('Export error caught:', err);
@@ -352,7 +372,10 @@
                   <button
                     type="button"
                     onclick={() => {
-                      if (!projectStore.project.exportSettings.exportRange) {
+                      if (!projectStore.project.exportSettings.bulkCount) {
+      projectStore.project.exportSettings.bulkCount = 1;
+    }
+    if (!projectStore.project.exportSettings.exportRange) {
                         projectStore.project.exportSettings.exportRange = { enabled: false, startTime: 0, endTime: Math.round(projectStore.project.audio.duration || 30) };
                       }
                       projectStore.project.exportSettings.exportRange.enabled = false;
@@ -365,7 +388,10 @@
                   <button
                     type="button"
                     onclick={() => {
-                      if (!projectStore.project.exportSettings.exportRange) {
+                      if (!projectStore.project.exportSettings.bulkCount) {
+      projectStore.project.exportSettings.bulkCount = 1;
+    }
+    if (!projectStore.project.exportSettings.exportRange) {
                         projectStore.project.exportSettings.exportRange = { enabled: true, startTime: 0, endTime: Math.min(30, Math.round(projectStore.project.audio.duration || 30)) };
                       }
                       projectStore.project.exportSettings.exportRange.enabled = true;
@@ -538,6 +564,22 @@
             </div>
 
             <!-- Other Formats Selector -->
+            <!-- Bulk / Mass Render -->
+            <div class="p-3 rounded-xl bg-neutral-900/40 border border-neutral-800 space-y-2 text-[11px]">
+              <div class="flex items-center justify-between">
+                <span class="text-neutral-300 font-medium">Render Massal (Bulk)</span>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="50" 
+                  bind:value={projectStore.project.exportSettings.bulkCount}
+                  onchange={() => projectStore.saveToDB()}
+                  class="w-16 bg-neutral-900 border border-neutral-800 rounded p-1 text-center text-neutral-200"
+                />
+              </div>
+              <div class="text-[9px] text-neutral-500">Jumlah video yang akan di-render sekaligus. Setiap render akan menerapkan acak (jika dicentang di panel Overlay/Backdrop/Playlist).</div>
+            </div>
+
             <div class="flex items-center justify-between pt-1 border-t border-neutral-900 text-[11px]">
               <span class="text-neutral-500">Format Lainnya:</span>
               <div class="flex gap-1.5">

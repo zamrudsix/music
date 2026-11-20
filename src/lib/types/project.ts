@@ -500,9 +500,13 @@ export interface VideoOverlayItem {
   transitionDuration?: number;
   /** Playback speed for video overlays. 1.0 = normal, 0.5 = half speed (slow-mo), 2.0 = double speed. Default 1.0 */
   playbackRate?: number;
-  /** Enable alternating mirror effect (normal → mirror → normal → ...) */
+  /** Enable mirror effect */
   mirrorEnabled?: boolean;
-  /** Duration of each normal / mirror segment in seconds. Default 60 (1 minute) */
+  /** Mirror mode: 'off' | 'immediate' (always flipped) | 'after-minutes' (flip after delay) | 'alternating' (bolak-balik) */
+  mirrorMode?: 'off' | 'immediate' | 'after-minutes' | 'alternating';
+  /** Minutes to wait before mirroring (for after-minutes mode). Default 1 */
+  mirrorAfterMinutes?: number;
+  /** Duration of each normal / mirror segment in seconds (for alternating mode). Default 60 */
   mirrorInterval?: number;
 }
 
@@ -603,6 +607,14 @@ export interface ExportSettings {
   audioBitrate: number;
   customExportDir?: string;
   exportRange?: ExportRange;
+  /** Number of bulk/mass renders to generate. Default 1 */
+  bulkCount?: number;
+  /** If true, randomize overlay scale and position for each bulk render */
+  randomizeOverlayScalePos?: boolean;
+  /** If true, shuffle backdrop images order for each bulk render (no duplicates in sequence) */
+  randomizeBackdrop?: boolean;
+  /** If true, shuffle playlist/songs order for each bulk render */
+  randomizePlaylist?: boolean;
 }
 
 export interface ProjectConfig {
