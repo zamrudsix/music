@@ -227,28 +227,33 @@
     }
     const bulk = Math.max(1, projectStore.project.exportSettings.bulkCount || 1);
     try {
-      // Ensure lyrics exist for bulk/random exports
+      // Generate lyrics FIRST, then render
       if ((!projectStore.project.lyrics?.segments || projectStore.project.lyrics.segments.length === 0) && typeof localStorage !== 'undefined') {
         const apiKey = localStorage.getItem('groq_api_key');
         if (apiKey && projectStore.audioBuffer) {
-          console.log('Auto-generating lyrics before export...');
+          console.log('Generating lyrics before render...');
           try {
-            const segments = await GroqService.transcribeAudioBuffer(
-              projectStore.audioBuffer,
-              apiKey,
-              'whisper-large-v3',
-              undefined,
-              (status, pct) => console.log(`Lyrics: ${status} (${pct}%)`),
-              projectStore.project.lyrics?.config?.language || 'auto'
-            );
+            const segments = await Promise.race([
+              GroqService.transcribeAudioBuffer(
+                projectStore.audioBuffer,
+                apiKey,
+                'whisper-large-v3',
+                undefined,
+                (status, pct) => console.log(`Lyrics: ${status} (${pct}%)`),
+                projectStore.project.lyrics?.config?.language || 'auto'
+              ),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('Lyrics timeout')), 180000))
+            ]);
             if (segments && segments.length > 0) {
               projectStore.project.lyrics.segments = segments;
               projectStore.saveToDB();
-              console.log(`Generated ${segments.length} lyric lines`);
+              console.log(`Lyrics ready: ${segments.length} lines. Starting render...`);
             }
           } catch (e) {
-            console.warn('Auto lyrics generation failed:', e);
+            console.warn('Lyrics generation failed or timed out, continuing without lyrics:', e);
           }
+        } else {
+          console.warn('No Groq API key or audio buffer — skipping lyrics generation');
         }
       }
       // Force center + enabled for all bulk renders
@@ -874,7 +879,13 @@
                   <div class="break-all select-all font-mono text-[10px]">
                     📁 <strong>{savedFilePath}</strong>
                   </div>
-                  <!-- File tersimpan otomatis di Downloads -->
+                  <button
+                    type="button"
+                    onclick={openSavedFileLocation}
+                    class="px-2.5 py-1 bg-emerald-700/60 hover:bg-emerald-600 text-white rounded text-[10px] font-semibold shrink-0 cursor-pointer transition-colors"
+                  >
+                    Buka Lokasi File
+                  </button>
                 </div>
               {/if}
             </div>

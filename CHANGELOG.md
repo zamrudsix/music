@@ -1,3 +1,16 @@
+## [v4.3.25] - 2026-11-20
+
+### 🔧 Perbaikan
+- Lyrics sekarang di-generate **dulu** sebelum mulai render (dengan timeout 3 menit).
+- Setelah lyrics siap, baru proses export dimulai.
+
+## [v4.3.24] - 2026-11-20
+
+### 🔧 Perbaikan
+- Auto-generate lyrics dibuat non-blocking (tidak menghalangi render).
+- Tombol "Buka Lokasi File" dikembalikan setelah export selesai.
+- File selalu tersimpan di Folder Downloads (path ditampilkan jelas).
+
 ## [v4.3.23] - 2026-11-20
 
 ### 🔧 Perbaikan
