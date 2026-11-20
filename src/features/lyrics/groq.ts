@@ -25,8 +25,8 @@ export interface GroqTranscriptionResponse {
 export class GroqService {
 
   /**
-   * Quick language detection using the first ~30 seconds of audio.
-   * Returns the detected language code (e.g. "id", "en") or "auto" on failure.
+   * Robust language detection. Samples from the middle of the track (skips intro)
+   * and falls back to the start if needed. Returns detected code (id, en, la, etc.) or "auto".
    */
   private static async detectLanguage(
     audioBuffer: AudioBuffer,
@@ -34,30 +34,51 @@ export class GroqService {
     model: string,
     signal?: AbortSignal
   ): Promise<string> {
-    try {
-      const sampleDur = Math.min(30, audioBuffer.duration);
-      if (sampleDur < 3) return 'auto';
+    const trySample = async (startSec: number, durationSec: number): Promise<string | null> => {
+      try {
+        const total = audioBuffer.duration;
+        if (total < 4) return null;
+        const start = Math.max(0, Math.min(startSec, total - 5));
+        const end = Math.min(total, start + durationSec);
+        const actualDur = end - start;
+        if (actualDur < 4) return null;
 
-      const sampleRate = audioBuffer.sampleRate;
-      const channels = audioBuffer.numberOfChannels;
-      const endSample = Math.floor(sampleDur * sampleRate);
+        const sampleRate = audioBuffer.sampleRate;
+        const channels = audioBuffer.numberOfChannels;
+        const startSample = Math.floor(start * sampleRate);
+        const endSample = Math.floor(end * sampleRate);
+        const len = endSample - startSample;
 
-      const tempCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const sampleBuffer = tempCtx.createBuffer(channels, endSample, sampleRate);
-      for (let ch = 0; ch < channels; ch++) {
-        sampleBuffer.getChannelData(ch).set(audioBuffer.getChannelData(ch).subarray(0, endSample));
+        const tempCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const sampleBuffer = tempCtx.createBuffer(channels, len, sampleRate);
+        for (let ch = 0; ch < channels; ch++) {
+          sampleBuffer.getChannelData(ch).set(
+            audioBuffer.getChannelData(ch).subarray(startSample, endSample)
+          );
+        }
+        await tempCtx.close();
+
+        const wavBlob = AudioAnalyzer.audioBufferToWavBlob(sampleBuffer, 16000);
+        const data = await this.transcribeChunk(wavBlob, apiKey, model, signal, 1, 'auto');
+        const detected = (data.language || '').toLowerCase().trim();
+        if (detected && detected !== 'auto' && detected.length >= 2 && detected.length <= 5) {
+          return detected;
+        }
+      } catch (e) {
+        console.warn('Sample language detect failed:', e);
       }
-      await tempCtx.close();
+      return null;
+    };
 
-      const wavBlob = AudioAnalyzer.audioBufferToWavBlob(sampleBuffer, 16000);
-      const data = await this.transcribeChunk(wavBlob, apiKey, model, signal, 1, 'auto');
-      const detected = (data.language || '').toLowerCase().trim();
-      if (detected && detected !== 'auto' && detected.length <= 5) {
-        return detected;
-      }
-    } catch (e) {
-      console.warn('Language detection failed, falling back to auto:', e);
-    }
+    // Prefer middle of the song (better vocal content, skip intro/outro)
+    const midStart = Math.max(15, audioBuffer.duration * 0.25);
+    let lang = await trySample(midStart, 25);
+    if (lang) return lang;
+
+    // Fallback to near the beginning
+    lang = await trySample(5, 25);
+    if (lang) return lang;
+
     return 'auto';
   }
 

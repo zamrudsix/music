@@ -34,7 +34,7 @@
   let subtitleFileInput = $state<HTMLInputElement>();
   let showClearConfirm = $state(false);
 
-  let selectedLanguage = $state('id');
+  let selectedLanguage = $state('auto');
 
   const supportedLanguages = [
     { code: 'id', label: '🇮🇩 Indonesian (ID)' },
