@@ -33,7 +33,8 @@ function applyRandomizations(project: any): any {
     item.y = preset.y;
     item.scale = preset.scale;
     item.opacity = preset.opacity;
-    item.isFullScreen = true;
+    // IMPORTANT: must be false so worker uses item.x / item.y instead of forcing center
+    item.isFullScreen = false;
     item.fitMode = 'cover';
     if (preset.mirror) {
       item.mirrorMode = 'immediate';
