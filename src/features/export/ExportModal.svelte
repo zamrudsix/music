@@ -43,8 +43,7 @@
     exportedBlob = null;
     savedFilePath = null;
     videoExporter.errorMessage = null;
-    // Always use default Downloads folder (no custom folder selection)
-    projectStore.project.exportSettings.customExportDir = undefined;
+    // Restore last custom export folder if any
     if (!projectStore.project.exportSettings.bulkCount) {
       projectStore.project.exportSettings.bulkCount = 1;
     }
@@ -763,6 +762,31 @@
               </div>
             {/if}
 
+            <!-- Folder Tujuan Export -->
+            {#if isDesktop()}
+              <div class="mt-3 p-2.5 rounded-xl bg-neutral-900/60 border border-neutral-800 text-xs">
+                <div class="flex items-center justify-between gap-2 mb-1.5">
+                  <div class="font-semibold text-neutral-200 text-[11px] flex items-center gap-1.5">
+                    <span>📁</span> Folder Tujuan Render
+                  </div>
+                  <button 
+                    type="button"
+                    onclick={handleSelectExportFolder}
+                    class="px-2.5 py-1 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-[10px] font-semibold"
+                  >
+                    Pilih Folder
+                  </button>
+                </div>
+                <div class="text-[10px] text-neutral-400 break-all leading-relaxed">
+                  {#if projectStore.project.exportSettings.customExportDir}
+                    <span class="text-emerald-400">{projectStore.project.exportSettings.customExportDir}</span>
+                    <button type="button" onclick={handleResetExportFolder} class="ml-2 text-red-400 hover:underline">Reset</button>
+                  {:else}
+                    Default: Folder Downloads
+                  {/if}
+                </div>
+              </div>
+            {/if}
 
           </div>
         {:else}
