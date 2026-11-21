@@ -462,13 +462,14 @@ export class VideoExporter {
             reader.readAsDataURL(slice);
           });
 
-          // Always save to default Downloads (no custom folder)
+          // Use custom export folder if set, otherwise default Downloads
+          const customDir = projectStore.project.exportSettings.customExportDir || undefined;
           lastPath = await invoke<string>('save_video_chunk', {
             filename,
             base64Chunk,
             isFirst,
             isLast,
-            customDir: undefined,
+            customDir,
           });
 
           offset = end;
