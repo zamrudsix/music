@@ -13,34 +13,39 @@ function applyRandomizations(project: any): any {
   const p = JSON.parse(JSON.stringify(project)); // deep clone
   const settings = p.exportSettings || {};
 
-  // Randomize overlay scale, position, and facing (left/right)
-  if (settings.randomizeOverlayScalePos) {
-    const randomizeItem = (item: any) => {
-      if (!item) return;
-      // Larger scales that fill more of the screen (like 16:9 full), still allow pan
-      const scales = [1.15, 1.25, 1.35, 1.45, 1.55, 1.7, 1.85];
-      item.scale = scales[Math.floor(Math.random() * scales.length)];
+  // Varied overlay presets per bulk render index (1-based). Does not simply repeat.
+  const overlayPresets = [
+    { x: 0.83, y: 0.52, scale: 4.10, opacity: 0.35, mirror: false }, // 1
+    { x: 0.27, y: 1.00, scale: 4.10, opacity: 0.35, mirror: false }, // 2
+    { x: 0.40, y: 0.27, scale: 4.10, opacity: 0.35, mirror: true  }, // 3 - mirrored
+    { x: 0.65, y: 0.75, scale: 4.60, opacity: 0.35, mirror: false }, // 4 - higher scale, different pos
+    { x: 0.15, y: 0.40, scale: 3.80, opacity: 0.40, mirror: true  }, // 5
+    { x: 0.90, y: 0.20, scale: 5.00, opacity: 0.30, mirror: false }, // 6
+    { x: 0.50, y: 0.85, scale: 4.30, opacity: 0.35, mirror: true  }, // 7
+    { x: 0.30, y: 0.15, scale: 4.80, opacity: 0.38, mirror: false }, // 8
+  ];
+  const bulkIndex = (p as any)._bulkRenderIndex || 1;
+  const preset = overlayPresets[(bulkIndex - 1) % overlayPresets.length];
 
-      // Position offset so user can still shift left/right/up/down when large
-      item.x = 0.35 + Math.random() * 0.3; // 35-65%
-      item.y = 0.35 + Math.random() * 0.3;
-
-      // Prefer fullscreen-like coverage
-      item.isFullScreen = true;
-      item.fitMode = 'cover';
-
-      // Random facing left or right (mirror)
-      if (Math.random() > 0.5) {
-        item.mirrorMode = 'immediate';
-        item.mirrorEnabled = true;
-      } else {
-        item.mirrorMode = 'off';
-        item.mirrorEnabled = false;
-      }
-    };
-    if (p.overlays?.images) p.overlays.images.forEach(randomizeItem);
-    if (p.overlays?.videos) p.overlays.videos.forEach(randomizeItem);
-  }
+  const applyPreset = (item: any) => {
+    if (!item) return;
+    item.x = preset.x;
+    item.y = preset.y;
+    item.scale = preset.scale;
+    item.opacity = preset.opacity;
+    item.isFullScreen = true;
+    item.fitMode = 'cover';
+    if (preset.mirror) {
+      item.mirrorMode = 'immediate';
+      item.mirrorEnabled = true;
+    } else {
+      item.mirrorMode = 'off';
+      item.mirrorEnabled = false;
+    }
+  };
+  if (p.overlays?.images) p.overlays.images.forEach(applyPreset);
+  if (p.overlays?.videos) p.overlays.videos.forEach(applyPreset);
+  console.log(`[Export] Applied overlay preset for render ${bulkIndex}:`, preset);
 
   // Shuffle backdrop images (Fisher-Yates)
   if (settings.randomizeBackdrop && p.background?.items && p.background.items.length > 1) {

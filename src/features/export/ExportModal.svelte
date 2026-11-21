@@ -313,6 +313,8 @@
           }
         }
 
+        // Tag current bulk index so exporter applies the correct overlay preset
+        (projectStore.project as any)._bulkRenderIndex = i;
         exportedBlob = await videoExporter.startExport();
         if (exportedBlob) {
           // Custom download with suffix for bulk
