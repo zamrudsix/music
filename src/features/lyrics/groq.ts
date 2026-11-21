@@ -25,8 +25,9 @@ export interface GroqTranscriptionResponse {
 export class GroqService {
 
   /**
-   * Robust language detection. Samples from the middle of the track (skips intro)
-   * and falls back to the start if needed. Returns detected code (id, en, la, etc.) or "auto".
+   * Robust multi-sample language detection with majority vote.
+   * Samples beginning, middle, and later part of the track.
+   * Maps common confusions (e.g. ms → id) for better Indonesian/English/Latin accuracy.
    */
   private static async detectLanguage(
     audioBuffer: AudioBuffer,
@@ -37,17 +38,16 @@ export class GroqService {
     const trySample = async (startSec: number, durationSec: number): Promise<string | null> => {
       try {
         const total = audioBuffer.duration;
-        if (total < 4) return null;
-        const start = Math.max(0, Math.min(startSec, total - 5));
+        if (total < 5) return null;
+        const start = Math.max(0, Math.min(startSec, total - 6));
         const end = Math.min(total, start + durationSec);
-        const actualDur = end - start;
-        if (actualDur < 4) return null;
+        if (end - start < 5) return null;
 
         const sampleRate = audioBuffer.sampleRate;
         const channels = audioBuffer.numberOfChannels;
         const startSample = Math.floor(start * sampleRate);
         const endSample = Math.floor(end * sampleRate);
-        const len = endSample - startSample;
+        const len = Math.max(1, endSample - startSample);
 
         const tempCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
         const sampleBuffer = tempCtx.createBuffer(channels, len, sampleRate);
@@ -60,26 +60,47 @@ export class GroqService {
 
         const wavBlob = AudioAnalyzer.audioBufferToWavBlob(sampleBuffer, 16000);
         const data = await this.transcribeChunk(wavBlob, apiKey, model, signal, 1, 'auto');
-        const detected = (data.language || '').toLowerCase().trim();
+        let detected = (data.language || '').toLowerCase().trim();
+        // Common confusions for Indonesian music
+        if (detected === 'ms' || detected === 'jv' || detected === 'su') detected = 'id';
         if (detected && detected !== 'auto' && detected.length >= 2 && detected.length <= 5) {
           return detected;
         }
       } catch (e) {
-        console.warn('Sample language detect failed:', e);
+        console.warn('Language sample failed:', e);
       }
       return null;
     };
 
-    // Prefer middle of the song (better vocal content, skip intro/outro)
-    const midStart = Math.max(15, audioBuffer.duration * 0.25);
-    let lang = await trySample(midStart, 25);
-    if (lang) return lang;
+    const total = audioBuffer.duration;
+    const positions = [
+      Math.max(8, total * 0.15),   // early vocal
+      Math.max(20, total * 0.40),  // middle
+      Math.max(10, total * 0.65),  // later
+    ];
 
-    // Fallback to near the beginning
-    lang = await trySample(5, 25);
-    if (lang) return lang;
+    const votes: string[] = [];
+    for (const pos of positions) {
+      if (signal?.aborted) break;
+      const lang = await trySample(pos, 20);
+      if (lang) votes.push(lang);
+    }
 
-    return 'auto';
+    if (votes.length === 0) return 'auto';
+
+    // Majority vote
+    const count: Record<string, number> = {};
+    for (const v of votes) count[v] = (count[v] || 0) + 1;
+    let best = 'auto';
+    let bestCount = 0;
+    for (const [lang, c] of Object.entries(count)) {
+      if (c > bestCount) {
+        best = lang;
+        bestCount = c;
+      }
+    }
+    console.log('[Lyrics] Language votes:', votes, '→ chosen:', best);
+    return best;
   }
 
   /**
