@@ -228,16 +228,18 @@
     }
     const bulk = Math.max(1, projectStore.project.exportSettings.bulkCount || 1);
     const langSetting = exportLyricsLanguage || projectStore.project.lyrics?.config?.language || 'auto';
-    const shouldRandomizePlaylist = !!projectStore.project.exportSettings.randomizePlaylist
-      && (projectStore.project.audio.tracks?.length || 0) > 1;
+    const shouldRandomizePlaylist = bulk > 1 && (projectStore.project.audio.tracks?.length || 0) > 1;
 
     try {
-      // Force center + enabled for all bulk renders
+      // Force center + enabled + font size 50 for all bulk renders
       if (projectStore.project.lyrics?.config) {
         projectStore.project.lyrics.config.enabled = true;
         projectStore.project.lyrics.config.position = 'center';
         projectStore.project.lyrics.config.x = 0.5;
-        projectStore.project.lyrics.config.y = 0.48;
+        projectStore.project.lyrics.config.y = 0.5;
+        projectStore.project.lyrics.config.fontSize = 50;
+        projectStore.project.lyrics.config.stroke = true;
+        projectStore.project.lyrics.config.strokeWidth = 14;
       }
 
       for (let i = 1; i <= bulk; i++) {

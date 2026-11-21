@@ -68,7 +68,7 @@ function applyRandomizations(project: any): any {
     p.lyrics.config.y = 0.48; // slightly above exact center for better look
     // Font size proportional to screen (roughly 70% of a "10" scale → larger on bigger screens)
     const w = p.exportSettings?.width || 1280;
-    p.lyrics.config.fontSize = Math.round(Math.min(72, Math.max(42, w / 18))); // ~70px on 1280, scales
+    p.lyrics.config.fontSize = 50; // fixed 50px as requested
   }
 
   return p;
