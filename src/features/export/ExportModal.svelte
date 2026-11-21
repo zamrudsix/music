@@ -245,7 +245,7 @@
       for (let i = 1; i <= bulk; i++) {
         console.log(`Starting bulk render ${i}/${bulk}`);
 
-        // Shuffle playlist before every render after the first (if enabled)
+        // Always ensure audio matches current track order before this render
         if (shouldRandomizePlaylist && i > 1) {
           console.log('Shuffling playlist for next bulk render...');
           const tracks = projectStore.project.audio.tracks;
@@ -253,9 +253,13 @@
             const j = Math.floor(Math.random() * (k + 1));
             [tracks[k], tracks[j]] = [tracks[j], tracks[k]];
           }
-          await projectStore.rebuildMergedAudio();
-          projectStore.saveToDB();
         }
+        // Rebuild merged audio for every render (especially important for render 1 after playlist change)
+        console.log(`Rebuilding audio for render ${i}...`);
+        await projectStore.rebuildMergedAudio();
+        projectStore.saveToDB();
+        // Small settle time so state is consistent
+        await new Promise(r => setTimeout(r, 300));
 
 
         // Apply specific overlay positions per bulk render index
@@ -284,11 +288,12 @@
         if (typeof localStorage !== 'undefined') {
           const apiKey = localStorage.getItem('groq_api_key');
           if (apiKey && projectStore.audioBuffer) {
-            const needLyrics = !projectStore.project.lyrics?.segments
-              || projectStore.project.lyrics.segments.length === 0
-              || (shouldRandomizePlaylist && i > 1);
+            // Always regenerate lyrics for every render so they match the current playlist/audio
+            const needLyrics = true;
             if (needLyrics) {
-              console.log(`Generating lyrics (lang=${langSetting}) for render ${i}...`);
+              // Clear old lyrics first so we never reuse stale ones
+              projectStore.project.lyrics.segments = [];
+              console.log(`Generating fresh lyrics (lang=${langSetting}) for render ${i} (audio duration: ${projectStore.audioBuffer?.duration?.toFixed(1)}s)...`);
               try {
                 const segments = await Promise.race([
                   GroqService.transcribeAudioBuffer(
