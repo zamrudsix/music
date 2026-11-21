@@ -36,6 +36,8 @@
 
   let exportedBlob = $state<Blob | null>(null);
   let savedFilePath = $state<string | null>(null);
+  let exportLyricsLanguage = $state(projectStore.project.lyrics?.config?.language || 'id');
+
   let showModal = $state(false);
 
   export function open() {
@@ -225,36 +227,11 @@
       e.stopPropagation();
     }
     const bulk = Math.max(1, projectStore.project.exportSettings.bulkCount || 1);
+    const langSetting = exportLyricsLanguage || projectStore.project.lyrics?.config?.language || 'auto';
+    const shouldRandomizePlaylist = !!projectStore.project.exportSettings.randomizePlaylist
+      && (projectStore.project.audio.tracks?.length || 0) > 1;
+
     try {
-      // Generate lyrics FIRST, then render
-      if ((!projectStore.project.lyrics?.segments || projectStore.project.lyrics.segments.length === 0) && typeof localStorage !== 'undefined') {
-        const apiKey = localStorage.getItem('groq_api_key');
-        if (apiKey && projectStore.audioBuffer) {
-          console.log('Generating lyrics before render...');
-          try {
-            const segments = await Promise.race([
-              GroqService.transcribeAudioBuffer(
-                projectStore.audioBuffer,
-                apiKey,
-                'whisper-large-v3',
-                undefined,
-                (status, pct) => console.log(`Lyrics: ${status} (${pct}%)`),
-                projectStore.project.lyrics?.config?.language || 'auto'
-              ),
-              new Promise((_, reject) => setTimeout(() => reject(new Error('Lyrics timeout')), 180000))
-            ]);
-            if (segments && segments.length > 0) {
-              projectStore.project.lyrics.segments = segments;
-              projectStore.saveToDB();
-              console.log(`Lyrics ready: ${segments.length} lines. Starting render...`);
-            }
-          } catch (e) {
-            console.warn('Lyrics generation failed or timed out, continuing without lyrics:', e);
-          }
-        } else {
-          console.warn('No Groq API key or audio buffer — skipping lyrics generation');
-        }
-      }
       // Force center + enabled for all bulk renders
       if (projectStore.project.lyrics?.config) {
         projectStore.project.lyrics.config.enabled = true;
@@ -265,6 +242,75 @@
 
       for (let i = 1; i <= bulk; i++) {
         console.log(`Starting bulk render ${i}/${bulk}`);
+
+        // Shuffle playlist before every render after the first (if enabled)
+        if (shouldRandomizePlaylist && i > 1) {
+          console.log('Shuffling playlist for next bulk render...');
+          const tracks = projectStore.project.audio.tracks;
+          for (let k = tracks.length - 1; k > 0; k--) {
+            const j = Math.floor(Math.random() * (k + 1));
+            [tracks[k], tracks[j]] = [tracks[j], tracks[k]];
+          }
+          await projectStore.rebuildMergedAudio();
+          projectStore.saveToDB();
+        }
+
+
+        // Apply specific overlay positions per bulk render index
+        const overlayPresets = [
+          { x: 0.83, y: 0.52, scale: 4.10, opacity: 0.35 }, // render 1
+          { x: 0.27, y: 1.00, scale: 4.10, opacity: 0.35 }, // render 2
+          { x: 0.40, y: 0.27, scale: 4.10, opacity: 0.35 }, // render 3
+        ];
+        const preset = overlayPresets[(i - 1) % overlayPresets.length];
+        const applyPreset = (item: any) => {
+          if (!item) return;
+          item.x = preset.x;
+          item.y = preset.y;
+          item.scale = preset.scale;
+          item.opacity = preset.opacity;
+        };
+        if (projectStore.project.overlays?.images) {
+          projectStore.project.overlays.images.forEach(applyPreset);
+        }
+        if (projectStore.project.overlays?.videos) {
+          projectStore.project.overlays.videos.forEach(applyPreset);
+        }
+        console.log(`Overlay preset for render ${i}:`, preset);
+
+        // Generate / regenerate lyrics for current audio order using the manual language setting
+        if (typeof localStorage !== 'undefined') {
+          const apiKey = localStorage.getItem('groq_api_key');
+          if (apiKey && projectStore.audioBuffer) {
+            const needLyrics = !projectStore.project.lyrics?.segments
+              || projectStore.project.lyrics.segments.length === 0
+              || (shouldRandomizePlaylist && i > 1);
+            if (needLyrics) {
+              console.log(`Generating lyrics (lang=${langSetting}) for render ${i}...`);
+              try {
+                const segments = await Promise.race([
+                  GroqService.transcribeAudioBuffer(
+                    projectStore.audioBuffer,
+                    apiKey,
+                    'whisper-large-v3',
+                    undefined,
+                    (status, pct) => console.log(`Lyrics: ${status} (${pct}%)`),
+                    langSetting
+                  ),
+                  new Promise((_, reject) => setTimeout(() => reject(new Error('Lyrics timeout')), 180000))
+                ]);
+                if (segments && segments.length > 0) {
+                  projectStore.project.lyrics.segments = segments;
+                  projectStore.saveToDB();
+                  console.log(`Lyrics ready: ${segments.length} lines for render ${i}`);
+                }
+              } catch (e) {
+                console.warn('Lyrics generation failed or timed out, continuing without lyrics:', e);
+              }
+            }
+          }
+        }
+
         exportedBlob = await videoExporter.startExport();
         if (exportedBlob) {
           // Custom download with suffix for bulk
@@ -647,6 +693,26 @@
                 />
               </div>
               <div class="text-[9px] text-neutral-500">Jumlah video yang akan di-render sekaligus. Setiap render akan menerapkan acak (jika dicentang di panel Overlay/Backdrop/Playlist).</div>
+            </div>
+
+            <!-- Lyrics Language for Bulk -->
+            <div class="p-3 rounded-xl bg-neutral-900/40 border border-neutral-800 space-y-2 text-[11px]">
+              <div class="flex items-center justify-between">
+                <span class="text-neutral-300 font-medium">Bahasa Lirik (untuk semua render)</span>
+                <select 
+                  bind:value={exportLyricsLanguage}
+                  class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-neutral-200 text-[11px]"
+                >
+                  <option value="id">🇮🇩 Indonesian</option>
+                  <option value="en">🇺🇸 English</option>
+                  <option value="la">🇻🇦 Latin</option>
+                  <option value="auto">🌐 Auto Detect</option>
+                  <option value="ms">🇲🇾 Malay</option>
+                  <option value="ja">🇯🇵 Japanese</option>
+                  <option value="ko">🇰🇷 Korean</option>
+                </select>
+              </div>
+              <div class="text-[9px] text-neutral-500">Semua render massal akan generate lirik pakai bahasa ini. Jika playlist diacak, lirik digenerate ulang setiap render dengan bahasa yang sama.</div>
             </div>
 
             <div class="flex items-center justify-between pt-1 border-t border-neutral-900 text-[11px]">
