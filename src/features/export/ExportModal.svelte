@@ -322,12 +322,16 @@
                     (status, pct) => console.log(`Lyrics: ${status} (${pct}%)`),
                     langSetting
                   ),
-                  new Promise((_, reject) => setTimeout(() => reject(new Error('Lyrics timeout')), 180000))
+                  new Promise((_, reject) => setTimeout(() => reject(new Error('Lyrics timeout')), 240000))
                 ]);
                 if (segments && segments.length > 0) {
                   projectStore.project.lyrics.segments = segments;
                   projectStore.saveToDB();
                   console.log(`Lyrics ready: ${segments.length} lines for render ${i}`);
+                  // Extra settle so segments are committed before export starts
+                  await new Promise(r => setTimeout(r, 500));
+                } else {
+                  console.warn(`No lyrics segments returned for render ${i}`);
                 }
               } catch (e) {
                 console.warn('Lyrics generation failed or timed out, continuing without lyrics:', e);
@@ -829,8 +833,8 @@
                 <div class="space-y-2 pt-1 border-t border-neutral-800/60">
                   <div class="text-[10px] text-neutral-400">Target CBR:</div>
                   <div class="flex gap-1.5 flex-wrap">
-                    <button type="button" onclick={() => { projectStore.updateExportResolution('1280x720'); projectStore.project.exportSettings.videoBitrate = 1800000; projectStore.project.exportSettings.audioBitrate = 160000; projectStore.saveToDB(); }} class="px-2 py-1 rounded text-[10px] border border-yellow-700/50 bg-yellow-950/30 text-yellow-300 hover:bg-yellow-900/40">720p (1.8 Mbps)</button>
-                    <button type="button" onclick={() => { projectStore.updateExportResolution('1920x1080'); projectStore.project.exportSettings.videoBitrate = 3500000; projectStore.project.exportSettings.audioBitrate = 160000; projectStore.saveToDB(); }} class="px-2 py-1 rounded text-[10px] border border-yellow-700/50 bg-yellow-950/30 text-yellow-300 hover:bg-yellow-900/40">1080p (3.5 Mbps)</button>
+                    <button type="button" onclick={() => { projectStore.updateExportResolution('1280x720'); projectStore.project.exportSettings.videoBitrate = 8000000; projectStore.project.exportSettings.audioBitrate = 160000; projectStore.saveToDB(); }} class="px-2 py-1 rounded text-[10px] border border-yellow-700/50 bg-yellow-950/30 text-yellow-300 hover:bg-yellow-900/40">720p (8 Mbps)</button>
+                    <button type="button" onclick={() => { projectStore.updateExportResolution('1920x1080'); projectStore.project.exportSettings.videoBitrate = 14000000; projectStore.project.exportSettings.audioBitrate = 160000; projectStore.saveToDB(); }} class="px-2 py-1 rounded text-[10px] border border-yellow-700/50 bg-yellow-950/30 text-yellow-300 hover:bg-yellow-900/40">1080p (14 Mbps)</button>
                   </div>
                   <div class="text-[9px] text-neutral-500">Pilih salah satu di atas → resolusi + bitrate CBR otomatis diset.</div>
                   <div class="flex items-center gap-2 text-[10px]">
