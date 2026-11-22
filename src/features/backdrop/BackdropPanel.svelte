@@ -57,10 +57,17 @@
 
     const newItems: BackgroundItem[] = [];
 
-    // Only show 5 in UI when lightweight; store full list for random on render
-    for (let i = 0; i < filePaths.length; i++) {
-      const filePath = filePaths[i];
-      importProgress = { current: i + 1, total: filePaths.length };
+    // Only show 5 in the list; store full paths for random selection on render
+    const maxShow = filePaths.length > 10 ? 5 : filePaths.length;
+    const pathsToShow = filePaths.slice(0, maxShow);
+    if (filePaths.length > 5) {
+      (projectStore.project.background as any).allFilePaths = [...filePaths];
+      console.log(`[Backdrop] UI shows ${maxShow} of ${filePaths.length}. Full list saved for random on render.`);
+    }
+
+    for (let i = 0; i < pathsToShow.length; i++) {
+      const filePath = pathsToShow[i];
+      importProgress = { current: i + 1, total: pathsToShow.length };
 
       const filename = filePath.split(/[/\\]/).pop() || `media-${i + 1}`;
       const ext = filename.split('.').pop()?.toLowerCase() || '';
