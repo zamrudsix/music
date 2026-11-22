@@ -49,7 +49,26 @@ function applyRandomizations(project: any): any {
   console.log(`[Export] Applied overlay preset for render ${bulkIndex}:`, preset);
 
   // Shuffle backdrop images (Fisher-Yates)
-  if (settings.randomizeBackdrop && p.background?.items && p.background.items.length > 1) {
+  // If full path list exists (folder mode), pick random subset from all paths
+  const allPaths = (p.background as any)?.allFilePaths as string[] | undefined;
+  if (allPaths && allPaths.length > 5 && settings.randomizeBackdrop) {
+    const shuffled = [...allPaths];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    // Use up to 30 random images for this render
+    const pick = shuffled.slice(0, Math.min(30, shuffled.length));
+    p.background.items = pick.map((fp, idx) => ({
+      id: `bg-rand-${idx}-${Date.now()}`,
+      name: fp.split(/[/\\]/).pop() || `img-${idx}`,
+      type: 'image' as const,
+      url: '',
+      filePath: fp,
+      duration: 5.0,
+    }));
+    console.log(`[Export] Backdrop folder mode: picked ${pick.length} random images from ${allPaths.length}`);
+  } else if (settings.randomizeBackdrop && p.background?.items && p.background.items.length > 1) {
     const items = p.background.items;
     for (let i = items.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
