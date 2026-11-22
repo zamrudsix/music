@@ -58,16 +58,9 @@
     const newItems: BackgroundItem[] = [];
 
     // Only show 5 in UI when lightweight; store full list for random on render
-    const maxUiItems = useLightweight ? 5 : filePaths.length;
-    const pathsForUi = filePaths.slice(0, maxUiItems);
-    if (useLightweight && filePaths.length > 5) {
-      (projectStore.project.background as any).allFilePaths = filePaths;
-      console.log(`[Backdrop] Stored ${filePaths.length} paths, UI shows only 5`);
-    }
-
-    for (let i = 0; i < pathsForUi.length; i++) {
-      const filePath = pathsForUi[i];
-      importProgress = { current: i + 1, total: pathsForUi.length };
+    for (let i = 0; i < filePaths.length; i++) {
+      const filePath = filePaths[i];
+      importProgress = { current: i + 1, total: filePaths.length };
 
       const filename = filePath.split(/[/\\]/).pop() || `media-${i + 1}`;
       const ext = filename.split('.').pop()?.toLowerCase() || '';
