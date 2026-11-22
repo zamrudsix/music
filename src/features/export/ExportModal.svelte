@@ -302,46 +302,50 @@
         }
         console.log(`Overlay preset for render ${i}:`, preset);
 
-        // Generate / regenerate lyrics for current audio order using the manual language setting
+        // === LYRICS MUST BE FULLY READY BEFORE RENDER STARTS ===
+        let lyricsReady = false;
         if (typeof localStorage !== 'undefined') {
           const apiKey = localStorage.getItem('groq_api_key');
           if (apiKey && projectStore.audioBuffer) {
-            // Always regenerate lyrics for every render so they match the current playlist/audio
-            const needLyrics = true;
-            if (needLyrics) {
-              // Clear old lyrics first so we never reuse stale ones
-              projectStore.project.lyrics.segments = [];
-              console.log(`Generating fresh lyrics (lang=${langSetting}) for render ${i} (audio duration: ${projectStore.audioBuffer?.duration?.toFixed(1)}s)...`);
-              try {
-                const segments = await Promise.race([
-                  GroqService.transcribeAudioBuffer(
-                    projectStore.audioBuffer,
-                    apiKey,
-                    'whisper-large-v3',
-                    undefined,
-                    (status, pct) => console.log(`Lyrics: ${status} (${pct}%)`),
-                    langSetting
-                  ),
-                  new Promise((_, reject) => setTimeout(() => reject(new Error('Lyrics timeout')), 240000))
-                ]);
-                if (segments && segments.length > 0) {
-                  projectStore.project.lyrics.segments = segments;
-                  projectStore.saveToDB();
-                  console.log(`Lyrics ready: ${segments.length} lines for render ${i}`);
-                  // Extra settle so segments are committed before export starts
-                  await new Promise(r => setTimeout(r, 500));
-                } else {
-                  console.warn(`No lyrics segments returned for render ${i}`);
-                }
-              } catch (e) {
-                console.warn('Lyrics generation failed or timed out, continuing without lyrics:', e);
+            projectStore.project.lyrics.segments = [];
+            console.log(`[Render ${i}] Generating lyrics FIRST (lang=${langSetting}, duration=${projectStore.audioBuffer.duration.toFixed(1)}s)...`);
+            try {
+              const segments = await Promise.race([
+                GroqService.transcribeAudioBuffer(
+                  projectStore.audioBuffer,
+                  apiKey,
+                  'whisper-large-v3',
+                  undefined,
+                  (status, pct) => console.log(`[Lyrics ${i}] ${status} (${pct}%)`),
+                  langSetting
+                ),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Lyrics timeout')), 300000))
+              ]);
+              if (segments && segments.length > 0) {
+                projectStore.project.lyrics.segments = segments;
+                await projectStore.saveToDB();
+                lyricsReady = true;
+                console.log(`[Render ${i}] Lyrics READY: ${segments.length} lines. Starting render now.`);
+                // Extra settle time so state is fully committed
+                await new Promise(r => setTimeout(r, 800));
+              } else {
+                console.warn(`[Render ${i}] Lyrics returned empty`);
               }
+            } catch (e) {
+              console.warn(`[Render ${i}] Lyrics generation failed:`, e);
             }
+          } else {
+            console.warn(`[Render ${i}] No API key or audioBuffer — skipping lyrics`);
           }
+        }
+
+        if (!lyricsReady) {
+          console.warn(`[Render ${i}] Proceeding without lyrics (generation failed or skipped)`);
         }
 
         // Tag current bulk index so exporter applies the correct overlay preset
         (projectStore.project as any)._bulkRenderIndex = i;
+        console.log(`[Render ${i}] Starting video export (lyrics ready: ${lyricsReady})`);
         exportedBlob = await videoExporter.startExport();
         if (exportedBlob) {
           // Custom download with suffix for bulk
