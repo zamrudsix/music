@@ -37,6 +37,7 @@
   let exportedBlob = $state<Blob | null>(null);
   let savedFilePath = $state<string | null>(null);
   let exportLyricsLanguage = $state(projectStore.project.lyrics?.config?.language || 'id');
+  let useLyrics = $state(true);
 
   let showModal = $state(false);
 
@@ -233,7 +234,7 @@
     try {
       // Force center + enabled + font size 50 for all bulk renders
       if (projectStore.project.lyrics?.config) {
-        projectStore.project.lyrics.config.enabled = true;
+        projectStore.project.lyrics.config.enabled = useLyrics;
         projectStore.project.lyrics.config.position = 'center';
         projectStore.project.lyrics.config.x = 0.5;
         projectStore.project.lyrics.config.y = 0.5;
@@ -304,7 +305,7 @@
 
         // === LYRICS MUST BE FULLY READY BEFORE RENDER STARTS ===
         let lyricsReady = false;
-        if (typeof localStorage !== 'undefined') {
+        if (useLyrics && typeof localStorage !== 'undefined') {
           const apiKey = localStorage.getItem('groq_api_key');
           if (apiKey && projectStore.audioBuffer) {
             projectStore.project.lyrics.segments = [];
@@ -740,7 +741,15 @@
               <div class="text-[9px] text-neutral-500">Jumlah video yang akan di-render sekaligus. Setiap render akan menerapkan acak (jika dicentang di panel Overlay/Backdrop/Playlist).</div>
             </div>
 
+            <!-- Use Lyrics Checkbox -->
+            <label class="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-900/40 border border-neutral-800 cursor-pointer text-[11px]">
+              <input type="checkbox" bind:checked={useLyrics} class="accent-cyan-500 w-4 h-4" />
+              <span class="text-neutral-200 font-medium">Pakai Lyrics</span>
+              <span class="text-neutral-500 text-[9px] ml-auto">Centang = generate lirik, kosongkan = tanpa lirik</span>
+            </label>
+
             <!-- Lyrics Language for Bulk -->
+            {#if useLyrics}
             <div class="p-3 rounded-xl bg-neutral-900/40 border border-neutral-800 space-y-2 text-[11px]">
               <div class="flex items-center justify-between">
                 <span class="text-neutral-300 font-medium">Bahasa Lirik (untuk semua render)</span>
@@ -759,6 +768,7 @@
               </div>
               <div class="text-[9px] text-neutral-500">Semua render massal akan generate lirik pakai bahasa ini. Jika playlist diacak, lirik digenerate ulang setiap render dengan bahasa yang sama.</div>
             </div>
+            {/if}
 
             <div class="flex items-center justify-between pt-1 border-t border-neutral-900 text-[11px]">
               <span class="text-neutral-500">Format Lainnya:</span>
