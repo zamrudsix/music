@@ -128,11 +128,15 @@
     try {
       const { invoke } = await import('@tauri-apps/api/core');
       const filePaths = await invoke<string[]>('select_media_folder', {
-        title: 'Pilih Folder Gambar/Video (Semua Gambar Terinput Otomatis)',
+        title: 'Pilih Folder (Acak) Gambar (Acak saat Render, Hemat Memori)',
       });
 
       if (filePaths && filePaths.length > 0) {
+        // Force lightweight: only store paths, backend will pick randomly on render
+        lightweightFolderMode = true;
+        (projectStore.project.background as any).folderPath = filePaths[0].replace(/[/\\][^/\\]+$/, '');
         await importMediaPaths(filePaths);
+        console.log(`[Backdrop] Folder mode: ${filePaths.length} images referenced (not loaded)`);
       }
     } catch (err: any) {
       alert('Gagal memilih folder: ' + err.message);
@@ -346,10 +350,10 @@
             onclick={handleNativePickFolder}
             disabled={isImporting}
             class="px-2 py-1 rounded-md bg-amber-500 hover:bg-amber-400 text-neutral-950 text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer shadow-sm shadow-amber-500/20"
-            title="Pilih satu folder (semua gambar/video di dalamnya langsung terinput otomatis)"
+            title="Pilih folder. Gambar tidak dimuat ke app, diacak oleh backend saat render."
           >
             <FolderPlus class="w-3 h-3" />
-            Pilih Folder
+            Pilih Folder (Acak)
           </button>
         {:else}
           <label class="px-2.5 py-1 rounded-md bg-cyan-500 hover:bg-cyan-400 text-neutral-950 text-[11px] font-semibold flex items-center gap-1 cursor-pointer transition-colors shadow-sm shadow-cyan-500/20">
