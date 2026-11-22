@@ -36,7 +36,9 @@ function applyRandomizations(project: any): any {
     // IMPORTANT: must be false so worker uses item.x / item.y instead of forcing center
     item.isFullScreen = false;
     item.fitMode = 'cover';
-    if (preset.mirror) {
+    // Alternate mirror: odd renders = normal (left), even renders = mirrored (right)
+    const shouldMirror = (bulkIndex % 2 === 0);
+    if (shouldMirror) {
       item.mirrorMode = 'immediate';
       item.mirrorEnabled = true;
     } else {
