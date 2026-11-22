@@ -836,7 +836,7 @@
                   if (!projectStore.project.exportSettings.keyframeIntervalSeconds) projectStore.project.exportSettings.keyframeIntervalSeconds = 2;
                   // Force high CBR bitrate based on resolution
                   const res = projectStore.project.exportSettings.resolution || '1280x720';
-                  projectStore.project.exportSettings.videoBitrate = res.includes('1920') || res.includes('1080') ? 14000000 : 8000000;
+                  projectStore.project.exportSettings.videoBitrate = res.includes('1920') || res.includes('1080') ? 3500000 : 1800000;
                   projectStore.saveToDB(); 
                 }} class={`flex-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold border cursor-pointer ${projectStore.project.exportSettings.bitrateMode === 'constant' ? 'border-yellow-500 bg-yellow-500/15 text-yellow-300' : 'border-neutral-800 text-neutral-400'}`}>CBR (Stabil / Live)</button>
               </div>
@@ -844,8 +844,8 @@
                 <div class="space-y-2 pt-1 border-t border-neutral-800/60">
                   <div class="text-[10px] text-neutral-400">Target CBR:</div>
                   <div class="flex gap-1.5 flex-wrap">
-                    <button type="button" onclick={() => { projectStore.updateExportResolution('1280x720'); projectStore.project.exportSettings.videoBitrate = 8000000; projectStore.project.exportSettings.audioBitrate = 160000; projectStore.saveToDB(); }} class="px-2 py-1 rounded text-[10px] border border-yellow-700/50 bg-yellow-950/30 text-yellow-300 hover:bg-yellow-900/40">720p (8 Mbps)</button>
-                    <button type="button" onclick={() => { projectStore.updateExportResolution('1920x1080'); projectStore.project.exportSettings.videoBitrate = 14000000; projectStore.project.exportSettings.audioBitrate = 160000; projectStore.saveToDB(); }} class="px-2 py-1 rounded text-[10px] border border-yellow-700/50 bg-yellow-950/30 text-yellow-300 hover:bg-yellow-900/40">1080p (14 Mbps)</button>
+                    <button type="button" onclick={() => { projectStore.updateExportResolution('1280x720'); projectStore.project.exportSettings.videoBitrate = 1800000; projectStore.project.exportSettings.audioBitrate = 160000; projectStore.saveToDB(); }} class="px-2 py-1 rounded text-[10px] border border-yellow-700/50 bg-yellow-950/30 text-yellow-300 hover:bg-yellow-900/40">720p (1.8 Mbps)</button>
+                    <button type="button" onclick={() => { projectStore.updateExportResolution('1920x1080'); projectStore.project.exportSettings.videoBitrate = 3500000; projectStore.project.exportSettings.audioBitrate = 160000; projectStore.saveToDB(); }} class="px-2 py-1 rounded text-[10px] border border-yellow-700/50 bg-yellow-950/30 text-yellow-300 hover:bg-yellow-900/40">1080p (3.5 Mbps)</button>
                   </div>
                   <div class="text-[9px] text-neutral-500">Pilih salah satu di atas → resolusi + bitrate CBR otomatis diset.</div>
                   <div class="flex items-center gap-2 text-[10px]">
