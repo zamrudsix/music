@@ -26,11 +26,16 @@
   let isSyncing = $state(false);
   let syncSuccessCount = $state<number | null>(null);
 
+  let lightweightFolderMode = $state(true);
+
   async function importMediaPaths(filePaths: string[]) {
     if (!filePaths || filePaths.length === 0) return;
 
     isImporting = true;
     importProgress = { current: 0, total: filePaths.length };
+
+    // Lightweight mode: only store paths, do not preload images into memory
+    const useLightweight = lightweightFolderMode || filePaths.length > 200;
 
     // Auto-switch to multi-image if multiple files are selected or items already exist
     if (filePaths.length > 1 || projectStore.project.background.items.length > 0) {
@@ -75,15 +80,7 @@
       if (!isMulti) break;
     }
 
-    // Immediately load first 2 items so preview canvas is live right away
-    if (newItems[0]) {
-      await backgroundManager.loadAsset(newItems[0]).catch(() => {});
-    }
-    if (newItems[1]) {
-      await backgroundManager.loadAsset(newItems[1]).catch(() => {});
-    }
-
-    // Atomic update to avoid 260 UI thrashing cycles
+    // Atomic update (always store items, even in lightweight mode)
     if (!isMulti) {
       projectStore.project.background.items = newItems;
     } else {
@@ -94,12 +91,16 @@
     isImporting = false;
     importProgress = null;
 
-    // Background preload all items asynchronously so upcoming slideshow items are ready in advance
-    setTimeout(() => {
-      newItems.forEach((it) => {
-        backgroundManager.ensureAssetLoaded(it);
-      });
-    }, 100);
+    // Only preload if not in lightweight mode
+    if (!useLightweight) {
+      if (newItems[0]) await backgroundManager.loadAsset(newItems[0]).catch(() => {});
+      if (newItems[1]) await backgroundManager.loadAsset(newItems[1]).catch(() => {});
+      setTimeout(() => {
+        newItems.forEach((it) => backgroundManager.ensureAssetLoaded(it));
+      }, 100);
+    } else {
+      console.log(`[Backdrop] Lightweight mode: stored ${newItems.length} paths only (no preload)`);
+    }
   }
 
   async function handleNativePickFiles() {
@@ -272,6 +273,12 @@
       />
     </label>
     <div class="text-[9px] text-neutral-500 mt-1">Jika dicentang, setiap render akan mengacak urutan gambar backdrop (tidak ada yang sama urutannya).</div>
+
+    <label class="flex items-center justify-between cursor-pointer mt-2">
+      <span class="text-neutral-300 text-[11px]">Mode Folder Hemat Memori (>200 gambar)</span>
+      <input type="checkbox" bind:checked={lightweightFolderMode} class="accent-cyan-500" />
+    </label>
+    <div class="text-[9px] text-neutral-500 mt-0.5">Aktifkan agar app tidak lemot. Gambar hanya disimpan sebagai path, dimuat saat render (cocok dengan opsi acak).</div>
   </div>
 
   <div>
