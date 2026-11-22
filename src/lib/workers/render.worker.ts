@@ -681,7 +681,7 @@ self.onmessage = async (e: MessageEvent<RenderRequest | { type: 'CANCEL' }>) => 
       codec: configuredCodec,
       width,
       height,
-      bitrate: videoBitrate || defaultBitrate,
+      bitrate: Math.max(videoBitrate || 0, defaultBitrate),
       bitrateMode: project.exportSettings.bitrateMode === 'constant' ? 'constant' : 'variable',
       framerate: fps,
       hardwareAcceleration: 'prefer-hardware',

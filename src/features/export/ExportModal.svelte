@@ -831,7 +831,14 @@
               </div>
               <div class="flex gap-2 mb-2">
                 <button type="button" onclick={() => { projectStore.project.exportSettings.bitrateMode = 'variable'; projectStore.saveToDB(); }} class={`flex-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold border cursor-pointer ${projectStore.project.exportSettings.bitrateMode !== 'constant' ? 'border-cyan-500 bg-cyan-500/15 text-cyan-300' : 'border-neutral-800 text-neutral-400'}`}>Standard (VBR)</button>
-                <button type="button" onclick={() => { projectStore.project.exportSettings.bitrateMode = 'constant'; if (!projectStore.project.exportSettings.keyframeIntervalSeconds) projectStore.project.exportSettings.keyframeIntervalSeconds = 2; projectStore.saveToDB(); }} class={`flex-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold border cursor-pointer ${projectStore.project.exportSettings.bitrateMode === 'constant' ? 'border-yellow-500 bg-yellow-500/15 text-yellow-300' : 'border-neutral-800 text-neutral-400'}`}>CBR (Stabil / Live)</button>
+                <button type="button" onclick={() => { 
+                  projectStore.project.exportSettings.bitrateMode = 'constant'; 
+                  if (!projectStore.project.exportSettings.keyframeIntervalSeconds) projectStore.project.exportSettings.keyframeIntervalSeconds = 2;
+                  // Force high CBR bitrate based on resolution
+                  const res = projectStore.project.exportSettings.resolution || '1280x720';
+                  projectStore.project.exportSettings.videoBitrate = res.includes('1920') || res.includes('1080') ? 14000000 : 8000000;
+                  projectStore.saveToDB(); 
+                }} class={`flex-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold border cursor-pointer ${projectStore.project.exportSettings.bitrateMode === 'constant' ? 'border-yellow-500 bg-yellow-500/15 text-yellow-300' : 'border-neutral-800 text-neutral-400'}`}>CBR (Stabil / Live)</button>
               </div>
               {#if projectStore.project.exportSettings.bitrateMode === 'constant'}
                 <div class="space-y-2 pt-1 border-t border-neutral-800/60">

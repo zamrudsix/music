@@ -48,25 +48,23 @@ function applyRandomizations(project: any): any {
   if (p.overlays?.videos) p.overlays.videos.forEach(applyPreset);
   console.log(`[Export] Applied overlay preset for render ${bulkIndex}:`, preset);
 
-  // Shuffle backdrop images. If full path list exists, pick random from entire folder.
+  // Use ALL images from the folder (allFilePaths). Shuffle them so order is random.
   const allPaths = (p.background as any)?.allFilePaths as string[] | undefined;
-  if (allPaths && allPaths.length > 5) {
+  if (allPaths && allPaths.length > 0) {
     const shuffled = [...allPaths];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    const pickCount = Math.min(40, shuffled.length);
-    const pick = shuffled.slice(0, pickCount);
-    p.background.items = pick.map((fp, idx) => ({
-      id: `bg-rand-${Date.now()}-${idx}`,
+    p.background.items = shuffled.map((fp, idx) => ({
+      id: `bg-folder-${Date.now()}-${idx}`,
       name: fp.split(/[/\\]/).pop() || `img-${idx}`,
       type: 'image' as const,
       url: '',
       filePath: fp,
       duration: 5.0,
     }));
-    console.log(`[Export] Backdrop: randomly picked ${pickCount} images from ${allPaths.length} in folder`);
+    console.log(`[Export] Backdrop: using ALL ${shuffled.length} images from folder (shuffled)`);
   } else if (settings.randomizeBackdrop && p.background?.items && p.background.items.length > 1) {
     const items = p.background.items;
     for (let i = items.length - 1; i > 0; i--) {
@@ -410,6 +408,21 @@ export class VideoExporter {
       // Send payload to worker (with optional randomizations applied)
       const projectSnapshot = $state.snapshot(projectStore.project);
       const projectToRender = applyRandomizations(projectSnapshot);
+
+      // Ensure all backdrop images have a loadable url (especially folder-mode items that only have filePath)
+      if (projectToRender.background?.items) {
+        for (const item of projectToRender.background.items) {
+          if (item.type === 'image' && !item.url && item.filePath) {
+            try {
+              await backgroundManager.loadAsset(item as any);
+              // loadAsset sets item.url via reloadAssetFromDisk
+            } catch (e) {
+              console.warn('[Export] Failed to load backdrop image:', item.filePath, e);
+            }
+          }
+        }
+      }
+
       this.worker.postMessage({
         type: 'START_RENDER',
         project: projectToRender,
