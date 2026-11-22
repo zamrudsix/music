@@ -677,16 +677,20 @@ self.onmessage = async (e: MessageEvent<RenderRequest | { type: 'CANCEL' }>) => 
     // WebCodecs VideoEncoder: Set latencyMode to 'quality' on ALL platforms (Mac & Windows).
     // CRITICAL: On Windows Media Foundation, 'realtime' clamps encoder pacing to display refresh rate (60 FPS).
     // Using 'quality' enables full unconstrained offline hardware transcode speed (7x-12x+).
+    const useCBR = project.exportSettings.bitrateMode === 'constant';
+    const targetBitrate = Math.max(videoBitrate || 0, defaultBitrate);
     videoEncoder.configure({
       codec: configuredCodec,
       width,
       height,
-      bitrate: Math.max(videoBitrate || 0, defaultBitrate),
-      bitrateMode: project.exportSettings.bitrateMode === 'constant' ? 'constant' : 'variable',
+      bitrate: targetBitrate,
+      bitrateMode: useCBR ? 'constant' : 'variable',
       framerate: fps,
-      hardwareAcceleration: 'prefer-hardware',
+      // Software encoder respects CBR better than Windows hardware Media Foundation
+      hardwareAcceleration: useCBR ? 'prefer-software' : 'prefer-hardware',
       latencyMode: 'quality',
     } as any);
+    console.log(`[Encoder] mode=${useCBR ? 'CBR' : 'VBR'} bitrate=${(targetBitrate/1_000_000).toFixed(1)}Mbps accel=${useCBR ? 'software' : 'hardware'}`);
 
     // Setup zero-latency ondequeue backpressure to prevent VRAM overflow while keeping pipeline saturated
     let queueDrainResolver: (() => void) | null = null;
