@@ -245,20 +245,38 @@
       for (let i = 1; i <= bulk; i++) {
         console.log(`Starting bulk render ${i}/${bulk}`);
 
-        // Always ensure audio matches current track order before this render
-        if (shouldRandomizePlaylist && i > 1) {
-          console.log('Shuffling playlist for next bulk render...');
-          const tracks = projectStore.project.audio.tracks;
-          for (let k = tracks.length - 1; k > 0; k--) {
-            const j = Math.floor(Math.random() * (k + 1));
-            [tracks[k], tracks[j]] = [tracks[j], tracks[k]];
-          }
+        // Save original full track list once
+        if (!(projectStore.project as any)._originalTracksBackup) {
+          (projectStore.project as any)._originalTracksBackup = [...(projectStore.project.audio.tracks || [])];
         }
-        // Rebuild merged audio for every render (especially important for render 1 after playlist change)
+        const fullTracks = (projectStore.project as any)._originalTracksBackup as any[];
+
+        if (fullTracks && fullTracks.length > 0) {
+          const minSongs = 6;
+          const maxSongs = fullTracks.length;
+          const actualMin = Math.min(minSongs, maxSongs);
+          let count = actualMin + Math.floor(Math.random() * (maxSongs - actualMin + 1));
+          // Avoid same count as previous render when possible
+          const prevCount = (projectStore.project as any)._lastRenderSongCount;
+          if (prevCount && count === prevCount && maxSongs > actualMin) {
+            count = count === maxSongs ? Math.max(actualMin, count - 1) : Math.min(maxSongs, count + 1);
+          }
+          (projectStore.project as any)._lastRenderSongCount = count;
+
+          // Shuffle and take subset
+          const shuffled = [...fullTracks];
+          for (let k = shuffled.length - 1; k > 0; k--) {
+            const j = Math.floor(Math.random() * (k + 1));
+            [shuffled[k], shuffled[j]] = [shuffled[j], shuffled[k]];
+          }
+          projectStore.project.audio.tracks = shuffled.slice(0, count);
+          console.log(`Render ${i}: using ${count}/${maxSongs} songs (random subset + shuffle)`);
+        }
+
+        // Rebuild merged audio for every render
         console.log(`Rebuilding audio for render ${i}...`);
         await projectStore.rebuildMergedAudio();
         projectStore.saveToDB();
-        // Small settle time so state is consistent
         await new Promise(r => setTimeout(r, 300));
 
 
@@ -334,6 +352,16 @@
         }
         // Small delay between renders to let GC settle
         if (i < bulk) await new Promise(r => setTimeout(r, 1000));
+      }
+
+      // Restore original playlist after all bulk renders
+      if ((projectStore.project as any)._originalTracksBackup) {
+        projectStore.project.audio.tracks = (projectStore.project as any)._originalTracksBackup;
+        delete (projectStore.project as any)._originalTracksBackup;
+        delete (projectStore.project as any)._lastRenderSongCount;
+        await projectStore.rebuildMergedAudio();
+        projectStore.saveToDB();
+        console.log('Restored original playlist');
       }
     } catch (err: any) {
       console.error('Export error caught:', err);
