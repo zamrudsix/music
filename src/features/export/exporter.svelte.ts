@@ -15,14 +15,10 @@ function applyRandomizations(project: any): any {
 
   // Varied overlay presets per bulk render index (1-based). Does not simply repeat.
   const overlayPresets = [
-    { x: 0.83, y: 0.52, scale: 4.10, opacity: 0.35, mirror: false }, // 1
-    { x: 0.27, y: 1.00, scale: 4.10, opacity: 0.35, mirror: false }, // 2
-    { x: 0.40, y: 0.27, scale: 4.10, opacity: 0.35, mirror: true  }, // 3 - mirrored
-    { x: 0.65, y: 0.75, scale: 4.60, opacity: 0.35, mirror: false }, // 4 - higher scale, different pos
-    { x: 0.15, y: 0.40, scale: 3.80, opacity: 0.40, mirror: true  }, // 5
-    { x: 0.90, y: 0.20, scale: 5.00, opacity: 0.30, mirror: false }, // 6
-    { x: 0.50, y: 0.85, scale: 4.30, opacity: 0.35, mirror: true  }, // 7
-    { x: 0.30, y: 0.15, scale: 4.80, opacity: 0.38, mirror: false }, // 8
+    { x: 0.5, y: 0.00, mirror: false }, // render 1: Y 0%
+    { x: 0.5, y: 1.00, mirror: false }, // render 2: Y 100%
+    { x: 0.5, y: 0.00, mirror: true  }, // render 3: mirror + Y 0%
+    { x: 0.5, y: 1.00, mirror: true  }, // render 4: mirror + Y 100%
   ];
   const bulkIndex = (p as any)._bulkRenderIndex || 1;
   const preset = overlayPresets[(bulkIndex - 1) % overlayPresets.length];
@@ -31,17 +27,14 @@ function applyRandomizations(project: any): any {
     if (!item) return;
     item.x = preset.x;
     item.y = preset.y;
-    item.scale = preset.scale;
-    item.opacity = preset.opacity;
-    // IMPORTANT: must be false so worker uses item.x / item.y instead of forcing center
-    item.isFullScreen = false;
+    item.scale = 4.0; // large scale for full coverage
+    item.opacity = item.opacity ?? 0.35;
+    // Full screen
+    item.isFullScreen = false; // false so Y position is respected
     item.fitMode = 'cover';
-    // Set overlay video speed to 0.80
     item.playbackRate = 0.80;
 
-    // Alternate mirror: odd renders = normal (left), even renders = mirrored (right)
-    const shouldMirror = (bulkIndex % 2 === 0);
-    if (shouldMirror) {
+    if (preset.mirror) {
       item.mirrorMode = 'immediate';
       item.mirrorEnabled = true;
     } else {
