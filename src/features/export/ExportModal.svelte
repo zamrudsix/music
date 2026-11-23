@@ -38,6 +38,8 @@
   let savedFilePath = $state<string | null>(null);
   let exportLyricsLanguage = $state(projectStore.project.lyrics?.config?.language || 'id');
   let useLyrics = $state(true);
+  let overlayOpacityPercent = $state(35);
+  let backgroundBrightnessPercent = $state(100);
 
   let showModal = $state(false);
 
@@ -232,6 +234,11 @@
     const shouldRandomizePlaylist = bulk > 1 && (projectStore.project.audio.tracks?.length || 0) > 1;
 
     try {
+      // Apply background brightness from export setting
+      if (projectStore.project.background) {
+        projectStore.project.background.brightness = backgroundBrightnessPercent / 100;
+      }
+
       // Force center + enabled + font size 50 for all bulk renders
       if (projectStore.project.lyrics?.config) {
         projectStore.project.lyrics.config.enabled = useLyrics;
@@ -293,7 +300,7 @@
           item.x = preset.x;
           item.y = preset.y;
           item.scale = preset.scale;
-          item.opacity = preset.opacity;
+          item.opacity = overlayOpacityPercent / 100;
         };
         if (projectStore.project.overlays?.images) {
           projectStore.project.overlays.images.forEach(applyPreset);
@@ -739,6 +746,40 @@
                 />
               </div>
               <div class="text-[9px] text-neutral-500">Jumlah video yang akan di-render sekaligus. Setiap render akan menerapkan acak (jika dicentang di panel Overlay/Backdrop/Playlist).</div>
+            </div>
+
+            <!-- Background Brightness -->
+            <div class="p-3 rounded-xl bg-neutral-900/40 border border-neutral-800 space-y-2 text-[11px]">
+              <div class="flex items-center justify-between">
+                <span class="text-neutral-300 font-medium">Background Brightness</span>
+                <span class="text-cyan-400 font-mono">{backgroundBrightnessPercent}%</span>
+              </div>
+              <input 
+                type="range" 
+                min="20" 
+                max="200" 
+                step="5" 
+                bind:value={backgroundBrightnessPercent}
+                class="w-full accent-cyan-500 cursor-pointer"
+              />
+              <div class="text-[9px] text-neutral-500">Atur kecerahan backdrop saat render (20% gelap - 200% terang). 100% = normal.</div>
+            </div>
+
+            <!-- Overlay Opacity -->
+            <div class="p-3 rounded-xl bg-neutral-900/40 border border-neutral-800 space-y-2 text-[11px]">
+              <div class="flex items-center justify-between">
+                <span class="text-neutral-300 font-medium">Opacity Video Overlay</span>
+                <span class="text-cyan-400 font-mono">{overlayOpacityPercent}%</span>
+              </div>
+              <input 
+                type="range" 
+                min="5" 
+                max="100" 
+                step="5" 
+                bind:value={overlayOpacityPercent}
+                class="w-full accent-cyan-500 cursor-pointer"
+              />
+              <div class="text-[9px] text-neutral-500">Atur transparansi overlay video saat render (5% - 100%).</div>
             </div>
 
             <!-- Use Lyrics Checkbox -->

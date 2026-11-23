@@ -7,6 +7,7 @@
   import { Video, UploadCloud, Plus, Trash2, Maximize } from '@lucide/svelte';
 
   let splitOverlayGrid = $state(false);
+  let splitVideoGrid = $state(false);
 
   async function splitImageTo4(file: File): Promise<ImageOverlayItem[] | null> {
     try {
@@ -223,6 +224,10 @@
         <Video class="w-3.5 h-3.5 text-cyan-400" />
         Video Overlays ({projectStore.project.overlays.videos?.length || 0})
       </span>
+      <label class="flex items-center gap-1.5 text-[10px] text-neutral-400 mr-2">
+        <input type="checkbox" bind:checked={splitVideoGrid} class="accent-cyan-500" />
+        Pecah Grid 2x2
+      </label>
       <label class="px-2 py-1 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[11px] font-medium flex items-center gap-1 cursor-pointer hover:bg-cyan-500/20 transition-colors">
         <Plus class="w-3 h-3" />
         Add Video
