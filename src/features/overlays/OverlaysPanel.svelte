@@ -6,12 +6,81 @@
   import type { ImageOverlayItem, VideoOverlayItem } from '../../lib/types/project';
   import { Video, UploadCloud, Plus, Trash2, Maximize } from '@lucide/svelte';
 
+  let splitOverlayGrid = $state(false);
+
+  async function splitImageTo4(file: File): Promise<ImageOverlayItem[] | null> {
+    try {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+      const w = img.naturalWidth;
+      const h = img.naturalHeight;
+      const ratio = w / h;
+      if (ratio < 1.5 || ratio > 2.2 || w < 600) {
+        URL.revokeObjectURL(url);
+        return null;
+      }
+      const halfW = Math.floor(w / 2);
+      const halfH = Math.floor(h / 2);
+      const mX = Math.floor(halfW * 0.025);
+      const mY = Math.floor(halfH * 0.035);
+      const quads = [
+        [mX, mY, halfW - mX, halfH - mY],
+        [halfW + mX, mY, w - mX, halfH - mY],
+        [mX, halfH + mY, halfW - mX, h - mY],
+        [halfW + mX, halfH + mY, w - mX, h - mY],
+      ];
+      const items: ImageOverlayItem[] = [];
+      for (let i = 0; i < 4; i++) {
+        const [x1, y1, x2, y2] = quads[i];
+        const c = document.createElement('canvas');
+        c.width = x2 - x1;
+        c.height = y2 - y1;
+        const ctx = c.getContext('2d')!;
+        ctx.drawImage(img, x1, y1, c.width, c.height, 0, 0, c.width, c.height);
+        const dataUrl = c.toDataURL('image/jpeg', 0.9);
+        const id = 'overlay-split-' + Math.random().toString(36).substring(2, 9);
+        items.push({
+          id,
+          name: file.name.replace(/\.[^.]+$/, '') + `_${i+1}.jpg`,
+          url: dataUrl,
+          x: 0.5,
+          y: 0.5,
+          scale: 0.5,
+          opacity: 1.0,
+          blendMode: 'source-over',
+          rotation: 0,
+          animation: 'none',
+          followBeat: false,
+          beatSensitivity: 1.0,
+        });
+      }
+      URL.revokeObjectURL(url);
+      return items;
+    } catch {
+      return null;
+    }
+  }
+
   async function handleImageOverlayUpload(e: Event) {
     const target = e.target as HTMLInputElement;
     if (!target.files || target.files.length === 0) return;
 
     for (let i = 0; i < target.files.length; i++) {
       const file = target.files[i];
+
+      // If split checkbox is on, try to split 2x2 grid
+      if (splitOverlayGrid) {
+        const splitItems = await splitImageTo4(file);
+        if (splitItems && splitItems.length === 4) {
+          for (const si of splitItems) {
+            await imageOverlayManager.preloadImage(si);
+            projectStore.project.overlays.images.push(si);
+          }
+          continue;
+        }
+      }
+
       const id = 'overlay-' + Math.random().toString(36).substring(2, 9);
       const url = URL.createObjectURL(file);
 
@@ -498,6 +567,10 @@
         <UploadCloud class="w-3.5 h-3.5 text-cyan-400" />
         Image Overlays ({projectStore.project.overlays.images.length})
       </span>
+      <label class="flex items-center gap-1.5 text-[10px] text-neutral-400 mr-2">
+        <input type="checkbox" bind:checked={splitOverlayGrid} class="accent-cyan-500" />
+        Pecah Grid 2x2
+      </label>
       <label class="px-2 py-1 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[11px] font-medium flex items-center gap-1 cursor-pointer hover:bg-cyan-500/20 transition-colors">
         <Plus class="w-3 h-3" />
         Add Image
