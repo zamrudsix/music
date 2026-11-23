@@ -36,6 +36,9 @@ function applyRandomizations(project: any): any {
     // IMPORTANT: must be false so worker uses item.x / item.y instead of forcing center
     item.isFullScreen = false;
     item.fitMode = 'cover';
+    // Set overlay video speed to 0.80
+    item.playbackRate = 0.80;
+
     // Alternate mirror: odd renders = normal (left), even renders = mirrored (right)
     const shouldMirror = (bulkIndex % 2 === 0);
     if (shouldMirror) {

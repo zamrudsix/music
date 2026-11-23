@@ -1373,7 +1373,8 @@ async function drawSingleBgItem(
     if (decoder) {
       try {
         const vidDur = decoder.duration || 10;
-        const videoTime = currentTime % vidDur;
+        const rate = item.playbackRate ?? 1.0;
+        const videoTime = (currentTime * rate) % vidDur;
         const sample = await decoder.getSampleForTime(videoTime);
         if (sample) {
           sourceCanvas = sample.toCanvasImageSource();
@@ -1390,7 +1391,8 @@ async function drawSingleBgItem(
       const frames = videoFramesMap[item.id];
       if (frames && frames.length > 0) {
         const vidDur = videoDurationsMap[item.id] || 15;
-        const progressInVid = (currentTime % vidDur) / vidDur;
+        const rate = item.playbackRate ?? 1.0;
+        const progressInVid = ((currentTime * rate) % vidDur) / vidDur;
         const frameIdx = Math.min(frames.length - 1, Math.floor(progressInVid * frames.length));
         sourceCanvas = frames[frameIdx];
         natW = (sourceCanvas as ImageBitmap).width;

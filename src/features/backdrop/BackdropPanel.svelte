@@ -151,6 +151,76 @@
     }
   }
 
+
+  async function handleSplitGridImage() {
+    if (!isDesktop()) return;
+    try {
+      const { invoke } = await import('@tauri-apps/api/core');
+      const filePaths = await invoke<string[]>('select_media_files', {
+        title: 'Pilih Gambar Grid 2x2 untuk Dipecah',
+        filterName: 'Images',
+        extensions: ['jpg', 'jpeg', 'png', 'webp'],
+        multiple: false,
+      });
+      if (!filePaths || filePaths.length === 0) return;
+
+      const srcPath = filePaths[0];
+      // Read image via canvas
+      const bytes = await invoke<number[]>('read_media_file', { path: srcPath });
+      const blob = new Blob([new Uint8Array(bytes)], { type: 'image/png' });
+      const imgUrl = URL.createObjectURL(blob);
+
+      const img = new Image();
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = imgUrl; });
+
+      const w = img.naturalWidth;
+      const h = img.naturalHeight;
+      const halfW = Math.floor(w / 2);
+      const halfH = Math.floor(h / 2);
+      const marginX = Math.floor(halfW * 0.03);
+      const marginY = Math.floor(halfH * 0.04);
+
+      const quads = [
+        [marginX, marginY, halfW - marginX, halfH - marginY],
+        [halfW + marginX, marginY, w - marginX, halfH - marginY],
+        [marginX, halfH + marginY, halfW - marginX, h - marginY],
+        [halfW + marginX, halfH + marginY, w - marginX, h - marginY],
+      ];
+
+      const newItems: any[] = [];
+      for (let i = 0; i < 4; i++) {
+        const [x1, y1, x2, y2] = quads[i];
+        const canvas = document.createElement('canvas');
+        canvas.width = x2 - x1;
+        canvas.height = y2 - y1;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, x1, y1, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        const id = `bg-split-${Date.now()}-${i}`;
+        newItems.push({
+          id,
+          name: `split_${i + 1}.jpg`,
+          type: 'image',
+          url: dataUrl,
+          duration: 5.0,
+        });
+      }
+      URL.revokeObjectURL(imgUrl);
+
+      if (!projectStore.project.background.type.startsWith('multi')) {
+        projectStore.project.background.type = 'multi-image';
+      }
+      projectStore.project.background.items = [
+        ...projectStore.project.background.items,
+        ...newItems,
+      ];
+      await projectStore.saveToDB();
+      alert('Gambar grid berhasil dipecah menjadi 4 backdrop.');
+    } catch (e: any) {
+      alert('Gagal memecah gambar: ' + e.message);
+    }
+  }
+
   async function handleBackgroundUpload(e: Event) {
     const target = e.target as HTMLInputElement;
     if (!target.files || target.files.length === 0) return;
@@ -362,6 +432,15 @@
           >
             <FolderPlus class="w-3 h-3" />
             Pilih Folder (Acak)
+          </button>
+          <button
+            type="button"
+            onclick={handleSplitGridImage}
+            disabled={isImporting}
+            class="px-2 py-1 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+            title="Pecah gambar grid 2x2 menjadi 4 backdrop terpisah"
+          >
+            Pecah Grid 2x2
           </button>
         {:else}
           <label class="px-2.5 py-1 rounded-md bg-cyan-500 hover:bg-cyan-400 text-neutral-950 text-[11px] font-semibold flex items-center gap-1 cursor-pointer transition-colors shadow-sm shadow-cyan-500/20">
