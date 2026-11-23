@@ -53,9 +53,10 @@ function applyRandomizations(project: any): any {
   if (p.overlays?.videos) p.overlays.videos.forEach(applyPreset);
   console.log(`[Export] Applied overlay preset for render ${bulkIndex}:`, preset);
 
-  // Use ALL images from the folder (allFilePaths). Shuffle them so order is random.
+  // Use ALL images from the folder (allFilePaths) ONLY if items were not already split
   const allPaths = (p.background as any)?.allFilePaths as string[] | undefined;
-  if (allPaths && allPaths.length > 0) {
+  const alreadySplit = p.background?.items?.some((it: any) => it.url && it.url.startsWith('data:'));
+  if (allPaths && allPaths.length > 0 && !alreadySplit) {
     const shuffled = [...allPaths];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));

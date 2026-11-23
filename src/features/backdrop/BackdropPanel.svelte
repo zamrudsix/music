@@ -42,7 +42,7 @@
       const h = img.naturalHeight;
       const ratio = w / h;
       // Detect typical 2x2 grid (landscape collage, ratio ~1.6-2.1)
-      if (ratio < 1.5 || ratio > 2.2 || w < 800) {
+      if (ratio < 1.4 || ratio > 2.4 || w < 600) {
         URL.revokeObjectURL(imgUrl);
         return null;
       }
