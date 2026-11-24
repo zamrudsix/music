@@ -38,6 +38,7 @@
   let savedFilePath = $state<string | null>(null);
   let exportLyricsLanguage = $state(projectStore.project.lyrics?.config?.language || 'id');
   let useLyrics = $state(true);
+  let useManualSettings = $state(false);
   let overlayOpacityPercent = $state(35);
   let backgroundBrightnessPercent = $state(100);
 
@@ -259,7 +260,7 @@
         }
         const fullTracks = (projectStore.project as any)._originalTracksBackup as any[];
 
-        if (fullTracks && fullTracks.length > 0) {
+        if (!useManualSettings && fullTracks && fullTracks.length > 0) {
           const minSongs = 6;
           const maxSongs = fullTracks.length;
           const actualMin = Math.min(minSongs, maxSongs);
@@ -288,7 +289,8 @@
         await new Promise(r => setTimeout(r, 300));
 
 
-        // Apply specific overlay positions per bulk render index
+        // Apply specific overlay positions per bulk render index (skip if manual)
+        if (!useManualSettings) {
         const overlayPresets = [
           { x: 0.83, y: 0.52, scale: 4.10, opacity: 0.35 }, // render 1
           { x: 0.27, y: 1.00, scale: 4.10, opacity: 0.35 }, // render 2
@@ -309,6 +311,7 @@
           projectStore.project.overlays.videos.forEach(applyPreset);
         }
         console.log(`Overlay preset for render ${i}:`, preset);
+        }
 
         // === LYRICS MUST BE FULLY READY BEFORE RENDER STARTS ===
         let lyricsReady = false;
@@ -353,6 +356,7 @@
 
         // Tag current bulk index so exporter applies the correct overlay preset
         (projectStore.project as any)._bulkRenderIndex = i;
+        (projectStore.project as any)._useManualSettings = useManualSettings;
         console.log(`[Render ${i}] Starting video export (lyrics ready: ${lyricsReady})`);
         exportedBlob = await videoExporter.startExport();
         if (exportedBlob) {
@@ -781,6 +785,15 @@
               />
               <div class="text-[9px] text-neutral-500">Atur transparansi overlay video saat render (5% - 100%).</div>
             </div>
+
+            <!-- Manual Settings Checkbox -->
+            <label class="flex items-center gap-2.5 p-3 rounded-xl bg-amber-950/30 border border-amber-700/40 cursor-pointer text-[11px]">
+              <input type="checkbox" bind:checked={useManualSettings} class="accent-amber-500 w-4 h-4" />
+              <div>
+                <span class="text-amber-200 font-medium">Gunakan Settingan Manual</span>
+                <div class="text-[9px] text-neutral-500 mt-0.5">Kalau dicentang, fitur acak (playlist, overlay, backdrop) dimatikan. Render memakai posisi, scale, dan settingan yang sudah kamu atur sendiri.</div>
+              </div>
+            </label>
 
             <!-- Use Lyrics Checkbox -->
             <label class="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-900/40 border border-neutral-800 cursor-pointer text-[11px]">

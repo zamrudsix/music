@@ -13,6 +13,12 @@ function applyRandomizations(project: any): any {
   const p = JSON.parse(JSON.stringify(project)); // deep clone
   const settings = p.exportSettings || {};
 
+  // If manual settings mode, skip all automatic randomizations
+  if ((p as any)._useManualSettings) {
+    console.log('[Export] Manual settings mode — skipping all randomizations');
+    return p;
+  }
+
   // Varied overlay presets per bulk render index (1-based). Does not simply repeat.
   const overlayPresets = [
     { x: 0.5, y: 0.00, mirror: false }, // render 1: Y 0%
