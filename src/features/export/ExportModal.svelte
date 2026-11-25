@@ -317,7 +317,12 @@
         let lyricsReady = false;
         if (useLyrics && typeof localStorage !== 'undefined') {
           const apiKey = localStorage.getItem('groq_api_key');
-          if (apiKey && projectStore.audioBuffer) {
+          const existing = projectStore.project.lyrics?.segments?.length || 0;
+          // In manual mode, skip generation if lyrics already exist
+          if (useManualSettings && existing > 0) {
+            console.log(`[Render ${i}] Manual mode + lyrics already exist (${existing} lines) — skipping generation`);
+            lyricsReady = true;
+          } else if (apiKey && projectStore.audioBuffer) {
             projectStore.project.lyrics.segments = [];
             console.log(`[Render ${i}] Generating lyrics FIRST (lang=${langSetting}, duration=${projectStore.audioBuffer.duration.toFixed(1)}s)...`);
             try {

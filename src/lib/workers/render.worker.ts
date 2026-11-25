@@ -686,8 +686,9 @@ self.onmessage = async (e: MessageEvent<RenderRequest | { type: 'CANCEL' }>) => 
       bitrate: videoBitrate || defaultBitrate,
       bitrateMode: useCBR ? 'constant' : 'variable',
       framerate: fps,
-      hardwareAcceleration: 'prefer-hardware',
-      latencyMode: 'quality',
+      // prefer-software reduces GPU coil whine / stress
+      hardwareAcceleration: 'prefer-software',
+      latencyMode: 'realtime',
     } as any);
     console.log(`[Encoder] mode=${useCBR ? 'CBR' : 'VBR'} bitrate=${((videoBitrate || defaultBitrate)/1_000_000).toFixed(1)}Mbps`);
 
